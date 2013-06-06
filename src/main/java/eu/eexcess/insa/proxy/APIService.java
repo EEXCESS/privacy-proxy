@@ -9,7 +9,7 @@ import eu.eexcess.insa.proxy.actions.PrepareResponse;
  * Hello world!
  *
  */
-public class App 
+public class APIService 
 {
     public static void main( String[] args )
     {
@@ -21,10 +21,10 @@ public class App
 			
 			@Override
 			public void configure() throws Exception {
-				from("jetty:http://localhost:8888/eexcess/recommend")
+				from("jetty:http://localhost:8888/v0/eexcess/recommend")
 					.process(prepReq)
-					// .to("https://api.econbiz.de/v1/search")
-					.process(prepRes);
+					.to("http://www.google.com/");
+//					.process(prepRes);
 			}
 		});
     	try {
