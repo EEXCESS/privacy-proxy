@@ -8,7 +8,7 @@ public class PrepareResponse implements Processor {
 
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
-		
+		in.setHeader("Content-Type","text/html");
 		in.setBody("<ul><li>toto</li><li>titi</li></ul>");
 	}
 

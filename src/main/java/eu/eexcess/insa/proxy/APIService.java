@@ -22,9 +22,11 @@ public class APIService
 			@Override
 			public void configure() throws Exception {
 				from("jetty:http://localhost:8888/v0/eexcess/recommend")
+					.removeHeaders("CamelHttp*")
 					.process(prepReq)
-					.to("http://www.google.com/");
-//					.process(prepRes);
+//					.to("http4://www.google.com/search")
+					.process(prepRes)
+				;
 			}
 		});
     	try {
