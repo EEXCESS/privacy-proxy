@@ -13,7 +13,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   	<spring.version>3.0.7.RELEASE</spring.version>
-  	<camel.version>2.10.3</camel.version>
+  	<camel.version>2.11.0</camel.version>
   </properties>
 
  
@@ -35,6 +35,12 @@
     <dependency>
 		<groupId>org.apache.camel</groupId>
 		<artifactId>camel-spring</artifactId>
+		<version>${camel.version}</version>
+	</dependency>
+
+    <dependency>
+		<groupId>org.apache.camel</groupId>
+		<artifactId>camel-spring-integration</artifactId>
 		<version>${camel.version}</version>
 	</dependency>
 
@@ -66,6 +72,12 @@
 	<dependency>
 		<groupId>org.springframework</groupId>
 		<artifactId>spring-context</artifactId>
+		<version>${spring.version}</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-test</artifactId>
 		<version>${spring.version}</version>
 	</dependency>
 	
