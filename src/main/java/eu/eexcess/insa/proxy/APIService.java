@@ -35,7 +35,10 @@ public class APIService
 					//.process(prepRes)
 				;
 				
-				
+				from("jetty:http://localhost:8888/v0/eexcess/trace")
+					.removeHeaders("CamelHttp*")
+					.to("seda:elastic.trace.index")
+				;
 			}
 		});
     	try {

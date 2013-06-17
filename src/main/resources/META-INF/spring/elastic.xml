@@ -9,7 +9,7 @@
 
     <camelContext xmlns="http://camel.apache.org/schema/spring" useMDCLogging="true">
 		<route>
-			<from uri="seda:elastic.index?concurrentConsumers=4" />
+			<from uri="seda:elastic.trace.index?concurrentConsumers=4" />
 			<setHeader headerName="CamelHttpURI">
 				<simple>http://localhost:9200/privacy/trace/</simple>
 			</setHeader>
@@ -21,7 +21,6 @@
     		</setProperty>
 			<to uri="http4://localhost:9200/" />
 		</route>
-		
 
 		<route>
 			<from uri="direct:elastic.search" />
