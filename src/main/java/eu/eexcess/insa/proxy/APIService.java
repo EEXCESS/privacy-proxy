@@ -21,12 +21,21 @@ public class APIService
 			
 			@Override
 			public void configure() throws Exception {
-				from("jetty:http://localhost:8888/v0/eexcess/recommend")
+				/*from("jetty:http://localhost:8888/v0/eexcess/recommend")
 					.removeHeaders("CamelHttp*")
 					.process(prepReq)
 //					.to("http4://www.google.com/search")
 					.process(prepRes)
+				;*/
+				
+				from("jetty:http://localhost:8888/api/v0/eexcess/trace")
+					.removeHeaders("CamelHttp*")
+					//.process(prepReq)
+					.to("seda:elastic.index")
+					//.process(prepRes)
 				;
+				
+				
 			}
 		});
     	try {

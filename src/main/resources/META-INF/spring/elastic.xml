@@ -11,7 +11,7 @@
 		<route>
 			<from uri="seda:elastic.index?concurrentConsumers=4" />
 			<setHeader headerName="CamelHttpURI">
-				<simple>http://localhost:9200/wordnet/synset/${headers.Wordnet.Id}</simple>
+				<simple>http://localhost:9200/privacy/trace/</simple>
 			</setHeader>
     		<setHeader headerName="CamelHttpMethod">
     			<constant>PUT</constant>
@@ -22,40 +22,11 @@
 			<to uri="http4://localhost:9200/" />
 		</route>
 		
-		<route>
-			<from uri="direct:elastic.update" />
-			<convertBodyTo type="String" />
-			<setHeader headerName="CamelHttpURI">
-				<simple>http://localhost:9200/wordnet/synset/${headers.Wordnet.Id}/_update?refresh=true</simple>
-			</setHeader>
-    		<setHeader headerName="CamelHttpMethod">
-    			<constant>POST</constant>
-    		</setHeader>
-    		<setProperty propertyName="CamelCharsetName">
-    			<constant>UTF-8</constant>
-    		</setProperty>
-			<to uri="http4://localhost:9200/" />
-		</route>
-		
-		<route>
-			<from uri="direct:elastic.bulk" />
-			<convertBodyTo type="String" />
-			<setHeader headerName="CamelHttpURI">
-				<simple>http://localhost:9200/_bulk</simple>
-			</setHeader>
-    		<setHeader headerName="CamelHttpMethod">
-    			<constant>POST</constant>
-    		</setHeader>
-    		<setProperty propertyName="CamelCharsetName">
-    			<constant>UTF-8</constant>
-    		</setProperty>
-			<to uri="http4://localhost:9200/" />
-		</route>
-		
+
 		<route>
 			<from uri="direct:elastic.search" />
 			<setHeader headerName="CamelHttpURI">
-				<simple>http4://localhost:9200/wordnet/_search</simple>
+				<simple>http4://localhost:9200/privacy/trace/_search</simple>
 			</setHeader>
     		<setHeader headerName="CamelHttpMethod">
     			<constant>POST</constant>
