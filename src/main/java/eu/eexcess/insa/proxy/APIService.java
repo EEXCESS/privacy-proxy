@@ -28,15 +28,16 @@ public class APIService
 					.process(prepRes)
 				;*/
 				
-				from("jetty:http://localhost:8888/api/v0/eexcess/trace")
+				/*from("jetty:http://localhost:8888/api/v0/eexcess/trace")
 					.removeHeaders("CamelHttp*")
 					//.process(prepReq)
 					.to("seda:elastic.index")
 					//.process(prepRes)
-				;
+				;*/
 				
-				from("jetty:http://localhost:8888/v0/eexcess/trace")
+				from("jetty:http://localhost:8888/api/v0/eexcess/trace")
 					.removeHeaders("CamelHttp*")
+					
 					.to("seda:elastic.trace.index")
 				;
 			}
