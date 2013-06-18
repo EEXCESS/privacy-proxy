@@ -4,7 +4,6 @@ import org.apache.camel.builder.RouteBuilder;
 
 import eu.eexcess.insa.proxy.actions.PrepareRequest;
 import eu.eexcess.insa.proxy.actions.PrepareResponse;
-import eu.eexcess.insa.proxy.actions.PrepareJson;
 
 /**
  * Hello world!
@@ -16,7 +15,6 @@ public class APIService
     {
     	final PrepareRequest prepReq = new PrepareRequest();
     	final PrepareResponse prepRes = new PrepareResponse();
-    	final PrepareJson prepJson = new PrepareJson(); 
     
     	final org.apache.camel.spring.Main main = new org.apache.camel.spring.Main();
     	main.addRouteBuilder(new RouteBuilder() {
@@ -32,7 +30,6 @@ public class APIService
 			
 				
 				from("jetty:http://localhost:8888/api/v0/eexcess/trace")
-					//.process(prepJson)
 					.to("seda:elastic.trace.index")
 				;
 			}
