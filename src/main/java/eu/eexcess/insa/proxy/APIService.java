@@ -29,9 +29,10 @@ public class APIService
 				;*/
 			
 				
-				from("jetty:http://localhost:8888/api/v0/eexcess/trace")
+				from("jetty:http://localhost:8888/api/v0/privacy/trace")
 					.to("seda:elastic.trace.index")
 				;
+				
 			}
 		});
     	try {

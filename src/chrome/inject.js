@@ -5,14 +5,14 @@ function doEEXCESSChange() {
 
 function date_heure()
 {
-        date = new Date;
+        date = new Date();
         year = date.getFullYear();
-        month = date.getMonth();
+        month = date.getMonth()+1;
         if(month<10)
         {
                 month = "0"+month;
         }
-        day = date.getDay();
+        day = date.getDate();
         if(day<10)
         {
                 day = "0"+day;
@@ -32,7 +32,7 @@ function date_heure()
 }
 
 function send_context(contextJson){
-	var url = "http://localhost:8888/api/v0/eexcess/trace";
+	var url = "http://localhost:8888/api/v0/privacy/trace";
 	var method = 'POST';
 	var postData = contextJson;
 	var async = true;
@@ -40,12 +40,10 @@ function send_context(contextJson){
 	
 	request.open(method, url, async);	
 	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-	
 	request.send(contextJson);	
 }
 
 function get_context() {
-	//alert(window.location.protocol+'//'+window.location.hostname+window.location.pathname);
 	var context = new Array();
 	context["test"] = "{ \"document\": \"Google\"}";
 	var date;
