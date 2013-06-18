@@ -14,7 +14,7 @@
 				<simple>http://localhost:9200/privacy/trace/</simple>
 			</setHeader>
     		<setHeader headerName="CamelHttpMethod">
-    			<constant>PUT</constant>
+    			<constant>POST</constant>
     		</setHeader>
     		<setProperty propertyName="CamelCharsetName">
     			<constant>UTF-8</constant>
