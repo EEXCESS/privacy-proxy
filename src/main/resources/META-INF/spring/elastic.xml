@@ -33,7 +33,7 @@
     		<setProperty propertyName="CamelCharsetName">
     			<constant>UTF-8</constant>
     		</setProperty>
-			<to uri="http4://localhost:9200/" />
+			<to uri="http4://localhost:9200/privacy/trace/_search?sort=temporal:desc&amp;size=50" />
 		</route>
     </camelContext>
 </beans>

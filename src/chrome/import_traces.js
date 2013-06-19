@@ -1,5 +1,5 @@
 function traces() {
-	var url = "http://localhost:9200/privacy/trace/_search?size=50&sort=temporal:desc";
+	var url = "http://localhost:8080/user/traces";
 	var method = 'GET';
 	var async = false;
 	var request = new XMLHttpRequest();
@@ -16,7 +16,7 @@ function traces() {
 	
 	var nbTraces = tracesJson["hits"].total;
 	
-	document.getElementById('test').innerHTML = nbTraces + " pages dans l'historique";
+	document.getElementById('list_trace').innerHTML = nbTraces + " pages dans l'historique";
 	if(nbTraces>50) nbTraces = 50;
 	
 	for(var i=0;i<nbTraces;i++) {
@@ -24,11 +24,10 @@ function traces() {
 		var newLink_li = document.createElement('li');
 		
 		var id_li = 'list'+i;
-		alert(id_li);
 		
 		newLink_li.id = id_li;
 		
-		document.getElementById('test').appendChild(newLink_li);
+		document.getElementById('list_trace').appendChild(newLink_li);
 		
 		var newLink = document.createElement('a');
 		var newLinkText = document.createTextNode(content["_source"].document.title+'  ('+content["_source"].temporal+')');

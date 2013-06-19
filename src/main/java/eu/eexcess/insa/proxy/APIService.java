@@ -33,6 +33,10 @@ public class APIService
 					.to("seda:elastic.trace.index")
 				;
 				
+				from("jetty:http://localhost:8080/user/traces")
+					.to("direct:elastic.search")
+				;
+				
 			}
 		});
     	try {

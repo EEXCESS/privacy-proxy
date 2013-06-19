@@ -18,6 +18,10 @@
     }
   ],
   
+  "background": {
+    "scripts": ["background.js"]
+  },
+  
   "permissions": [
     "http://*/*",
     "https://*/*",

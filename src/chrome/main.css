@@ -22,6 +22,11 @@ ul li:hover {
   background-color: #1d904e;
 }
 
+#list_trace {
+  text-align: center;
+  width: 100%;
+}
+
 .mendeley {
   background-image: url(http://www.mendeley.com/graphics/favicon.ico);
 }
@@ -35,6 +40,14 @@ body  {
 }
 
 .footer {
+  bottom: 5px;
+  right: 15px;
+  text-align: right;
+  font-family: sans-serif;
+  font-size: smaller;
+}
+
+.footer_popup {
   position: absolute;
   bottom: 5px;
   right: 15px;
