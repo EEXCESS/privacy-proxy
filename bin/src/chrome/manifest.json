@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+
+  "name": "EEXCESS Recommendation Extension",
+  "description": "This extension allows to obtain content recommendations from the EEXCESS service ",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_title": "EEXCESS",
+    "default_popup": "popup.html"
+  },
+  
+  "content_scripts": [
+  	{
+  	  "matches": ["http://*/*", "https://*/*"],
+  	  "js": ["inject.js"]
+    }
+  ],
+  
+  "permissions": [
+    "http://*/*",
+    "https://*/*",
+    "notifications"
+  ]
+}
