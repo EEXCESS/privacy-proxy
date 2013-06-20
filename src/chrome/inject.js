@@ -1,7 +1,11 @@
-function doEEXCESSChange() {
-	//alert('test2');
-}
+/******************************************************
+*   This script add users's context to the database   *
+******************************************************/
 
+
+/*
+*    This function collect the date at this format: YYYY-MM-DDTHH:mmZ (ISO_8601)
+*/
 
 function date_heure()
 {
@@ -31,8 +35,13 @@ function date_heure()
         return result;
 }
 
+
+/*
+*  This function takes the Json (string format) and send it to the proxy
+*/
+
 function send_context(contextJson){
-	var url = "http://localhost:8888/api/v0/privacy/trace";
+	var url = "http://localhost:12564/api/v0/privacy/trace";
 	var method = 'POST';
 	var postData = contextJson;
 	var async = true;
@@ -43,13 +52,12 @@ function send_context(contextJson){
 	request.send(contextJson);	
 }
 
+
+/*
+*    This function create a string readable by elasticsearch in Json
+*/
+
 function get_context() {
-	var context = new Array();
-	//alert(document.cookie);
-	//alert(read_cookie("email"));
-	
-	//alert(localStorage.getItem("privacy_email"));
-	
 	var user_email;
 	
 	chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
@@ -57,40 +65,51 @@ function get_context() {
 	});
 	
 	
-	setTimeout(function(){context["test"] = "{ \"document\": \"Google\"}";
-	var date;
-	date = date_heure();
-	var myJson = "{\
-	\"user\": {\
-	\"email\":\""+user_email+"\"\
-	},\
-	\"temporal\": \""+date+"\",\
-	\"document\":{ \
-	\"url\": \""+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"\",\
-	\"title\": \""+document.title+"\"\
-	}\
-	}";send_context(myJson);},100);
-
+	// if the user is admin, it only adds data to the database 
+	if (user_email=='admin') {
+		var content = (document.getElementsByTagName("body")[0].innerText).replace(/\n/g,' '); //suppression des retours charriots
+		content = content.replace(/\t/g,'   ');
+		content = content.replace(/\"/g,'\'');
 	
-
-}
-
-function read_cookie(name) {
-	var nameEQ = name + "=";
-	var ca = document.cookie.split(';');
-	for(var i=0;i < ca.length;i++) {
-		var c = ca[i];
-		while (c.charAt(0)==' ') c = c.substring(1,c.length);
-		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+		
+		setTimeout(function(){
+		var myJson = "{\
+		\"url\": \""+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"\",\
+		\"content\": \""+content+"\"\
+		}";send_context(myJson);},100);
 	}
-	return null;
+	//if he's not admin, the normal function is executed
+	else 
+		{
+		setTimeout(function(){
+		var date;
+		date = date_heure();
+		var myJson = "{\
+		\"user\": {\
+		\"email\":\""+user_email+"\"\
+		},\
+		\"temporal\": \""+date+"\",\
+		\"document\":{ \
+		\"url\": \""+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"\",\
+		\"title\": \""+document.title+"\"\
+		}\
+		}";send_context(myJson);},100);	
+	}
+	
 }
-
-window.onload = get_context;
-//document.getElementById("gbqfq").addEventListener('change',doEEXCESSChange);
-var body = document.getElementsByTagName("body")[0];
 
 /*
+*    On each new page, this function saves the new context
+*/
+
+window.onload = get_context;
+
+/*
+First code to test the plugin. To remove ?
+
+var body = document.getElementsByTagName("body")[0];
+
+
 var content = document.createElement("iframe");
 content.setAttribute("style","width: 600px; height: 600px; position: fixed; top: 0; right: 0");
 content.setAttribute("src","http://www.wikipedia.com");

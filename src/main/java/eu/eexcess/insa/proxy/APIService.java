@@ -4,6 +4,7 @@ import org.apache.camel.builder.RouteBuilder;
 
 import eu.eexcess.insa.proxy.actions.PrepareRequest;
 import eu.eexcess.insa.proxy.actions.PrepareResponse;
+import eu.eexcess.insa.proxy.actions.PrepareSearch;
 
 /**
  * Hello world!
@@ -15,6 +16,7 @@ public class APIService
     {
     	final PrepareRequest prepReq = new PrepareRequest();
     	final PrepareResponse prepRes = new PrepareResponse();
+    	final PrepareSearch prepSearch = new PrepareSearch();
     
     	final org.apache.camel.spring.Main main = new org.apache.camel.spring.Main();
     	main.addRouteBuilder(new RouteBuilder() {
@@ -27,15 +29,16 @@ public class APIService
 //					.to("http4://www.google.com/search")
 					.process(prepRes)
 				;*/
-			
 				
-				from("jetty:http://localhost:8888/api/v0/privacy/trace")
+				from("jetty:http://localhost:12564/api/v0/privacy/trace")
 					.to("seda:elastic.trace.index")
 				;
 				
-				from("jetty:http://localhost:8080/user/traces")
+				from("jetty:http://localhost:11564/user/traces")
+					.process(prepSearch)
 					.to("direct:elastic.search")
 				;
+				
 				
 			}
 		});

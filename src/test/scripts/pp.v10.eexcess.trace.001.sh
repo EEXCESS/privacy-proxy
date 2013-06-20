@@ -1,6 +1,6 @@
 #!/bin/bash
 
-curl -XPOST "http://localhost:8888/api/v0/eexcess/trace" -d "{
+curl -XPOST "http://localhost:8888/api/v0/privacy/trace" -d "{
  \"document\":\"Google\"
 }
 "
