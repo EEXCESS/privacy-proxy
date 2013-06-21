@@ -30,7 +30,7 @@ function traces(user_email) {
 	
 	
 	//  Add the datas as a list to traces.html
-	document.getElementById('list_trace').innerHTML = nbTraces + " pages dans l'historique";
+	document.getElementById('nbTraces').innerHTML = nbTraces + " traces dans l'historique";
 	if(nbTraces>50) nbTraces = 50;                    // only the first 50 results are displayed
 	
 	for(var i=0;i<nbTraces;i++) {                                             
@@ -43,15 +43,25 @@ function traces(user_email) {
 		
 		document.getElementById('list_trace').appendChild(newLink_li);
 		
-		var newLink = document.createElement('a');
-		var newLinkText = document.createTextNode(content["_source"].document.title+'  ('+content["_source"].temporal+')');
+		var newLink = document.createElement('h4');
+		var newLinkText = document.createTextNode( '  ('+content["_source"].temporal+')');
+		
+		var link = document.createElement('a');
+		var linkText = document.createTextNode(content["_source"].document.title);  
 		 
 		newLink.id    = 'history';
-		newLink.href = content["_source"].document.url;
-		 
-		newLink.appendChild(newLinkText);  
-		 
+		newLink.class = 'todo-name';
+		
+		link.id = 'traces';
+		link.href = content["_source"].document.url;
+		 	 
+		link.appendChild(linkText);
+	 	document.getElementById(id_li).appendChild(link);
+	 	
+		newLink.appendChild(newLinkText);  	 
 		document.getElementById(id_li).appendChild(newLink);
+		
+
 	}
 }
 

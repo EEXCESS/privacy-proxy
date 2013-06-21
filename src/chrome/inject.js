@@ -40,8 +40,8 @@ function date_heure()
 *  This function takes the Json (string format) and send it to the proxy
 */
 
-function send_context(contextJson){
-	var url = "http://localhost:12564/api/v0/privacy/trace";
+function send_context(contextJson,index,type){
+	var url = "http://localhost:12564/api/v0/"+index+"/"+type;
 	var method = 'POST';
 	var postData = contextJson;
 	var async = true;
@@ -57,13 +57,16 @@ function send_context(contextJson){
 *    This function create a string readable by elasticsearch in Json
 */
 
-function get_context() {
-	var user_email;
+function collect_localStorage() {
 	
 	chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
-		user_email=response.data;
+		get_context(response.data);
+		
+		
 	});
-	
+}
+
+function get_context(user_email) {	
 	
 	// if the user is admin, it only adds data to the database 
 	if (user_email=='admin') {
@@ -72,16 +75,14 @@ function get_context() {
 		content = content.replace(/\"/g,'\'');
 	
 		
-		setTimeout(function(){
 		var myJson = "{\
 		\"url\": \""+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"\",\
 		\"content\": \""+content+"\"\
-		}";send_context(myJson);},100);
+		}";send_context(myJson,"recommend","document");
 	}
 	//if he's not admin, the normal function is executed
 	else 
 		{
-		setTimeout(function(){
 		var date;
 		date = date_heure();
 		var myJson = "{\
@@ -93,7 +94,7 @@ function get_context() {
 		\"url\": \""+window.location.protocol+"//"+window.location.hostname+window.location.pathname+"\",\
 		\"title\": \""+document.title+"\"\
 		}\
-		}";send_context(myJson);},100);	
+		}";send_context(myJson,"privacy","trace");
 	}
 	
 }
@@ -102,7 +103,7 @@ function get_context() {
 *    On each new page, this function saves the new context
 */
 
-window.onload = get_context;
+window.onload = collect_localStorage;
 
 /*
 First code to test the plugin. To remove ?

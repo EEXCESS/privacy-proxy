@@ -31,6 +31,14 @@ public class APIService
 				;*/
 				
 				from("jetty:http://localhost:12564/api/v0/privacy/trace")
+					.setHeader("ElasticType").constant("trace")
+					.setHeader("ElasticIndex").constant("privacy")
+					.to("seda:elastic.trace.index")
+				;
+				
+				from("jetty:http://localhost:12564/api/v0/recommend/document")
+					.setHeader("ElasticType").constant("document")
+					.setHeader("ElasticIndex").constant("recommend")
 					.to("seda:elastic.trace.index")
 				;
 				

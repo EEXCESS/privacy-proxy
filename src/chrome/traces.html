@@ -1,12 +1,30 @@
 <html>
 	<head>
-	<meta charset = "utf-8">
-		<link rel="stylesheet" type="text/css" href="main.css">
+		<meta charset = "utf-8">
+		<!-- <link rel="stylesheet" type="text/css" href="main.css"> -->
 		<script type="text/javascript" src="import_traces.js"></script>
+		    <!-- Loading Bootstrap -->
+   		 <link href="flat_ui/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+	 	   <!-- Loading Flat UI -->
+	    <link href="flat_ui/css/flat-ui.css" rel="stylesheet">
 	</head>
 	<body>
+		<div class="container">
+		<div class="row">
 		<p><img src="logo.jpg" /></p>
-		<ul id="list_trace"></ul>
+		</div>
+		<div class="row demo-samples">
+			<div class="span12">
+					<div class="todo mrm">
+						<div class="todo-search">
+							<h3 id="nbTraces"></h3>
+						</div>
+						<ul id="list_trace"></ul>
+					</div>
+			</div>
+		</div>
+		</div>
 		<p class="footer"><a target="_blank" href="http://www.eexcess.eu/">More about the EEXCESS project</a></p>
 	</body>
 </html>
