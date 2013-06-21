@@ -11,7 +11,7 @@ public class PrepareSearch implements Processor {
 		Message in = exchange.getIn();
 		String body = in.getBody(String.class);
 		
-		body = "{\"query\":{\"bool\":{\"must\":[{\"text\":{\"trace.user.email\":\""+body+"\"}}]}}}";
+		body = "{\"filter\":{\"term\":{\"trace.user.email\":\""+body+"\"}}}";
 		in.setBody(body);
 		
 		//in.setHeader("Content-Type","text/html");
