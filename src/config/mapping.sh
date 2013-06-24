@@ -18,7 +18,8 @@ curl -XPUT "http://localhost:9200/privacy/trace/_mapping" -d '
 	"trace": {
 		"properties": {
 			"user.email": {"type": "string","index": "not_analyzed"},
-			"temporal": {"type": "string"}
+			"temporal.begin": {"type": "string"},
+			"temporal.end": {"type": "string"}
 		}
 	}
 }

@@ -33,6 +33,7 @@ public class APIService
 				from("jetty:http://localhost:12564/api/v0/privacy/trace")
 					.setHeader("ElasticType").constant("trace")
 					.setHeader("ElasticIndex").constant("privacy")
+					.process(prepReq)
 					.to("seda:elastic.trace.index")
 				;
 				
