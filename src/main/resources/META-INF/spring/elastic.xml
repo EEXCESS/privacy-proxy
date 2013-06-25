@@ -11,7 +11,7 @@
 		<route>
 			<from uri="seda:elastic.trace.index?concurrentConsumers=4" />
 			<setHeader headerName="CamelHttpURI">
-				<simple>http://localhost:9200/${in.header.ElasticIndex}/${in.header.ElasticType}/${in.header.elasticId}</simple>
+				<simple>http://localhost:9200/${in.header.ElasticIndex}/${in.header.ElasticType}/${in.header.traceId}</simple>
 			</setHeader>
     		<setHeader headerName="CamelHttpMethod">
     			<constant>POST</constant>
@@ -25,7 +25,7 @@
 		<route>
 			<from uri="direct:elastic.search" />
 			<setHeader headerName="CamelHttpURI">
-				<simple>http4://localhost:9200/privacy/trace/_search</simple>
+				<simple>http4://localhost:9200/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
 			</setHeader>
     		<setHeader headerName="CamelHttpMethod">
     			<constant>POST</constant>
@@ -35,6 +35,24 @@
     		</setProperty>
 			<to uri="http4://localhost:9200/privacy/trace/_search?sort=temporal:desc&amp;size=50" />
 		</route>
+		
+		<route>
+			<from uri="direct:elastic.userSearch" />
+			<setHeader headerName="CamelHttpURI">
+				<simple>http4://localhost:9200/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
+			</setHeader>
+    		<setHeader headerName="CamelHttpMethod">
+    			<constant>POST</constant>
+    		</setHeader>
+    		<setProperty propertyName="CamelCharsetName">
+    			<constant>UTF-8</constant>
+    		</setProperty>
+			<to uri="http4://localhost:9200/privacy/trace/_search" />
+		</route>
+		
+		
+		
+		
     </camelContext>
 </beans>
 

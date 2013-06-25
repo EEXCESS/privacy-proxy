@@ -16,16 +16,8 @@ public class PrepareRequest implements Processor {
 		//in.getBody(String.class);
 		if (in.hasHeaders()){
 			System.out.println("le mesage a des headers");
-			Map<String, Object> headers = new HashMap<String, Object>();
-			headers = in.getHeaders();
-			Iterator it2 = headers.keySet().iterator();
-			Iterator it = headers.keySet().iterator();
-			while(it.hasNext()){
-				System.out.print(it2.next());
-				System.out.println(" : "+headers.get(it.next()));
-				
-			}
-			
+			Object header = in.getHeader("traceId");
+			System.out.println(header);
 		}
 
 	}

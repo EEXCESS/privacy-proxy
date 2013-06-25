@@ -5,6 +5,7 @@ import org.apache.camel.builder.RouteBuilder;
 import eu.eexcess.insa.proxy.actions.PrepareRequest;
 import eu.eexcess.insa.proxy.actions.PrepareResponse;
 import eu.eexcess.insa.proxy.actions.PrepareSearch;
+import eu.eexcess.insa.proxy.actions.PrepareUserSearch;
 
 /**
  * Hello world!
@@ -17,6 +18,7 @@ public class APIService
     	final PrepareRequest prepReq = new PrepareRequest();
     	final PrepareResponse prepRes = new PrepareResponse();
     	final PrepareSearch prepSearch = new PrepareSearch();
+    	final PrepareUserSearch prepUserSearch = new PrepareUserSearch();
     
     	final org.apache.camel.spring.Main main = new org.apache.camel.spring.Main();
     	main.addRouteBuilder(new RouteBuilder() {
@@ -33,7 +35,6 @@ public class APIService
 				from("jetty:http://localhost:12564/api/v0/privacy/trace")
 					.setHeader("ElasticType").constant("trace")
 					.setHeader("ElasticIndex").constant("privacy")
-					.process(prepReq)
 					.to("seda:elastic.trace.index")
 				;
 				
@@ -44,14 +45,29 @@ public class APIService
 				;
 				
 				from("jetty:http://localhost:11564/user/traces")
+					.setHeader("ElasticType").constant("trace")
+					.setHeader("ElasticIndex").constant("privacy")
 					.process(prepSearch)
 					.to("direct:elastic.search")
 				;
 				
-				
+				from("jetty:http://localhost:12564/api/v0/users/data")
+					.setHeader("ElasticType").constant("data")
+					.setHeader("ElasticIndex").constant("users")
+					.to("seda:elastic.trace.index")
+				;
+
+				from("jetty:http://localhost:11564/user/verify")
+					.setHeader("ElasticType").constant("data")
+					.setHeader("ElasticIndex").constant("users")
+					.process(prepUserSearch)
+					.to("direct:elastic.userSearch")
+					.process(prepRes)
+				;
 			}
 		});
     	try {
+    		
 			main.run();
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -1,13 +1,26 @@
 <html>
 	<head>
-		<link rel="stylesheet" type="text/css" href="main.css">
+	<meta charset = "utf-8">
+		 
 		<script type="text/javascript" src="sign_up.js"></script>
+		<script type="text/javascript" src="jquery-1.10.1.min.js"></script>
+		<script type="text/javascript" src="md5.js"></script>
 	</head>
 	<body>
 		<p><img src="logo.jpg" /></p>
+		<form name="login">Sign In:</br>
+			<p><label>Email or Username<input type="text" name="idSignin" id="idSignin"></label>
+			<label>Password<input type="password" name="passwordSignin" id="passwordSignin"></label>
+			<input id="sign_in" type="submit" value="Sign in"></br>
+			</p>
+		</form>	
 		<form name="register">Sign Up:</br>
-			<p><label> Enter your Email<input type="text" name="email" id="email" /required></br>
-			<input id="sign_up" type="submit" value="Register"></br>
+			<p> Create an Account :</br></p>
+			<p><label>Full Name<input type="text" name="fullName" id="fullName"></label>
+			<label>Email<input type="text" name="emailSignup" id="emailSignup"></label>
+			<label>Password<input type="password" name="passwordSignup" id="passwordSignup"></label>
+			<input id="sign_up" type="button" value="Sign up"></br>
+			<p id="successSignup"></p>
 			</p>
 		</form>	
 			
