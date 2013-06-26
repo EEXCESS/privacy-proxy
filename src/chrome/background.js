@@ -51,8 +51,8 @@ $.ajax("http://habegger.fr/",{
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	console.log("processing brower request");
-    if (request.method == "getLocalStorage") {
-      sendResponse({data: localStorage[request.key]});
+    if (request.method == "getPrivacyEmail") {
+      sendResponse({data: localStorage["privacy_email"]});
     } else if(request.method == "setDocumentContext") {
     	var url = request.url;
     	var title = request.title;
@@ -93,7 +93,12 @@ function date_heure()
         {
                 minute = "0"+minute;
         }
-        result = year + '-' + month +'-'+day+'T'+hour+':'+minute+'Z';
+        second = date.getSeconds();
+        if(second<10)
+        {
+                second = "0"+second;
+        }
+        result = year + '-' + month +'-'+day+'T'+hour+':'+minute+':'+second+'Z';
         return result;
 }
 

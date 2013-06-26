@@ -555,17 +555,17 @@ h6 {
   margin-right: -2px;
 }
 .btn.btn-primary {
-  background-color: #1abc9c;
+  background-color: #1D904F;
 }
 .btn.btn-primary:hover,
 .btn.btn-primary:focus,
 .btn-group:focus .btn.btn-primary.dropdown-toggle {
-  background-color: #48c9b0;
+  background-color: #074321;
 }
 .btn.btn-primary:active,
 .btn-group.open .btn.btn-primary.dropdown-toggle,
 .btn.btn-primary.active {
-  background-color: #16a085;
+  background-color: #39903A;
 }
 .btn.btn-info {
   background-color: #3498db;
@@ -2879,7 +2879,7 @@ textarea[class*="span"] {
 }
 .todo {
   background-color: #5D3F09;
-  color: #798795;
+  color: #3A905F;
   margin-bottom: 20px;
   -webkit-border-radius: 8px 8px 6px 6px;
   -moz-border-radius: 8px 8px 6px 6px;
@@ -2924,7 +2924,7 @@ textarea[class*="span"] {
   position: relative;
   background: #1D904F;
   background-size: 16px 16px;
-  border-radius: 6px 6px 0 0;
+  border-radius: 6px 6px 6px 6px;
   color: #34495e;
   padding: 19px 25px 20px;
 }

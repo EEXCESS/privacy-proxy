@@ -6,6 +6,8 @@ import eu.eexcess.insa.proxy.actions.PrepareRequest;
 import eu.eexcess.insa.proxy.actions.PrepareResponse;
 import eu.eexcess.insa.proxy.actions.PrepareSearch;
 import eu.eexcess.insa.proxy.actions.PrepareUserSearch;
+import eu.eexcess.insa.proxy.actions.PrepareUserLogin;
+import eu.eexcess.insa.proxy.actions.PrepareRespLogin;
 
 /**
  * Hello world!
@@ -19,6 +21,8 @@ public class APIService
     	final PrepareResponse prepRes = new PrepareResponse();
     	final PrepareSearch prepSearch = new PrepareSearch();
     	final PrepareUserSearch prepUserSearch = new PrepareUserSearch();
+    	final PrepareUserLogin prepUserLogin = new PrepareUserLogin();
+    	final PrepareRespLogin prepRespUser = new PrepareRespLogin();
     
     	final org.apache.camel.spring.Main main = new org.apache.camel.spring.Main();
     	main.addRouteBuilder(new RouteBuilder() {
@@ -63,6 +67,14 @@ public class APIService
 					.process(prepUserSearch)
 					.to("direct:elastic.userSearch")
 					.process(prepRes)
+				;
+				
+				from("jetty:http://localhost:11564/user/login")
+					.setHeader("ElasticType").constant("data")
+					.setHeader("ElasticIndex").constant("users")
+					.process(prepUserLogin)
+					.to("direct:elastic.userSearch")
+					.process(prepRespUser)
 				;
 			}
 		});

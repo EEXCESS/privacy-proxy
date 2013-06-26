@@ -44,7 +44,7 @@ function traces(user_email) {
 		document.getElementById('list_trace').appendChild(newLink_li);
 		
 		var newLink = document.createElement('h4');
-		var newLinkText = document.createTextNode( '  ('+content["_source"].temporal+')');
+		var newLinkText = document.createTextNode( '  ('+content["_source"].temporal.begin+')');
 		
 		var link = document.createElement('a');
 		var linkText = document.createTextNode(content["_source"].document.title);  
@@ -72,7 +72,7 @@ function traces(user_email) {
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
+  chrome.extension.sendRequest({method: "getPrivacyEmail", key: "privacy_email"}, function(response) {
 	traces(response.data);
   });
 

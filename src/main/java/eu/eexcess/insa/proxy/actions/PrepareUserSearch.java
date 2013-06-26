@@ -1,7 +1,5 @@
 package eu.eexcess.insa.proxy.actions;
 
-import java.io.InputStream;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
