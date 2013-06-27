@@ -27,9 +27,10 @@ curl -XPUT "http://localhost:9200/privacy/trace/_mapping" -d '
 {
 	"trace": {
 		"properties": {
+			"plugin.uuid": {"type": "string","index": "not_analyzed"},
 			"user.email": {"type": "string","index": "not_analyzed"},
-			"temporal.begin": {"type": "string"},
-			"temporal.end": {"type": "string"}
+			"temporal.begin": {"type": "date"},
+			"temporal.end": {"type": "date"}
 		}
 	}
 }

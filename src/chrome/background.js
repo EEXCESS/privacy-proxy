@@ -51,8 +51,8 @@ $.ajax("http://habegger.fr/",{
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	console.log("processing brower request");
-    if (request.method == "getPrivacyEmail") {
-      sendResponse({data: localStorage["privacy_email"]});
+    if (request.method == "getLocalStorage") {
+      sendResponse({data: localStorage[request.key]});
     } else if(request.method == "setDocumentContext") {
     	var url = request.url;
     	var title = request.title;
