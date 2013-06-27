@@ -1,26 +1,13 @@
 <html>
 	<head>
 		<link rel="stylesheet" type="text/css" href="main.css">
-		<script>
-		chrome.browserAction.setBadgeBackgroundColor({color:[190, 190, 190, 230]});
-		chrome.browserAction.setBadgeText({text:"?"});
-
-		chrome.extension.onMessage.addListner(function(v,s,sendResponse)) {
-		  alert(v);
-		  sendResponse();
-		}
-		alert("Loaded");
-
-		var notification = webkitNotifications.createHTMLNotification(
-		'notification.html'  // html url - can be relative
-		);
-		notification.show();
-		</script>
+		<script type="text/javascript" src="popup.js"></script>
 	</head>
 	<body>
-		<p><img src="logo.jpg" /></p>
+		<p><img src="logo.jpg" /><p id="username"></p></p>
 		<a href="traces.html" target="_blank"><input type="button" value="Your traces"></a>
-		<a href="sign_up.html"><input type="button" value="Sign up"></a>
+		<a href="sign_up.html" target="_blank"><input type="button" value="Sign up"></a>
+		<input style="visibility:hidden" id="logout_btn" type="button" value="Log Out">
 		<ul>
 			<li class="mendeley">
 				<a target="_blank" href="http://www.mendeley.com/catalog/next-generation-dna-sequencing-methods/">Next generation dna sequencing methods</a>

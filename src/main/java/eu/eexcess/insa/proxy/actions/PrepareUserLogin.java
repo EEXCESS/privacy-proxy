@@ -4,18 +4,18 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
 
-public class PrepareSearch implements Processor {
+
+public class PrepareUserLogin implements Processor {
 
 	public void process(Exchange exchange) throws Exception {
 
 		Message in = exchange.getIn();
 		String body = in.getBody(String.class);
 		
-		body = "{\"query\":{\"bool\":{\"should\":["+body+"]}}}";
-		in.setBody(body);
 		
-		//in.setHeader("Content-Type","text/html");
-		//in.setBody("<ul><li>toto</li><li>titi</li></ul>");
+		String query = "{\"query\":{\"bool\":{\"must\":["+body+"]}},\"from\":0,\"size\":50,\"sort\":[],\"facets\":{}}";
+		in.setBody(query);
+
 	}
 
 }

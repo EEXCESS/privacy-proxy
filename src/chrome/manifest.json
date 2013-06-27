@@ -19,12 +19,13 @@
   ],
   
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["jquery-1.10.1.min.js","background.js"]
   },
   
   "permissions": [
     "http://*/*",
     "https://*/*",
-    "notifications"
+    "notifications",
+    "tabs"
   ]
 }

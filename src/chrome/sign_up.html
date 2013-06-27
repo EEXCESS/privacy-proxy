@@ -1,15 +1,50 @@
 <html>
 	<head>
-		<link rel="stylesheet" type="text/css" href="main.css">
+	<meta charset = "utf-8">
+		  <!-- Loading Bootstrap -->
+   		 <link href="flat_ui/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+	 	   <!-- Loading Flat UI -->
+	    <link href="flat_ui/css/flat-ui.css" rel="stylesheet">
 		<script type="text/javascript" src="sign_up.js"></script>
+		<script type="text/javascript" src="jquery-1.10.1.min.js"></script>
+		<script type="text/javascript" src="md5.js"></script>
 	</head>
 	<body>
+	<div class="container">
 		<p><img src="logo.jpg" /></p>
-		<form name="register">Sign Up:</br>
-			<p><label> Enter your Email<input type="text" name="email" id="email" /required></br>
-			<input id="sign_up" type="submit" value="Register"></br>
-			</p>
+		<div class="row">
+		<div class="span5">
+		<div class="todo mrm">
+		<div class="todo-search">
+		<form name="login" style="text-align: center;"><h2 style="text-align: center;">Sign In:</h4></br>
+			<ul>
+			<li><input value="Username/Email" type="text" name="idSignin" id="idSignin"></li>
+			<li><input type="text" value="Password" name="passwordSignin" id="passwordSignin"></li>
+			<li><input id="sign_in" type="button" value="Sign in" class="btn btn-primary"></br><p id="successLogin"></p></li>
+			
+			</ul>
 		</form>	
+		</div>
+		</div>
+		</div>
+		<div class="span5 offset2">
+		<div class="todo mrm">
+		<div class="todo-search">
+		<form name="register" style="text-align: center"><h2>Sign Up:</h2></br>
+			<ul>
+			<li><input value="Full Name" type="text" name="fullName" id="fullName"></li>
+			<li><input value="Email" type="text" name="emailSignup" id="emailSignup"></li>
+			<li><input value="Password" type="text" name="passwordSignup" id="passwordSignup"></li>
+			<li><input id="sign_up" type="button" value="Sign up" class="btn btn-primary"></br><p id="successSignup"></p></li>
+			
+			</ul>
+		</form>	
+		</div>
+		</div>
+		</div>
+		</div>
+		</div>
 			
 		<p class="footer"><a target="_blank" href="http://www.eexcess.eu/">More about the EEXCESS project</a></p>
 	</body>

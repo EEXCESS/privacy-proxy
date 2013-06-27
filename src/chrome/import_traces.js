@@ -6,20 +6,27 @@
 * This function gets the user's data and put them into traces.html
 */
 
-function traces(user_email) {
+function traces(user_id,email) {
 	// a query is send to the elasticsearch database
 	var url = "http://localhost:11564/user/traces";
 	var method = 'POST';
 	var async = false;
 	var request = new XMLHttpRequest();
 	
-	// The query can be made on the proxy (like now) or here (like on comments)
+	var body = '';
+	if(user_id != '') {
+		body = body + "{\"term\":{\"trace.plugin.uuid\": \""+user_id+"\"}}";
+	}
+	if (user_id != '' && email!='') {
+		body = body + ",";
+	}
+	if(email != '') {
+		body = body + "{\"term\":{\"trace.user.email\": \""+email+"\"}}";
+	}	
 	
-	//var elasticSearchQuery = "{\"query\":{\"bool\":{\"must\":[{\"text\":{\"trace.user.email\":\""+user_email+"\"}}]}}}";
 	request.open(method, url, async);	
 	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-	//request.send(elasticSearchQuery);
-	request.send(user_email);
+	request.send(body);
 	
 	
 	// useful data are collected from the response
@@ -44,7 +51,7 @@ function traces(user_email) {
 		document.getElementById('list_trace').appendChild(newLink_li);
 		
 		var newLink = document.createElement('h4');
-		var newLinkText = document.createTextNode( '  ('+content["_source"].temporal+')');
+		var newLinkText = document.createTextNode( '  ('+content["_source"].temporal.begin+')');
 		
 		var link = document.createElement('a');
 		var linkText = document.createTextNode(content["_source"].document.title);  
@@ -70,10 +77,82 @@ function traces(user_email) {
 *    More informations may be collected later
 */
 
-document.addEventListener('DOMContentLoaded', function () {
+$('#inputUserTraces').live("change",function(){
 
-  chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
-	traces(response.data);
+	for(var i=0;i<50;i++){
+		var id = "list"+i;
+		$('#'+id).remove();
+	}
+	
+	if($(this).is(':checked')){
+		if($('#inputPluginTraces').is(':checked')) {
+			chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
+				var uuidPlugin = response.data;
+				chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
+					traces(uuidPlugin,response.data);
+ 				 });
+  			});
+		}
+		else {
+			chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
+				traces('',response.data);
+ 			 });
+		}
+	}
+	else {
+		if($('#inputPluginTraces').is(':checked')) {
+			chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
+				traces(response.data,'');
+  			});
+		}
+		else {
+			traces('','');
+ 		}
+		
+	}
+		
+});
+
+$('#inputPluginTraces').live("change",function(){
+
+	for(var i=0;i<50;i++){
+		var id = "list"+i;
+		$('#'+id).remove();
+	}
+	
+	if($(this).is(':checked')){
+		if($('#inputUserTraces').is(':checked')) {
+			chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
+				var uuidPlugin = response.data;
+				chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
+					traces(uuidPlugin,response.data);
+ 				 });
+  			});
+		}
+		else {
+			chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
+				traces(response.data,'');
+ 			 });
+		}
+	}
+	else {
+		if($('#inputUserTraces').is(':checked')) {
+			chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
+				traces('',response.data);
+  			});
+		}
+		else {
+			traces('','');
+ 		}
+		
+	}
+		
+});
+
+
+$(document).ready(function () {
+  chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
+	traces(response.data,'');
   });
-
+  
 });
