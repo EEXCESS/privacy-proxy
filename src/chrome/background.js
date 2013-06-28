@@ -129,20 +129,38 @@ function send_context(traceUrl, title, tabID){
 	
 	var traceJSON = JSON.stringify(trace);
 	console.log("Context: "+traceJSON);
+	
 	$.ajax({
 	   url: "http://localhost:12564/api/v0/privacy/trace",
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: traceJSON,
-	   success: function(response) {
-			console.log(response);
-			console.log(response["_id"]);
-			trace["id"] = response["_id"];
-			console.log(trace);
+	   complete: function(response){
+	   		trace["id"] = response["_id"];
 			arrayTraceID[tabID] = trace;
-			
+			recommend(traceJSON);
 	   }
 	});
+}
+
+function recommend(traces){
+
+	$.ajax({
+	   url: "http://localhost:12564/api/v0/recommend",
+	   type: "POST",
+	   contentType: "application/json;charset=UTF-8",
+	   data: traces,
+	   complete: function(response){
+	   
+			var xml = $(response.responseText);
+			var hitCount = $(xml).attr("data-hits");
+			localStorage["recommend"] = response.responseText;
+			if (hitCount != 0) {
+				chrome.browserAction.setBadgeText({text: hitCount});
+			}
+	   }
+	});
+	
 }
 
 function updateContext(tabID) {
@@ -164,7 +182,7 @@ function updateContext(tabID) {
 	   data: traceJSON,
 	   headers:{"traceId": headerTraceID},
 	   success: function(response) {
-			console.log(response);
+			console.log("Response: "+response);
 			delete(arrayTraceID[tabID]);			
 	   }
 	});

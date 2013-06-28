@@ -1,7 +1,12 @@
 	package eu.eexcess.insa.proxy;
 
+import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 
+import com.semsaas.jsonxml.JsonXMLReader;
+
+import eu.eexcess.insa.camel.JsonXMLDataFormat;
+import eu.eexcess.insa.proxy.actions.PrepareRecommendationRequest;
 import eu.eexcess.insa.proxy.actions.PrepareRequest;
 import eu.eexcess.insa.proxy.actions.PrepareResponse;
 import eu.eexcess.insa.proxy.actions.PrepareSearch;
@@ -23,6 +28,7 @@ public class APIService
     	final PrepareUserSearch prepUserSearch = new PrepareUserSearch();
     	final PrepareUserLogin prepUserLogin = new PrepareUserLogin();
     	final PrepareRespLogin prepRespUser = new PrepareRespLogin();
+    	final PrepareRecommendationRequest prepRecommendRequ = new PrepareRecommendationRequest();
     
     	final org.apache.camel.spring.Main main = new org.apache.camel.spring.Main();
     	main.addRouteBuilder(new RouteBuilder() {
@@ -40,6 +46,13 @@ public class APIService
 					.setHeader("ElasticType").constant("trace")
 					.setHeader("ElasticIndex").constant("privacy")
 					.to("seda:elastic.trace.index")
+				;	
+					
+				from("jetty:http://localhost:12564/api/v0/recommend")	
+					.removeHeaders("CamelHttp*")
+					.removeHeader("Host")			
+					.to("direct:recommend.econbiz")
+					.setHeader("Content-Type").constant("text/html")
 				;
 				
 				from("jetty:http://localhost:12564/api/v0/recommend/document")
@@ -76,6 +89,18 @@ public class APIService
 					.to("direct:elastic.userSearch")
 					.process(prepRespUser)
 				;
+				
+				
+				
+				from("direct:recommend.econbiz")
+					.process(prepRecommendRequ)
+				    .to("http4://api.econbiz.de/v1/search")
+				    .unmarshal(new JsonXMLDataFormat())
+				    //.wireTap("file:///tmp/econbiz/?fileName=example.xml")
+				    .to("xslt:eu/eexcess/insa/xslt/econbiz2html.xsl")
+				    //.wireTap("file:///tmp/econbiz/?fileName=example.html")
+				;
+				
 			}
 		});
     	try {

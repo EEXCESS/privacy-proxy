@@ -1,22 +1,31 @@
 function logout(){
 	localStorage.removeItem("privacy_email");
 	localStorage.removeItem("username");
-	document.getElementById('username').innerHTML = "Good Bye !";
-	document.getElementById('logout_btn').style.visibility = "hidden";
+	$('#username').html("Good Bye !");
+	$('#logout_btn').hide();
+	$('#sign_in').show();
 }
 
 
 function username() {
 	if(localStorage["username"] != undefined){
-		document.getElementById('username').innerHTML = "Welcome "+localStorage["username"];
-		document.getElementById('logout_btn').style.visibility= "visible";
+		$('#username').html("Welcome "+localStorage["username"]);
+		$('#logout_btn').show();
+		$('#sign_in').hide();
 	}
 	
 	document.getElementById("logout_btn").addEventListener('click',logout);
 }
 
+function recommend() {
+	chrome.browserAction.setBadgeText({text:""});
+	var recommendation = localStorage["recommend"];
+	document.getElementById('recommend').innerHTML = recommendation;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   username();
+  recommend();
 });
 
 
