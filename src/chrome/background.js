@@ -4,13 +4,50 @@
 var version = "1.00";
 console.log("EEXCESS privacy plugin version "+version);
 
+/////////////////////////////////////////////////////// global variables
+
+
+//active tab's id
+var activeTabId = 0;
+
+// plugin's unique id
 var uuidUser = localStorage["uuid"];
+
+// traces's unique elasticsearch id (used for updating them)
+var arrayTraceID = new Array();
 
 
 if (uuidUser == undefined) {
 	uuidUser = randomUUID();
 	localStorage["uuid"] = uuidUser;
 }
+
+
+
+
+// Event trigered when the window's active tab changes
+chrome.tabs.onActivated.addListener(function(info) {
+
+	//alert(info.tabId);
+
+	if (activeTabId){                  //
+		//alert(activeTabId);
+		updateContext(activeTabId, "blur");    //
+		}
+
+	activeTabId = info.tabId;
+	//alert('new:'+activeTabId);
+	if (activeTabId){
+		//triggerContext( activeTabId);	
+		triggerContext(activeTabId);	
+	}
+});
+
+
+
+
+
+
 
 
 /**
@@ -39,27 +76,22 @@ function randomUUID() {
 
 
 
-var arrayTraceID = new Array();
-
-/*
-$.ajax("http://habegger.fr/",{
-	success: function(response) { alert(response); },
-	error: function(response) { alert("Oooops"); }
-});
-*/
-
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	console.log("processing brower request");
     if (request.method == "getLocalStorage") {
       sendResponse({data: localStorage[request.key]});
-    } else if(request.method == "setDocumentContext") {
-    	var url = request.url;
-    	var title = request.title;
-    	send_context(url, title, sender.tab.id);
-    } else if (request.method == "updateDocumentContext") {
-    	updateContext(sender.tab.id);
-    } else {  
+    }else if (request.method == "documentContext") {
+    	send_context("load", sender.tab.id, request);
+    }else if (request.method == "newRequest") {
+    	if (request.event == "onload") {
+    		triggerContext(sender.tab.id);
+    	}
+    	else if (request.event == "onunload"){
+    		updateContext(sender.tab.id,"unload");
+    	}
+    }
+    else {  
       sendResponse({});
     }
 });
@@ -107,8 +139,21 @@ function date_heure()
 *  This function makes the Json (string format) and send it to the proxy
 */
 
-function send_context(traceUrl, title, tabID){
+
+// function triggerContext(event, tabId) {
+function triggerContext(tabId) {
+	var requestContext = {
+		method: "getContext"
+	}
+
+	chrome.tabs.sendMessage(tabId, requestContext, function(){});  //asks for a tab to send the page's context
+}
+	
+
+function send_context(event, tabID, context){
+	
 	console.log("Putting document context");
+	console.log("tabID: " +tabID);
 	var date = date_heure();
 	var trace = {
 		user: {
@@ -121,9 +166,13 @@ function send_context(traceUrl, title, tabID){
 		temporal: {
 			begin: date
 		},
+		events: {
+			begin: event,
+			end: "active"
+		},
 		document: {
-			url: traceUrl,
-			title: title
+			url: context.url,
+			title: context.title
 		}
 	};
 	
@@ -136,7 +185,9 @@ function send_context(traceUrl, title, tabID){
 	   contentType: "application/json;charset=UTF-8",
 	   data: traceJSON,
 	   complete: function(response){
-	   		trace["id"] = response["_id"];
+	   		var responseJSON = JSON.parse(response.responseText);
+	   		trace["id"]
+	   		 = responseJSON["_id"];
 			arrayTraceID[tabID] = trace;
 			recommend(traceJSON);
 	   }
@@ -163,27 +214,31 @@ function recommend(traces){
 	
 }
 
-function updateContext(tabID) {
+function updateContext(tabID, evnt) {
 	console.log("Putting document context");
 	var date = date_heure();
+
 	var trace = arrayTraceID[tabID];
-	console.log(trace);
-	var headerTraceID = trace.id;
-	delete(trace.id);
-	
-	trace.temporal.end = date_heure();
-	
-	var traceJSON = JSON.stringify(trace);
-	console.log("Context: "+traceJSON);
-	$.ajax({
-	   url: "http://localhost:12564/api/v0/privacy/trace",
-	   type: "POST",
-	   contentType: "application/json;charset=UTF-8",
-	   data: traceJSON,
-	   headers:{"traceId": headerTraceID},
-	   success: function(response) {
-			console.log("Response: "+response);
-			delete(arrayTraceID[tabID]);			
-	   }
-	});
+	if (trace != undefined) {
+		console.log("tabID (update): " +tabID);
+		console.log(trace);
+		var headerTraceID = trace.id;
+		delete(trace.id);
+		
+		trace.temporal.end = date_heure();
+		trace.events.end = evnt;
+		
+		var traceJSON = JSON.stringify(trace);
+		console.log("Context: "+traceJSON);
+		$.ajax({
+		   url: "http://localhost:12564/api/v0/privacy/trace",
+		   type: "POST",
+		   contentType: "application/json;charset=UTF-8",
+		   data: traceJSON,
+		   headers:{"traceId": headerTraceID},
+		   success: function(response) {
+				console.log("Response: "+response);	
+		   }
+		});
+	}
 }
