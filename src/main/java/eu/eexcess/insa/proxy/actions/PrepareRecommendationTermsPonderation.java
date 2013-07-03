@@ -1,6 +1,7 @@
 package eu.eexcess.insa.proxy.actions;
 
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.eexcess.insa.proxy.Utils;
+
 public class PrepareRecommendationTermsPonderation implements Processor {
 	Logger logger = LoggerFactory.getLogger(PrepareRecommendationTermsPonderation.class);
 	static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -33,32 +36,44 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	double B = -1/(k*T+b);
 
 	
+	
+	
+	
+	/**
+	 * Takes a list of obsels and processes it into 
+	 * a list of terms with coefficients
+	 * 
+	 * @see org.apache.camel.Processor#process(org.apache.camel.Exchange)
+	 */
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
-		InputStream is = in.getBody(InputStream.class);
+		String is = in.getBody(String.class);
 
 		
-		//coefficients are calculated for each term in the obsel's title 
-		// *************************************************
+		//coefficients are calculated for each term from the obsel's title 
+		// ************************************************************
 		JsonFactory factory = new JsonFactory();
 	    JsonParser jp = factory.createJsonParser(is);
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
 	   
-	   // List<Double> coefficients = obselWeight(rootNode);
+	  
 	    
 	    HashMap<String, Double> ponderatedTerms = new HashMap<String,Double>();
 	    JsonNode hitsNode = rootNode.path("hits").path("hits");
 	    Iterator<JsonNode> itJson = hitsNode.getElements();
-	   // Iterator<Double> itCoef = coefficients.iterator();
 	    String titleBuffer ="";
 	    String term = "";
 	    double coefficient = 0.0;
-	    while(itJson.hasNext()){
+	    while(itJson.hasNext()){ //goes over all the obsels in order to extract their title's terms and 
+	    	// to give them a coefficient
+	    	JsonNode obsel = itJson.next();
+	    	coefficient = calcOneObselWeight(itJson.next(), new Date()); 
+	    	titleBuffer = obsel.path("_source").path("document").path("title").asText();
 	    	
-	    	coefficient = calcOneObselWeight(itJson.next(), new Date());
-	    	titleBuffer = hitsNode.path("_source").path("document").path("title").asText();
+	    	
 	    	List<String> terms = tokenize(titleBuffer);
+	    	
 	    	Iterator<String> itTerms = terms.iterator();
 	    	while ( itTerms.hasNext() ){
 	    		term = itTerms.next();
@@ -78,9 +93,10 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    	
 	    }
 	    
-	    // The coefficients are parsed into a Json structure 
-	    //***************************************************
-	    //in.setBody
+	    
+	    StringWriter stringWriter = new StringWriter();
+	    Utils.writeWeightedQuery(stringWriter, ponderatedTerms);
+	    in.setBody(stringWriter.toString());
 		
 		
 		
@@ -97,7 +113,8 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	
 	
 	
-	/* Calculates each obsel a coefficient based on different parameters :
+	/*//////////////// CURRENTLY UNUSED ///// ( to be removed ?)
+	 * Calculates each obsel a coefficient based on different parameters :
 	 * 	* the duration the page represented by the obsel has been viewed
 	 * 	* the time passed since said page have been opened
 	 *  
@@ -129,7 +146,14 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 		return coefficients;
 	}
 
-	
+	/** Attributes a coefficient from 0 to 1 to a given obsel
+	 * 
+	 * @param hitJson : the JsonNode refering to the obsel taken into consideration
+	 * @param cDate = the current date
+	 * 
+	 * @return : given obsel's relative coefficient
+	 * 
+	 */
 	private Double calcOneObselWeight(JsonNode hitJson, Date cDate)
 			throws ParseException {
 		Date begin = null;
@@ -172,7 +196,8 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 
 
 
-	/*
+	/** @param titleContent : the obsel's title to exctract tokens from
+	 * 
 	 *  @ return : the trace's title as a list of tokens
 	 */
 	public List<String> tokenize(String titleContent) {

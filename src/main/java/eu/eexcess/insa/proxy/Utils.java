@@ -17,8 +17,10 @@ public class Utils {
 		jg.writeStartObject();
 			for(Entry<String, Double> entry: query.entrySet()) {
 				jg.writeArrayFieldStart("query");
-					jg.writeStringField("term", entry.getKey());
-					jg.writeNumberField("score", entry.getValue());
+					jg.writeStartObject();
+						jg.writeStringField("term", entry.getKey());
+						jg.writeNumberField("score", entry.getValue());
+					jg.writeEndObject();
 				jg.writeEndArray();
 			}
 		jg.writeEndObject();
