@@ -1,28 +1,44 @@
 <html>
 	<head>
-		<link rel="stylesheet" type="text/css" href="main.css">
+		<script type="text/javascript" src="jquery-1.10.1.min.js"></script>
 		<script type="text/javascript" src="popup.js"></script>
+		<link rel="stylesheet" type="text/css" href="main.css"></link>
+		<link rel="stylesheet" type="text/css" href="flat_ui/bootstrap/css/bootstrap.css"></link>
+		<link rel="stylesheet" type="text/css" href="flat_ui/css/flat-ui.css"></link>
+		<link rel="stylesheet" type="text/css" href="popup.css"></link>
 	</head>
 	<body>
-		<p><img src="logo.jpg" /><p id="username"></p></p>
-		<a href="traces.html" target="_blank"><input type="button" value="Your traces"></a>
-		<a href="sign_up.html" target="_blank"><input type="button" value="Sign up"></a>
-		<input style="visibility:hidden" id="logout_btn" type="button" value="Log Out">
-		<ul>
-			<li class="mendeley">
-				<a target="_blank" href="http://www.mendeley.com/catalog/next-generation-dna-sequencing-methods/">Next generation dna sequencing methods</a>
-				<p class="info">Score: 3.2</p>
-			</li>
-			<li class="econbiz">
-				<a target="_blank" href="https://dipot.ulb.ac.be/dspace/bitstream/2013/109525/1/wp12006.pdf">Examining Relationships between Culture, Creativity and Business Stage in an Emerging Market: A Categorical Data Analysis of Vietnam’s Data Set</a>
-				<p class="info">Score: 2.8</p>
-			</li>
-			<li>Recommentation 3</li>
-			<li>Recommentation 4</li>
-			<li>Recommentation 5</li>
-			<li>Recommentation 6</li>
-			<li>Recommentation 7</li>
-		</ul>
-		<p class="footer_popup"><a target="_blank" href="http://www.eexcess.eu/">More about the EEXCESS project</a></p>
+		<div class="container">
+			<div class="span8">
+			
+			<div class="header">
+				<div class="logo">
+					<img src="logo.jpg" />
+				</div>	
+				
+				<div class="buttons">
+					<a href="traces.html" target="_blank">
+						<input class="btn btn-primary" type="button" value="Your traces">
+					</a>
+					<a href="sign_up.html" target="_blank">
+						<input id="sign_in" class="btn btn-primary" type="button" value="Sign in/Sign up">
+					</a>
+					<input style="display:none" class="btn btn-primary" id="logout_btn" type="button" value="Log Out"></input>
+				</div>
+				<div class="username">
+					<p id="username"></p>
+				</div>
+				</div>
+				<div class="todo mrm">
+					<div class="todo-search">
+						<div id="recommend">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<p class="footer_popup">
+			<a target="_blank" href="http://www.eexcess.eu/">More about the EEXCESS project</a>
+		</p>
 	</body>
 </html>
