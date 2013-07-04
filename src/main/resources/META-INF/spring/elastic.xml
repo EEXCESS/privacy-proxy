@@ -20,6 +20,7 @@
     			<constant>UTF-8</constant>
     		</setProperty>
 			<to uri="http4://localhost:9200/" />
+			<removeHeaders pattern="CamelHttp*" />
 		</route>
 
 		<route>
@@ -34,6 +35,7 @@
     			<constant>UTF-8</constant>
     		</setProperty>
 			<to uri="http4://localhost:9200/privacy/trace/_search?sort=temporal.begin:desc&amp;size=50" />
+			<removeHeaders pattern="CamelHttp*" />
 		</route>
 		
 		<route>
@@ -48,11 +50,9 @@
     			<constant>UTF-8</constant>
     		</setProperty>
 			<to uri="http4://localhost:9200/privacy/trace/_search" />
+			<removeHeaders pattern="CamelHttp*" />
 		</route>
-		
-		
-		
-		
+
     </camelContext>
 </beans>
 
