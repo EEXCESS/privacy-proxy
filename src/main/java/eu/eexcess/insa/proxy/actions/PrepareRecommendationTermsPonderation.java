@@ -47,7 +47,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	 */
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
-		String is = in.getBody(String.class);
+		InputStream is = in.getBody(InputStream.class);
 
 		
 		//coefficients are calculated for each term from the obsel's title 
@@ -79,9 +79,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    		term = itTerms.next();
 	    		if ( ponderatedTerms.containsKey(term)){
 	    			int newCoef = ponderatedTerms.get(term)+ coefficient;
-	    			if(newCoef>1){
-	    				newCoef = 1;
-	    			}
+	    			
 	    			ponderatedTerms.remove(term);
 	    			ponderatedTerms.put( term, newCoef);
 	    		}
@@ -96,7 +94,9 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    
 	    StringWriter stringWriter = new StringWriter();
 	    Utils.writeWeightedQuery(stringWriter, ponderatedTerms);
+	    logger.info(ponderatedTerms.toString());
 	    in.setBody(stringWriter.toString());
+
 		
 		
 		
@@ -208,9 +208,11 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 		List<String> result = new ArrayList<String>(); 
 		String tokenDeLimiters = " \t|[]/\'()\"@\\&~,;:!?<>#_-.1234567890\n\b\r\f";
 		StringTokenizer tokenizer = new StringTokenizer ( titleContent,tokenDeLimiters,  false );
+		String token = "";
 		while ( tokenizer.hasMoreElements()){
-			
-			result.add(tokenizer.nextToken());
+			token = tokenizer.nextToken();
+			token = token.replace("&nbsp", "");
+			result.add(token);
 		}
 		
 		return result;
