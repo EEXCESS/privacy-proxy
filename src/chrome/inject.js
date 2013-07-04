@@ -31,7 +31,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 
 function sendRequest(event) {
-	alert(event);
 	var documentRequest = {
 		method: "newRequest",
 		event: event
