@@ -150,6 +150,12 @@ function traces(user_id,email) {
 		
 		$(clone).find('.traces').html(content["_source"].document.title);
 		$(clone).find('.traces').attr("href",content["_source"].document.url);
+		if (content["_source"].events.begin == "focus") {
+			$(clone).find('.tempImg1').attr("src","focus.png");
+		}
+		if (content["_source"].events.end == "blur") {
+			$(clone).find('.tempImg2').attr("src","blur.png");
+		}
 		
 		var parsedUrl = parseUrl(content["_source"].document.url);
 		var faviconUrl = parsedUrl+"/favicon.ico";
@@ -162,7 +168,6 @@ function traces(user_id,email) {
 			$(clone).find('.userGravatar').attr('src',gravatar);
 			$(clone).find('.userInformations').css("display","inline")
 		}
-		
 		
 		
 		$(clone).find('.jsonDetail').JSONView(content["_source"]);

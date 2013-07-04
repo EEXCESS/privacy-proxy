@@ -39,7 +39,7 @@ chrome.tabs.onActivated.addListener(function(info) {
 	//alert('new:'+activeTabId);
 	if (activeTabId){
 		//triggerContext( activeTabId);	
-		triggerContext(activeTabId);	
+		triggerContext(activeTabId,"focus");	
 	}
 });
 
@@ -82,10 +82,10 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     if (request.method == "getLocalStorage") {
       sendResponse({data: localStorage[request.key]});
     }else if (request.method == "documentContext") {
-    	send_context("load", sender.tab.id, request);
+    	send_context(request.event, sender.tab.id, request);
     }else if (request.method == "newRequest") {
-    	if (request.event == "onload") {
-    		triggerContext(sender.tab.id);
+    	if (request.event == "load") {
+    		triggerContext(sender.tab.id,"load");
     	}
     	else if (request.event == "onunload"){
     		updateContext(sender.tab.id,"unload");
@@ -141,9 +141,10 @@ function date_heure()
 
 
 // function triggerContext(event, tabId) {
-function triggerContext(tabId) {
+function triggerContext(tabId,event) {
 	var requestContext = {
-		method: "getContext"
+		method: "getContext",
+		event: event
 	}
 
 	chrome.tabs.sendMessage(tabId, requestContext, function(){});  //asks for a tab to send the page's context
