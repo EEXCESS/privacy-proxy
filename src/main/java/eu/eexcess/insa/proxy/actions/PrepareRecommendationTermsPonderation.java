@@ -79,9 +79,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    		term = itTerms.next();
 	    		if ( ponderatedTerms.containsKey(term)){
 	    			int newCoef = ponderatedTerms.get(term)+ coefficient;
-	    			if(newCoef>1){
-	    				newCoef = 1;
-	    			}
+	    			
 	    			ponderatedTerms.remove(term);
 	    			ponderatedTerms.put( term, newCoef);
 	    		}
@@ -194,7 +192,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 				* (1 / k) + B * (beginTrace - endTrace))
 				/ (Math.log((k * T + b) / b) * (1 / k) + B * T);
 		//double truncatedCoefficient = coefficient - coefficient % 0.001;
-		double truncatedCoefficient = Math.round(coefficient*3000);
+		double truncatedCoefficient = Math.round(coefficient*300);
 		return (int)(truncatedCoefficient);
 	}
 
