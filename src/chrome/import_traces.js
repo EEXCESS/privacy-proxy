@@ -6,6 +6,98 @@
 * This function gets the user's data and put them into traces.html
 */
 
+function parseUrl(url) {
+	url = url.split(':')[1];
+	host = url.split('/')[0];
+	host = 'http://'+host;
+	return(host);
+}
+
+function getDelay(begin, end){
+	
+	if (end == undefined) {
+		end=begin;
+	}
+	
+	begin = begin.split('Z')[0];
+	end = end.split('Z')[0];
+	
+	var timeBegin = begin.split('T')[1];
+	var dayBegin = begin.split('T')[0];
+	var timeEnd = end.split('T')[1];
+	var dayEnd = end.split('T')[0];
+	
+	var delayYear = dayEnd.split('-')[0]-dayBegin.split('-')[0];
+	var delayMonth = dayEnd.split('-')[1]-dayBegin.split('-')[1];
+	var delayDay = dayEnd.split('-')[2]-dayBegin.split('-')[2];
+	
+	var delayHour = timeEnd.split(':')[0]-timeBegin.split(':')[0];
+	var delayMinute = timeEnd.split(':')[1]-timeBegin.split(':')[1];
+	var delaySecond = timeEnd.split(':')[2]-timeBegin.split(':')[2];
+	
+	//alert(delayYear+ '-'+delayMonth+'-'+delayDay+'T'+delayHour+':'+delayMinute+':'+delaySecond);
+	
+	var result = "Time spent: "
+	
+	if (delayYear != 0) {
+		result = result + delayYear + " year";
+		}
+	else if(delayMonth != 0){
+		result = result + delayMonth + " month";
+	}
+	else if(delayDay != 0){
+		result = result + delayDay + " day";
+	}
+	else if (delayHour != 0){
+		if(delayHour ==1 && delayMinute <=10){
+			result = result + (delayMinute+60) + " minutes";
+		}
+		else {
+			result = result + delayHour + " hour";
+			if (delayHour!=1) result= result +"s";
+		}
+	}
+	else if (delayMinute !=0){
+		if(delayMinute ==1 && delaySecond <=40){
+			result = result + (delaySecond+60) + " seconds";
+		}
+		else {
+			result = result + delayMinute + " minute";
+			if (delayMinute!=1) result= result +"s";
+		}
+		
+	}
+	else {
+		result = result + delaySecond + " second";
+		if (delaySecond!=1) result= result +"s";
+	}
+	
+	return result;
+}
+
+function parseDate(date){
+	if(date == undefined) {
+		return('Error in date format');
+	}
+	else{
+		date = date.split('Z')[0];  //remove the Z character
+		var dateParts = date.split('T');
+		var dayPart = dateParts[0];
+		var timePart = dateParts[1];
+		
+		var daySplit = dayPart.split('-');
+		var year = Number(daySplit[0]);
+		var month = Number(daySplit[1]) - 1;
+		var day = Number(daySplit[2]);
+		
+		var monthsTab = new Array("January","February","March","April","May","June","July","August","September","October","November","December");
+		month = monthsTab[month];
+		
+		dateFormated = day + " " + month + " " + year + " at " + timePart;
+		return(dateFormated);
+	}
+}
+
 function traces(user_id,email) {
 	// a query is send to the elasticsearch database
 	var url = "http://localhost:11564/user/traces";
@@ -40,37 +132,40 @@ function traces(user_id,email) {
 	document.getElementById('nbTraces').innerHTML = nbTraces + " traces dans l'historique";
 	if(nbTraces>50) nbTraces = 50;                    // only the first 50 results are displayed
 	
-	for(var i=0;i<nbTraces;i++) {                                             
+	for(var i=0;i<nbTraces;i++) {     
 		var content = sources[i];
-		var newLink_li = document.createElement('li');
+		var clone = $('#template').clone(true);
 		
-		var id_li = 'list'+i;
+		clone.css("display","inherit");
 		
-		newLink_li.id = id_li;
+		clone.appendTo('#list_trace');
 		
-		document.getElementById('list_trace').appendChild(newLink_li);
+		var beginDate = parseDate(content["_source"].temporal.begin);
+		var endDate = parseDate(content["_source"].temporal.end);
 		
-		var newLink = document.createElement('h4');
-		var newLinkText = document.createTextNode( '  ('+content["_source"].temporal.begin+')');
+		$(clone).find('.historyEnd').html('('+endDate+')');
+		$(clone).find('.delay').html(getDelay(content["_source"].temporal.begin,content["_source"].temporal.end))
 		
-		var link = document.createElement('a');
-		var linkText = document.createTextNode(content["_source"].document.title);  
-		 
-		newLink.id    = 'history';
-		newLink.class = 'todo-name';
+		$(clone).find('.historyBegin').html('('+beginDate+')');
 		
-		link.id = 'traces';
-		link.href = content["_source"].document.url;
-		 	 
-		link.appendChild(linkText);
-	 	document.getElementById(id_li).appendChild(link);
-	 	
-		newLink.appendChild(newLinkText);  	 
-		document.getElementById(id_li).appendChild(newLink);
+		$(clone).find('.traces').html(content["_source"].document.title);
+		$(clone).find('.traces').attr("href",content["_source"].document.url);
 		
+		var parsedUrl = parseUrl(content["_source"].document.url);
+		var faviconUrl = parsedUrl+"/favicon.ico";
+		$(clone).find('.host').html(parsedUrl);
+		$(clone).find('.favicon').attr("src",faviconUrl);
+		
+		if (content["_source"].user.email != undefined){
+			$(clone).find('.userEmail').html(content["_source"].user.email);
+			var gravatar = "http://www.gravatar.com/avatar/"+MD5(content["_source"].user.email);
+			$(clone).find('.userGravatar').attr('src',gravatar);
+			$(clone).find('.userInformations').css("display","inline")
+		}
 
 	}
 }
+
 
 /*
 *    This function collect the user email from the localStorage (via background.js)
@@ -112,6 +207,7 @@ $('#inputUserTraces').live("change",function(){
 	}
 		
 });
+
 
 $('#inputPluginTraces').live("change",function(){
 

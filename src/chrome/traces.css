@@ -1,0 +1,45 @@
+.siteContext{
+	display:inline-block;
+	width:500px;
+}
+.traces{
+	position: relative;
+	top: -14px;
+	left: 15px;
+}
+.host{
+	position: relative;
+	top:-20px;
+	left:60px;
+}
+
+.historyBegin{
+	display: inline-block;
+	width: 180px;
+	margin-left:15px;
+}
+.historyEnd{
+	display: inline-block;
+	width: 180px;
+	margin-left:15px;
+}
+.delay{
+	display: inline-block;
+	width: 180px;
+}
+.tempImg{
+	width:45px;
+	padding:2;
+	
+}
+
+
+.userInformations{
+	display: inline-block;
+	float: right;
+}
+.userGravatar{
+	width:35px !important;
+	margin-right: 20px
+}
+
