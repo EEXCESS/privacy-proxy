@@ -101,11 +101,18 @@ public class APIService extends RouteBuilder  {
 				.process(prepEconBizQuery)
 				.removeHeader("ElasticType")
 				.removeHeader("ElasticIndex")
-			    .to("http4://api.econbiz.de/v1")
+				
+				.to("log:query?showHeaders=true")
+				.choice()
+					.when().simple("${in.header.CamelHttpQuery} == 'q='")
+						.to("http4://api.econbiz.de/v1/search")
+					.otherwise()
+						.to("string-template:templates/empty-results.tm")
+			    //.wireTap("direct:essai")
 			    .unmarshal(new JsonXMLDataFormat())
 			    .wireTap("file:///tmp/econbiz/?fileName=example.xml")
 			    .to("xslt:eu/eexcess/insa/xslt/econbiz2html.xsl")
-			    //.wireTap("file:///tmp/econbiz/?fileName=example.html")
+			    .wireTap("file:///tmp/econbiz/?fileName=example.html")
 			;
 			
 			

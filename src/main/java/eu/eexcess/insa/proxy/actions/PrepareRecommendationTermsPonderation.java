@@ -59,12 +59,12 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	   
 	  
 	    
-	    HashMap<String, Double> ponderatedTerms = new HashMap<String,Double>();
+	    HashMap<String, Integer> ponderatedTerms = new HashMap<String,Integer>();
 	    JsonNode hitsNode = rootNode.path("hits").path("hits");
 	    Iterator<JsonNode> itJson = hitsNode.getElements();
 	    String titleBuffer ="";
 	    String term = "";
-	    double coefficient = 0.0;
+	    int coefficient = 0;
 	    while(itJson.hasNext()){ //goes over all the obsels in order to extract their title's terms and 
 	    	// to give them a coefficient
 	    	JsonNode obsel = itJson.next();
@@ -78,7 +78,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    	while ( itTerms.hasNext() ){
 	    		term = itTerms.next();
 	    		if ( ponderatedTerms.containsKey(term)){
-	    			double newCoef = ponderatedTerms.get(term)+ coefficient;
+	    			int newCoef = ponderatedTerms.get(term)+ coefficient;
 	    			if(newCoef>1){
 	    				newCoef = 1;
 	    			}
@@ -106,7 +106,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	
 	
 	
-	public List<Double> obselWeight(JsonNode traceSearchResults){
+	public List<Integer> obselWeight(JsonNode traceSearchResults){
 		
 		return( obselWeight ( traceSearchResults, new Date()));
 	}
@@ -123,22 +123,25 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	 * @return : list containing the calculated coefficients, ordered the same way the obsels where in the JsonNode parameter
 	 * 
 	 */
-	public List<Double> obselWeight(JsonNode traceSearchResults, Date cDate) {
+	public List<Integer> obselWeight(JsonNode traceSearchResults, Date cDate) {
 		
-		List<Double> coefficients = new ArrayList<Double>();		
+		//List<Double> coefficients = new ArrayList<Double>();
+		List<Integer> coefficients = new ArrayList<Integer>();
 
 		JsonNode hitsJson = traceSearchResults.path("hits").path("hits");
 		Iterator<JsonNode> it = hitsJson.getElements();
 		while(it.hasNext()) {
 			try {
 				JsonNode hitJson = it.next();
-				Double obs = calcOneObselWeight(hitJson, cDate);
+				//Double obs = calcOneObselWeight(hitJson, cDate);
+				int  obs = calcOneObselWeight(hitJson, cDate);
 
 				coefficients.add(obs);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				coefficients.add(0.0);
+				//coefficients.add(0.0);
+				coefficients.add(0);
 			}
 
 		}
@@ -154,7 +157,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	 * @return : given obsel's relative coefficient
 	 * 
 	 */
-	private Double calcOneObselWeight(JsonNode hitJson, Date cDate)
+	private int calcOneObselWeight(JsonNode hitJson, Date cDate)
 			throws ParseException {
 		Date begin = null;
 		Date end = null;
@@ -188,9 +191,9 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 				/ (k * endTrace + b))
 				* (1 / k) + B * (beginTrace - endTrace))
 				/ (Math.log((k * T + b) / b) * (1 / k) + B * T);
-		double truncatedCoefficient = coefficient - coefficient % 0.001;
-
-		return truncatedCoefficient;
+		//double truncatedCoefficient = coefficient - coefficient % 0.001;
+		double truncatedCoefficient = Math.round(coefficient*300);
+		return (int)(truncatedCoefficient);
 	}
 
 
@@ -203,7 +206,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	public List<String> tokenize(String titleContent) {
 
 		List<String> result = new ArrayList<String>(); 
-		String tokenDeLimiters = " |[]/\'\"@\\&~,;:!?<>#_-.1234567890";
+		String tokenDeLimiters = " \t|[]/\'()\"@\\&~,;:!?<>#_-.1234567890\n\b\r\f";
 		StringTokenizer tokenizer = new StringTokenizer ( titleContent,tokenDeLimiters,  false );
 		while ( tokenizer.hasMoreElements()){
 			

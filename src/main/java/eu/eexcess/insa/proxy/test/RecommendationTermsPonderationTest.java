@@ -83,7 +83,7 @@ public class RecommendationTermsPonderationTest {
 		
 		Double[] expecteds = new Double[] {0.631,  0.112 , 0.0 , 0.064 , 0.0, 0.001, 0.028, 0.001, 0.064, 0.0}; // TODO
 		
-		List<Double> resultList = ponderator.obselWeight(testNode,dateTest);
+		List<Integer> resultList = ponderator.obselWeight(testNode,dateTest);
 		
 		Double[] actuals = new Double[resultList.size()];
 		
