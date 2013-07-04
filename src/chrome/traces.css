@@ -1,6 +1,6 @@
 .siteContext{
 	display:inline-block;
-	width:500px;
+	width:600px;
 }
 .traces{
 	position: relative;
@@ -41,5 +41,9 @@
 .userGravatar{
 	width:35px !important;
 	margin-right: 20px
+}
+
+.json{
+	padding: 2px 42px 0px 25px !important;
 }
 
