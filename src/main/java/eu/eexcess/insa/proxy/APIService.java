@@ -6,13 +6,16 @@ import org.apache.camel.builder.RouteBuilder;
 import com.semsaas.jsonxml.JsonXMLReader;
 
 import eu.eexcess.insa.camel.JsonXMLDataFormat;
+import eu.eexcess.insa.proxy.actions.PrepareLastTenTracesQuery;
 import eu.eexcess.insa.proxy.actions.PrepareRecommendationRequest;
+import eu.eexcess.insa.proxy.actions.PrepareRecommendationTermsPonderation;
 import eu.eexcess.insa.proxy.actions.PrepareRequest;
 import eu.eexcess.insa.proxy.actions.PrepareResponse;
 import eu.eexcess.insa.proxy.actions.PrepareSearch;
 import eu.eexcess.insa.proxy.actions.PrepareUserSearch;
 import eu.eexcess.insa.proxy.actions.PrepareUserLogin;
 import eu.eexcess.insa.proxy.actions.PrepareRespLogin;
+import eu.eexcess.insa.proxy.connectors.EconBizQueryMapper;
 
 /**
  * Hello world!
@@ -27,6 +30,9 @@ public class APIService extends RouteBuilder  {
 	final PrepareUserLogin prepUserLogin = new PrepareUserLogin();
 	final PrepareRespLogin prepRespUser = new PrepareRespLogin();
 	final PrepareRecommendationRequest prepRecommendRequ = new PrepareRecommendationRequest();
+	final PrepareRecommendationTermsPonderation prepPonderation = new PrepareRecommendationTermsPonderation();
+	final EconBizQueryMapper prepEconBizQuery = new EconBizQueryMapper ();
+	final PrepareLastTenTracesQuery prepLastTen = new PrepareLastTenTracesQuery();
 	
 		public void configure() throws Exception {
 			/*from("jetty:http://localhost:8888/v0/eexcess/recommend")
@@ -87,13 +93,34 @@ public class APIService extends RouteBuilder  {
 			
 			
 			from("direct:recommend.econbiz")
-				.process(prepRecommendRequ)
-			    .to("http4://api.econbiz.de/v1/search")
+				.process(prepLastTen)
+				.setHeader("ElasticType").constant("trace")
+				.setHeader("ElasticIndex").constant("privacy")
+				.to("direct:elastic.userSearch")
+				.process(prepPonderation)
+				.process(prepEconBizQuery)
+				.removeHeader("ElasticType")
+				.removeHeader("ElasticIndex")
+			    .to("http4://api.econbiz.de/v1")
 			    .unmarshal(new JsonXMLDataFormat())
-			    //.wireTap("file:///tmp/econbiz/?fileName=example.xml")
+			    .wireTap("file:///tmp/econbiz/?fileName=example.xml")
 			    .to("xslt:eu/eexcess/insa/xslt/econbiz2html.xsl")
 			    //.wireTap("file:///tmp/econbiz/?fileName=example.html")
 			;
+			
+			
+			
+			
+			
+			
+			from("direct:essai")
+			.unmarshal().string("UTF-8")
+			.to("file:///tmp/econbiz/?fileName=debug.txt");
+			
+			
+			from("direct:essaiRequete")
+			.unmarshal().string("UTF-8")
+			.to("file:///tmp/econbiz/?fileName=debugRequete.txt");
 			
 		}
 
