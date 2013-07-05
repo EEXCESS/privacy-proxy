@@ -8,6 +8,10 @@
   margin-bottom: 20px;
   
 }
+.recommendation{
+  display: inline !important;
+  padding-left: 10px;
+}
 
 ::-webkit-scrollbar {
       width: 15px;

@@ -15,6 +15,7 @@ import java.util.StringTokenizer;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
@@ -22,6 +23,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.eexcess.insa.lucene.Tokenizer;
 import eu.eexcess.insa.proxy.Utils;
 
 public class PrepareRecommendationTermsPonderation implements Processor {
@@ -205,16 +207,9 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	 */
 	public List<String> tokenize(String titleContent) {
 
-		List<String> result = new ArrayList<String>(); 
-		String tokenDeLimiters = " \t|[]/\'()\"@\\&~,;:!?<>#_-.1234567890\n\b\r\f";
-		StringTokenizer tokenizer = new StringTokenizer ( titleContent,tokenDeLimiters,  false );
-		String token = "";
-		while ( tokenizer.hasMoreElements()){
-			token = tokenizer.nextToken();
-			token = token.replace("&nbsp", "");
-			result.add(token);
-		}
+		String utf8String = StringEscapeUtils.unescapeHtml4(titleContent);
+		List<String> tokens = Tokenizer.tokenize(utf8String);
 		
-		return result;
+		return tokens;
 	}
 }

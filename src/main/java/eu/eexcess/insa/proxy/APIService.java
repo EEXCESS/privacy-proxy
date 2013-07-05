@@ -16,6 +16,7 @@ import eu.eexcess.insa.proxy.actions.PrepareUserSearch;
 import eu.eexcess.insa.proxy.actions.PrepareUserLogin;
 import eu.eexcess.insa.proxy.actions.PrepareRespLogin;
 import eu.eexcess.insa.proxy.connectors.EconBizQueryMapper;
+import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
 
 /**
  * Hello world!
@@ -33,6 +34,7 @@ public class APIService extends RouteBuilder  {
 	final PrepareRecommendationTermsPonderation prepPonderation = new PrepareRecommendationTermsPonderation();
 	final EconBizQueryMapper prepEconBizQuery = new EconBizQueryMapper ();
 	final PrepareLastTenTracesQuery prepLastTen = new PrepareLastTenTracesQuery();
+	final MendeleyQueryMapper prepMendeleyQuery = new MendeleyQueryMapper();
 	
 		public void configure() throws Exception {
 			/*from("jetty:http://localhost:8888/v0/eexcess/recommend")
@@ -101,11 +103,22 @@ public class APIService extends RouteBuilder  {
 				.log("${out.body}")
 				.process(prepPonderation)
 				.log("${in.body}")
+				
+				//************Mendeley Part**********
+				.process(prepMendeleyQuery)
+				.recipientList().header("QueryEndpoint")
+				.unmarshal(new JsonXMLDataFormat())
+				.removeHeader("HTTP_URI")
+			    .wireTap("file:///tmp/mendeley/?fileName=example.xml")
+			    .to("xslt:eu/eexcess/insa/xslt/mendeley2html.xsl")
+			    .wireTap("file:///tmp/mendeley/?fileName=example.html")
+				
+			/*	// ***********  Econbiz part**************
+				
 				.process(prepEconBizQuery)
 				
 				.removeHeader("ElasticType")
 				.removeHeader("ElasticIndex")
-				
 				.log("Query: ${in.header.CamelHttpQuery}")
 				.choice()
 					.when().simple("${in.header.CamelHttpQuery} != 'q='")
@@ -113,11 +126,12 @@ public class APIService extends RouteBuilder  {
 					.otherwise()
 						.to("string-template:templates/empty-results.tm")
 				.end()
-			    //.wireTap("direct:essai")
 			    .unmarshal(new JsonXMLDataFormat())
 			    .wireTap("file:///tmp/econbiz/?fileName=example.xml")
 			    .to("xslt:eu/eexcess/insa/xslt/econbiz2html.xsl")
 			    .wireTap("file:///tmp/econbiz/?fileName=example.html")
+			  */  
+			    
 			;
 			
 			
