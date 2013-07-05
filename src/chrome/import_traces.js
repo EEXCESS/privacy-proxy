@@ -170,7 +170,6 @@ function traces(user_id,email) {
 		if(baseG < 0) baseG = 0;
 		
 		colorRGB = "rgb("+baseRJ+","+baseG+","+baseRJ+")";
-		alert(colorRGB);
 		$(clone).find('.timebar').css("background",colorRGB);
 		
 		$(clone).find('.historyBegin').html('('+beginDate+')');
