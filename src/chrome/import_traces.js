@@ -150,6 +150,12 @@ function traces(user_id,email) {
 		
 		$(clone).find('.traces').html(content["_source"].document.title);
 		$(clone).find('.traces').attr("href",content["_source"].document.url);
+		if (content["_source"].events.begin == "focus") {
+			$(clone).find('.tempImg1').attr("src","focus.png");
+		}
+		if (content["_source"].events.end == "blur") {
+			$(clone).find('.tempImg2').attr("src","blur.png");
+		}
 		
 		var parsedUrl = parseUrl(content["_source"].document.url);
 		var faviconUrl = parsedUrl+"/favicon.ico";
@@ -162,6 +168,9 @@ function traces(user_id,email) {
 			$(clone).find('.userGravatar').attr('src',gravatar);
 			$(clone).find('.userInformations').css("display","inline")
 		}
+		
+		
+		$(clone).find('.jsonDetail').JSONView(content["_source"]);
 
 	}
 }
@@ -172,7 +181,7 @@ function traces(user_id,email) {
 *    More informations may be collected later
 */
 
-$('#inputUserTraces').live("change",function(){
+function doReloadTraces(){
 
 	for(var i=0;i<50;i++){
 		var id = "list"+i;
@@ -206,10 +215,9 @@ $('#inputUserTraces').live("change",function(){
 		
 	}
 		
-});
+}
 
-
-$('#inputPluginTraces').live("change",function(){
+function doLoadTracesOther(){
 
 	for(var i=0;i<50;i++){
 		var id = "list"+i;
@@ -243,8 +251,21 @@ $('#inputPluginTraces').live("change",function(){
 		
 	}
 		
-});
+}
 
+function doToggleDetails() {
+	var d = $(this).closest('.details').find('.jsonDetail');
+	d.toggle("drop");
+	/*if(d.is(":visible")) {
+		d.effect("drop","down");
+	} else {
+		d.toggle("drop");	
+	}*/
+}
+
+$('#inputUserTraces').live("change",doReloadTraces);
+$('#inputPluginTraces').live("change",doReloadTraces);
+$('.detailHandle').live("click",doToggleDetails);
 
 $(document).ready(function () {
   chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {

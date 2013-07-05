@@ -1,6 +1,6 @@
 .siteContext{
 	display:inline-block;
-	width:500px;
+	width:600px;
 }
 .traces{
 	position: relative;
@@ -27,7 +27,11 @@
 	display: inline-block;
 	width: 180px;
 }
-.tempImg{
+.tempImg1{
+	width:45px;
+	padding:2;
+}
+.tempImg2{
 	width:45px;
 	padding:2;
 	
@@ -41,5 +45,9 @@
 .userGravatar{
 	width:35px !important;
 	margin-right: 20px
+}
+
+.json{
+	padding: 2px 42px 0px 25px !important;
 }
 

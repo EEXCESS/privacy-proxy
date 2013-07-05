@@ -8,12 +8,13 @@
 */
 
 // sendDocumentContext
-function collect_context() {
+function collect_context(event) {
 	console.log("Loaded");
     var documentContext = {
     	method: "documentContext",
     	url : window.location.protocol + window.location.hostname + window.location.pathname,
     	title : document.title,
+    	event: event
     };
     
     console.log("Sending docContext");
@@ -24,8 +25,7 @@ function collect_context() {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.method == "getContext") {
 	
-	
-		collect_context();
+		collect_context(request.event);
 	}
 });
 
@@ -43,6 +43,6 @@ function sendRequest(event) {
 *    On each new page, this function saves the new context
 */
 //chrome.tabs.onActivated.addListener(collect_context("focus"));
-window.addEventListener("load",sendRequest("onload"));
-window.addEventListener("unload",sendRequest("onunload"));
+window.addEventListener("load",sendRequest("load"));
+window.addEventListener("unload",sendRequest("unload"));
 
