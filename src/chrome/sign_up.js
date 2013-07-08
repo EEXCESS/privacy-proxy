@@ -41,6 +41,7 @@ function register(){
 
 	/*
 	* TODO : verifier la disponibilite  document.forms["register"].elements[0].value
+	* Already done in valideIDs
 	*/
 	
 	var username = document.forms["register"].elements[0].value;
@@ -64,6 +65,10 @@ function register(){
 	   data: userDataJSON,
 	   success: function(response) {
 			document.getElementById('successSignup').innerHTML='Registration Successfull';
+			localStorage["privacy_email"] = response["email"];
+			localStorage["username"] = response["username"];
+			document.getElementById("successLogin").innerHTML = "Successful Sign in";
+			document.location.href="traces.html";
 	   }
 	});
 	
@@ -86,9 +91,9 @@ function validEmail(mail)
 
 
 function login() {
-
-	var id = document.forms["login"].elements[0].value;
-	var password = MD5(document.forms["login"].elements[1].value);
+	
+	var id = document.forms["login"].elements[1].value;
+	var password = MD5(document.forms["login"].elements[1].value);	
 
 	if(validEmail(id)) {
 		var field = "email";
@@ -114,6 +119,7 @@ function login() {
 					localStorage["privacy_email"] = response["email"];
 					localStorage["username"] = response["username"];
 					document.getElementById("successLogin").innerHTML = "Successful Sign in";
+					document.location.href="traces.html";
 				}
 		    }
 		});
