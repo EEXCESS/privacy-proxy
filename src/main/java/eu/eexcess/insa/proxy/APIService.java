@@ -15,6 +15,7 @@ import eu.eexcess.insa.proxy.actions.PrepareSearch;
 import eu.eexcess.insa.proxy.actions.PrepareUserSearch;
 import eu.eexcess.insa.proxy.actions.PrepareUserLogin;
 import eu.eexcess.insa.proxy.actions.PrepareRespLogin;
+import eu.eexcess.insa.proxy.actions.PrepareUserProfile;
 import eu.eexcess.insa.proxy.connectors.EconBizQueryMapper;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
 
@@ -30,6 +31,7 @@ public class APIService extends RouteBuilder  {
 	final PrepareUserSearch prepUserSearch = new PrepareUserSearch();
 	final PrepareUserLogin prepUserLogin = new PrepareUserLogin();
 	final PrepareRespLogin prepRespUser = new PrepareRespLogin();
+	final PrepareUserProfile prepUserProfile = new PrepareUserProfile();
 	final PrepareRecommendationRequest prepRecommendRequ = new PrepareRecommendationRequest();
 	final PrepareRecommendationTermsPonderation prepPonderation = new PrepareRecommendationTermsPonderation();
 	final EconBizQueryMapper prepEconBizQuery = new EconBizQueryMapper ();
@@ -49,6 +51,14 @@ public class APIService extends RouteBuilder  {
 				.setHeader("ElasticIndex").constant("privacy")
 				.to("seda:elastic.trace.index")
 			;	
+			
+			from("jetty:http://localhost:12564/api/v0/users/profile")
+				.setHeader("ElasticType").constant("data")
+				.setHeader("ElasticIndex").constant("users")
+				.process(prepUserSearch)
+				.to("direct:elastic.userSearch")
+				.process(prepUserProfile)
+			;
 				
 			from("jetty:http://localhost:12564/api/v0/recommend")	
 				.removeHeaders("CamelHttp*")
