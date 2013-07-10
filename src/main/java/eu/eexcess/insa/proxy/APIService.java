@@ -15,13 +15,15 @@ import eu.eexcess.insa.proxy.actions.PrepareSearch;
 import eu.eexcess.insa.proxy.actions.PrepareUserSearch;
 import eu.eexcess.insa.proxy.actions.PrepareUserLogin;
 import eu.eexcess.insa.proxy.actions.PrepareRespLogin;
+import eu.eexcess.insa.proxy.connectors.CloseJsonObject;
 import eu.eexcess.insa.proxy.connectors.EconBizQueryMapper;
+import eu.eexcess.insa.proxy.connectors.EconBizResultFormater;
+import eu.eexcess.insa.proxy.connectors.MendeleyDocumentQueryMapper;
+import eu.eexcess.insa.proxy.connectors.MendeleyQueriesAggregator;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
+import eu.eexcess.insa.proxy.connectors.RecomendationResultAggregator;
 
-/**
- * Hello world!
- *
- */
+
 public class APIService extends RouteBuilder  {
 
 	final PrepareRequest prepReq = new PrepareRequest();
@@ -35,6 +37,10 @@ public class APIService extends RouteBuilder  {
 	final EconBizQueryMapper prepEconBizQuery = new EconBizQueryMapper ();
 	final PrepareLastTenTracesQuery prepLastTen = new PrepareLastTenTracesQuery();
 	final MendeleyQueryMapper prepMendeleyQuery = new MendeleyQueryMapper();
+	final MendeleyDocumentQueryMapper prepDocumentSearch = new MendeleyDocumentQueryMapper();
+	final CloseJsonObject closeJson = new CloseJsonObject();
+	final EconBizResultFormater econBizResultFormater = new EconBizResultFormater();
+
 	
 		public void configure() throws Exception {
 			/*from("jetty:http://localhost:8888/v0/eexcess/recommend")
@@ -53,7 +59,7 @@ public class APIService extends RouteBuilder  {
 			from("jetty:http://localhost:12564/api/v0/recommend")	
 				.removeHeaders("CamelHttp*")
 				.removeHeader("Host")	
-				.to("direct:recommend.econbiz")
+				.to("direct:recommend")
 				.setHeader("Content-Type").constant("text/html")
 			;
 			
@@ -94,7 +100,7 @@ public class APIService extends RouteBuilder  {
 			
 			
 			
-			from("direct:recommend.econbiz")
+			from("direct:recommend")
 				.process(prepLastTen)
 				.log("${in.body}")
 				.setHeader("ElasticType").constant("trace")
@@ -103,8 +109,19 @@ public class APIService extends RouteBuilder  {
 				.log("${out.body}")
 				.process(prepPonderation)
 				.log("${in.body}")
+				.setHeader("origin").simple("exchangeId")
+				.multicast().aggregationStrategy(new RecomendationResultAggregator())
+					.to("direct:recommend.econbiz")
+					.to("direct:recommend.mendeley")
+				.end()
+				.unmarshal().string("UTF-8")
+			    .unmarshal(new JsonXMLDataFormat())
+			    //.wireTap("file:///tmp/econbiz/?fileName=example.xml")
+			    .to("xslt:eu/eexcess/insa/xslt/results2html.xsl")
+			    // .wireTap("file:///tmp/econbiz/?fileName=example.html")
+			;
 				
-				//************Mendeley Part**********
+			/*	//************Mendeley Part**********
 				.process(prepMendeleyQuery)
 				.recipientList().header("QueryEndpoint")
 				.unmarshal(new JsonXMLDataFormat())
@@ -112,41 +129,28 @@ public class APIService extends RouteBuilder  {
 			    .wireTap("file:///tmp/mendeley/?fileName=example.xml")
 			    .to("xslt:eu/eexcess/insa/xslt/mendeley2html.xsl")
 			    .wireTap("file:///tmp/mendeley/?fileName=example.html")
-				
-			/*	// ***********  Econbiz part**************
-				
+				*/
+			    
+			    
+			from("direct:recommend.econbiz")
 				.process(prepEconBizQuery)
-				
-				.removeHeader("ElasticType")
-				.removeHeader("ElasticIndex")
-				.log("Query: ${in.header.CamelHttpQuery}")
-				.choice()
+			    .choice()
 					.when().simple("${in.header.CamelHttpQuery} != 'q='")
 						.to("http4://api.econbiz.de/v1/search")
 					.otherwise()
 						.to("string-template:templates/empty-results.tm")
 				.end()
-			    .unmarshal(new JsonXMLDataFormat())
-			    .wireTap("file:///tmp/econbiz/?fileName=example.xml")
-			    .to("xslt:eu/eexcess/insa/xslt/econbiz2html.xsl")
-			    .wireTap("file:///tmp/econbiz/?fileName=example.html")
-			  */  
-			    
+				.process(econBizResultFormater)
+			; 
+
+			from("direct:recommend.mendeley")
+			    .process(prepMendeleyQuery)
+			    .recipientList().header("QueryEndpoint")
+			    .process(prepDocumentSearch)
+			    .recipientList(header("QueryEndPoint").tokenize(",")).aggregationStrategy(new MendeleyQueriesAggregator())
+			    .process(closeJson)
 			;
-			
-			
-			
-			
-			
-			
-			from("direct:essai")
-			.unmarshal().string("UTF-8")
-			.to("file:///tmp/econbiz/?fileName=debug.txt");
-			
-			
-			from("direct:essaiRequete")
-			.unmarshal().string("UTF-8")
-			.to("file:///tmp/econbiz/?fileName=debugRequete.txt");
+
 			
 		}
 
