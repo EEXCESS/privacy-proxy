@@ -5,11 +5,14 @@ var idUser;
 
 
 $(document).ready(function(){
+
 	var request ={
 		term:{
 			email: localStorage["privacy_email"]
 		}
 	};
+	
+	alert(localStorage["privacy_email"]);
 	
 	var JSONrequest = JSON.stringify(request);
 	
@@ -55,7 +58,59 @@ function generateProfilePage() {
 		$(".gender").html("Gender: Not saved yet");
 	}
 	
+	$(".birthdate").html("Birthdate: " + userInfo.birthdate);
+	if(userInfo.birthdate == "") {
+		$(".birthdate").html("Birthdate: Not saved yet");
+	}
 	
+	generateDateSelect();
+	
+	generateAddress();
+	
+	
+	
+}
+
+function generateDateSelect(){
+	
+	for (var i=2;i<=31;i++){
+		var day = i;
+		
+		if(day<10) day = "0"+day;
+		
+		$('.inputBirthdate3').append("<option>"+day+"</option>");
+	}
+	
+	for (var i=2;i<=12;i++){
+		var month = i;
+		
+		if(month<10) month = "0"+month;
+		
+		$('.inputBirthdate2').append("<option>"+month+"</option>");
+	}
+	
+	
+	for (var i=1;i<=120;i++){
+		year = 2013-i;
+		$('.inputBirthdate1').append("<option>"+year+"</option>");
+	}
+}
+
+function generateAddress(){
+	
+	$(".street").html("Address: " + userInfo.address.street);
+	$(".city").html(userInfo.address.postalcode+" "+userInfo.address.city);
+	$(".country").html(userInfo.address.country);
+	if(userInfo.address.street == "") {
+		$(".street").html("Adress: Not saved yet");
+		$(".city").html("");
+		$(".country").html("");
+	}
+	
+	$('.inputStreet').val(userInfo.address.street);
+	$('.inputPostalcode').val(userInfo.address.postalcode);
+	$('.inputCity').val(userInfo.address.city);
+	$('.inputCountry').val(userInfo.address.country);
 }
 
 function doToggleEmail() {
@@ -118,6 +173,30 @@ function doToggleGender() {
 	}
 }
 
+function doToggleBirthdate() {
+
+	if ($(".birthdateChange").css("display") == "none"){
+		$(".birthdateChange").show("slow");
+		$('.menuArrowBirthdate').css("-webkit-transform","rotate(90deg)");		
+	}
+	else {
+		$('.menuArrowBirthdate').css("-webkit-transform","none");
+		$('.birthdateChange').hide("slow");
+	}
+}
+
+function doToggleAddress() {
+
+	if ($(".addressChange").css("display") == "none"){
+		$(".addressChange").show("slow");
+		$('.menuArrowAddress').css("-webkit-transform","rotate(90deg)");		
+	}
+	else {
+		$('.menuArrowAddress').css("-webkit-transform","none");
+		$('.addressChange').hide("slow");
+	}
+}
+
 
 function checkUpdate(){
 	
@@ -162,6 +241,92 @@ function updateFirstname(){
 
 function updateGender(){
 	doUpdate("Gender");
+}
+
+function updateBirthdate(){
+	
+	//First, we check the date
+	var valid = 0;
+	var longMonths = ["01","03","05","07","08","10","12"];
+	
+	if ($('.inputBirthdate3').val() == "31"){
+		for (i=0;i<7;i++){
+			if($('.inputBirthdate2').val() == longMonths[i]) {
+				valid = 1; 
+			}
+		}
+	}
+	else {
+		if ($('inputBirthdate2') == "02"){
+			if ($('.inputBirthdate3') <= 28){
+				valid = 1;
+			}
+			else {
+				if($('.inputBirthdate3') == 29){
+					if ((($('.inputBirthdate1')%4)==0) && ($('.inputBirthdate1') != "1900")){
+						valid = 1;
+					}
+				}
+			}
+		}
+		else{
+			valid=1;
+		}
+	}
+	
+	if(valid){
+		userInfo["birthdate"] = $('.inputBirthdate1').val()+"-"+$('.inputBirthdate2').val()+"-"+$('.inputBirthdate3').val();
+	
+		var userDataJSON = JSON.stringify(userInfo);
+		
+		$.ajax({
+		   url: "http://localhost:12564/api/v0/users/data",
+		   type: "POST",
+		   contentType: "application/json;charset=UTF-8",
+		   data: userDataJSON,
+		   beforeSend: function (request)
+	       {
+	           request.setRequestHeader("traceid", idUser);
+	       },
+		   success: function(response) {
+				$('.birthdate').html("Birthdate: "+userInfo["birthdate"]);
+				$('.stateBirthdate').html("Changes saved");
+		   }
+		});
+	}
+	else {
+		$('.stateBirthdate').html("This date doesn't exist");
+	}
+}
+
+function updateAddress(){
+	
+	addr = userInfo["address"];
+	
+	addr["street"] = $('.inputStreet').val();
+	addr["postalcode"] = $('.inputPostalcode').val();
+	addr["city"] = $('.inputCity').val();
+	addr["country"] = $('.inputCountry').val();
+
+	var userDataJSON = JSON.stringify(userInfo);
+	
+	$.ajax({
+	   url: "http://localhost:12564/api/v0/users/data",
+	   type: "POST",
+	   contentType: "application/json;charset=UTF-8",
+	   data: userDataJSON,
+	   beforeSend: function (request)
+       {
+           request.setRequestHeader("traceid", idUser);
+       },
+	   success: function(response) {
+		    $(".street").html("Address: " + userInfo.address.street);
+			$(".city").html(userInfo.address.postalcode+" "+userInfo.address.city);
+			$(".country").html(userInfo.address.country);
+			$('.stateAddress').html("Changes saved");
+	   }
+	});
+	
 }
 
 function doUpdate(field){
@@ -209,10 +374,14 @@ $(document).ready(function(){
 	$('.lastnameHandle').live("click",doToggleLastname);
 	$('.firstnameHandle').live("click",doToggleFirstname);
 	$('.genderHandle').live("click",doToggleGender);
+	$('.birthdateHandle').live("click",doToggleBirthdate);
+	$('.addressHandle').live("click",doToggleAddress);
 	
 	$('.submitEmail').live("click",checkUpdate);
 	$('.submitTitle').live("click",updateTitle);
 	$('.submitLastname').live("click",updateLastname);
 	$('.submitFirstname').live("click",updateFirstname);
 	$('.submitGender').live("click",updateGender);
+	$('.submitBirthdate').live("click",updateBirthdate);
+	$('.submitAddress').live("click",updateAddress);
 });

@@ -65,3 +65,39 @@
 	margin-top:10px;
 	margin-left:30px;
 }
+
+.birthdateChange{
+	padding:10px;
+}
+.birthdateChange select{
+	margin-top:10px;
+	margin-right:25px;
+}
+.stateBirthdate{
+	margin-top:10px;
+	margin-left:30px;
+}
+
+.addressChange{
+	padding:10px;
+}
+.addressChange input{
+	margin-top:10px;
+	margin-right:25px;
+}
+.stateAddress{
+	margin-top:10px;
+	margin-left:30px;
+}
+.inputStreet{
+	width: 500px;
+}
+.inputPostalcode{
+	width: 500px;
+}
+.inputCity{
+	width: 500px;
+}
+.inputCountry{
+	width: 500px;
+}

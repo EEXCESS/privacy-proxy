@@ -48,7 +48,8 @@ function register(){
 	var email = document.forms["register"].elements[1].value;
 	var password = MD5(document.forms["register"].elements[2].value);	
 	
-	
+	localStorage["privacy_email"] = email;
+	localStorage["username"] = username;
 	
 	var userData = {	
 		username: username,
@@ -65,8 +66,6 @@ function register(){
 	   data: userDataJSON,
 	   success: function(response) {
 			document.getElementById('successSignup').innerHTML='Registration Successfull';
-			localStorage["privacy_email"] = response["email"];
-			localStorage["username"] = response["username"];
 			document.getElementById("successLogin").innerHTML = "Successful Sign in";
 			document.location.href="traces.html";
 	   }
