@@ -68,7 +68,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    while(itJson.hasNext()){ //goes over all the obsels in order to extract their title's terms and 
 	    	// to give them a coefficient
 	    	JsonNode obsel = itJson.next();
-	    	coefficient = calcOneObselWeight(itJson.next(), new Date()); 
+	    	coefficient = calcOneObselWeight(obsel, new Date()); 
 	    	titleBuffer = obsel.path("_source").path("document").path("title").asText();
 	    	
 	    	
