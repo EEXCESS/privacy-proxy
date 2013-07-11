@@ -45,12 +45,7 @@ public class APIService extends RouteBuilder  {
 
 	
 		public void configure() throws Exception {
-			/*from("jetty:http://localhost:8888/v0/eexcess/recommend")
-				.removeHeaders("CamelHttp*")
-				.process(prepReq)
-//				.to("http4://www.google.com/search")
-				.process(prepRes)
-			;*/
+		
 			
 			from("jetty:http://localhost:12564/api/v0/privacy/trace")
 				.setHeader("ElasticType").constant("trace")
@@ -131,15 +126,7 @@ public class APIService extends RouteBuilder  {
 			    // .wireTap("file:///tmp/econbiz/?fileName=example.html")
 			;
 				
-			/*	//************Mendeley Part**********
-				.process(prepMendeleyQuery)
-				.recipientList().header("QueryEndpoint")
-				.unmarshal(new JsonXMLDataFormat())
-				.removeHeader("HTTP_URI")
-			    .wireTap("file:///tmp/mendeley/?fileName=example.xml")
-			    .to("xslt:eu/eexcess/insa/xslt/mendeley2html.xsl")
-			    .wireTap("file:///tmp/mendeley/?fileName=example.html")
-				*/
+			
 			    
 			    
 			from("direct:recommend.econbiz")
