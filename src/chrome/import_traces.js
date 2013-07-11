@@ -272,8 +272,12 @@ $('#inputUserTraces').live("change",doReloadTraces);
 $('#inputPluginTraces').live("change",doReloadTraces);
 $('.detailHandle').live("click",doToggleDetails);
 
+var URL = $(document)[0].URL;
+var urlSplit = URL.split("/");
+URL = urlSplit[0]+"//"+urlSplit[2]+"/";
+
 $.ajax({
-	   url: "chrome-extension://jngfnmggnbmloldmibpecgalhlaaiddg/profile.html",
+	   url: URL+"profile.html",
 	   type: "GET",
 	   complete: function(response){
 		   $('#profile').append(response.responseText)
@@ -281,7 +285,7 @@ $.ajax({
 });
 
 $.ajax({
-	   url: "chrome-extension://jngfnmggnbmloldmibpecgalhlaaiddg/settings.html",
+	   url: URL+"settings.html",
 	   type: "GET",
 	   complete: function(response){
 		   $('#settings').append(response.responseText)
