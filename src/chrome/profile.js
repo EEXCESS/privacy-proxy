@@ -300,12 +300,12 @@ function updateBirthdate(){
 
 function updateAddress(){
 	
-	addr = userInfo["address"];
+	userInfo["address"] = {};
 	
-	addr["street"] = $('.inputStreet').val();
-	addr["postalcode"] = $('.inputPostalcode').val();
-	addr["city"] = $('.inputCity').val();
-	addr["country"] = $('.inputCountry').val();
+	userInfo.address["street"] = $('.inputStreet').val();
+	userInfo.address["postalcode"] = $('.inputPostalcode').val();
+	userInfo.address["city"] = $('.inputCity').val();
+	userInfo.address["country"] = $('.inputCountry').val();
 
 	var userDataJSON = JSON.stringify(userInfo);
 	

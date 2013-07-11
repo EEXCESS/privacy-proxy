@@ -14,6 +14,26 @@
 	display: inline;
 }
 
+#slider{
+	margin-top: 30px !important;
+}
+.submitAgeSetting{
+	display: inline-block;
+	position: absolute;
+	top: 15px;
+	right: 15px;
+}
+
+#sliderAddress{
+	margin-top: 30px !important;
+}
+.submitAddressSetting{
+	display: inline-block;
+	position: absolute;
+	top: 15px;
+	right: 15px;
+}
+
 .toggle{
 	display: inline;
 	float: right;
