@@ -12,7 +12,6 @@ $(document).ready(function(){
 		}
 	};
 	
-	alert(localStorage["privacy_email"]);
 	
 	var JSONrequest = JSON.stringify(request);
 	

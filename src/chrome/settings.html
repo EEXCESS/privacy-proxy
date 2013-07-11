@@ -1,14 +1,69 @@
-<html>
-	<head>
-		
-	</head>
-	<body>
-		<div class="container">
-			<div class="row">
-				<div class="span12">
-					<h1>Settings</h1>
+<div class="todo mrm">
+	<div class="todo-search headerTraces">
+		<h1 style="display:inline">Privacy Settings</h1>
+		<img class="gravatarProfile"></img>
+		<h4 class="username">User name</h4>
+	</div>
+	<ul id="list_settings">
+		<li id="emailSetting">
+			<div class="emailInfo">
+				<h4 class="email">Email</h4>
+				<div class="switch-animate toggle">
+					<div class="switch has-switch emailSwitch">
+						<div class="switch-animate switch-email switch-off" style="">
+							<input type="checkbox" data-toggle="switch" id="emailPrivacy">
+							<span class="switch-left privacyToggleLeft">Show</span>
+							<label class="privacyToggle" for="emailPrivacy">&nbsp;</label>
+							<span class="switch-right privacyToggleRight">Hide</span>
+						</div>
+					</div>
 				</div>
-			</div>	
-		</div>
-	</body>
-</html>
+			</div>
+		</li>
+		<li id="genderSetting">
+			<div class="genderInfo">
+				<h4 class="gender">Email</h4>
+				<div class="switch-animate toggle">
+					<div class="switch has-switch genderSwitch">
+						<div class="switch-animate switch-gender switch-off" style="">
+							<input type="checkbox" data-toggle="switch" id="genderPrivacy">
+							<span class="switch-left privacyToggleLeft">Show</span>
+							<label class="privacyToggle" for="genderPrivacy">&nbsp;</label>
+							<span class="switch-right privacyToggleRight">Hide</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</li>
+		<li id="titleSetting" style="display:none">
+			<div class="titleInfo">
+				<h4 class="title">Email</h4>
+				<div class="switch-animate toggle">
+					<div class="switch has-switch titleSwitch">
+						<div class="switch-animate switch-title switch-off" style="">
+							<input type="checkbox" data-toggle="switch" id="titlePrivacy">
+							<span class="switch-left privacyToggleLeft">Show</span>
+							<label class="privacyToggle" for="titlePrivacy">&nbsp;</label>
+							<span class="switch-right privacyToggleRight">Hide</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</li>
+		<li id="ageSetting">
+			<div class="ageInfo">
+				<h4 class="birthdate">Age</h4>
+				<div id="slider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false">
+					<div class="ui-slider-segment" style="margin-left: 25%;"></div>
+					<div class="ui-slider-segment" style="margin-left: 25%;"></div>
+					<div class="ui-slider-segment" style="margin-left: 25%;"></div>
+					<div class="ui-slider-segment"></div>
+					<div class="ui-slider-segment"></div>
+					<div class="ui-slider-segment"></div>
+					<div class="ui-slider-range ui-widget-header ui-corner-all ui-slider-range-min" style="width: 25%;"></div>
+					<a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 25%;"></a>
+         		</div>
+			</div>
+		</li>
+	</ul>
+</div>
