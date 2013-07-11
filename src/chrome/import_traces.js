@@ -278,7 +278,15 @@ $.ajax({
 	   complete: function(response){
 		   $('#profile').append(response.responseText)
 	   }
-	});
+});
+
+$.ajax({
+	   url: "chrome-extension://knkiliagpcbbclfpiilchjkbabbhilbf/settings.html",
+	   type: "GET",
+	   complete: function(response){
+		   $('#settings').append(response.responseText)
+	   }
+});
 
 
 $(document).ready(function () {
