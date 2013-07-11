@@ -1,0 +1,20 @@
+.privacyToggleLeft{
+	background-color: #fff !important;
+}
+.privacyToggle{
+	border-color: #fff !important;
+}
+.email{
+	display: inline;
+}
+.gender{
+	display: inline;
+}
+.title{
+	display: inline;
+}
+
+.toggle{
+	display: inline;
+	float: right;
+}
