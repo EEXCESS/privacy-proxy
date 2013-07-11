@@ -1,3 +1,8 @@
+#nbTraces{
+	display: inline;
+	position: absolute;
+}
+
 .timebar{
 	background: rgb(255,80,80); 
 	width: 10px; 
@@ -62,5 +67,15 @@
 .collapser {
 display: inline;
 margin-right: 10px;
+}
+.demo-samples{
+	background: #1D904F;
+}
+.headerTraces{
+	background: #FFF !important;
+}
+
+.nav-tabs{
+	padding-left: 15px !important;
 }
 

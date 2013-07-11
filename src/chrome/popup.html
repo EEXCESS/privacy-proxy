@@ -1,7 +1,5 @@
 <html>
 	<head>
-		<script type="text/javascript" src="jquery-1.10.1.min.js"></script>
-		<script type="text/javascript" src="popup.js"></script>
 		<link rel="stylesheet" type="text/css" href="main.css"></link>
 		<link rel="stylesheet" type="text/css" href="flat_ui/bootstrap/css/bootstrap.css"></link>
 		<link rel="stylesheet" type="text/css" href="flat_ui/css/flat-ui.css"></link>
@@ -15,7 +13,13 @@
 				<div class="logo">
 					<img src="logo.jpg" />
 				</div>	
-				
+				<div class="env">
+					<div class="btn-group" data-toggle="buttons-radio">
+						<button id="homeButton" type="button" class="btn btn-primary" data-toggle="button"><i class="icon icon-home"></i>Home</button>
+						<button id="workButton" type="button" class="btn btn-primary" data-toggle="button"><i class="icon icon-briefcase"></i>Work</button>
+					</div>
+					
+				</div>
 				<div class="buttons">
 					<a href="traces.html" target="_blank">
 						<input class="btn btn-primary" type="button" value="Your traces">
@@ -40,5 +44,8 @@
 		<p class="footer_popup">
 			<a target="_blank" href="http://www.eexcess.eu/">More about the EEXCESS project</a>
 		</p>
+		<script type="text/javascript" src="jquery-1.10.1.min.js"></script>
+		<script type="text/javascript" src="flat_ui/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="popup.js"></script>
 	</body>
 </html>

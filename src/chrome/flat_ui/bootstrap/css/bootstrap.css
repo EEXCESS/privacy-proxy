@@ -4058,6 +4058,7 @@ input[type="submit"].btn.btn-mini {
 }
 
 .nav-tabs {
+  background: #FFF;
   border-bottom: 1px solid #ddd;
 }
 
@@ -4066,6 +4067,7 @@ input[type="submit"].btn.btn-mini {
 }
 
 .nav-tabs > li > a {
+  text-decoration: none;
   padding-top: 8px;
   padding-bottom: 8px;
   line-height: 20px;
@@ -4083,9 +4085,9 @@ input[type="submit"].btn.btn-mini {
 .nav-tabs > .active > a,
 .nav-tabs > .active > a:hover,
 .nav-tabs > .active > a:focus {
-  color: #555555;
+  color: #FFF;
   cursor: default;
-  background-color: #ffffff;
+  background-color: #1D904F;
   border: 1px solid #ddd;
   border-bottom-color: transparent;
 }

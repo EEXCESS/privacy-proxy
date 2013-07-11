@@ -255,6 +255,12 @@ function doReloadTraces(){
 function doToggleDetails() {
 	var d = $(this).closest('.details').find('.jsonDetail');
 	d.toggle("drop");
+	if ($(this).closest('.details').find('.menuArrow').css("-webkit-transform") != "none"){
+		$(this).closest('.details').find('.menuArrow').css("-webkit-transform","none");
+	}
+	else {
+		$(this).closest('.details').find('.menuArrow').css("-webkit-transform","rotate(90deg)");
+	}
 	/*if(d.is(":visible")) {
 		d.effect("drop","down");
 	} else {
@@ -266,9 +272,20 @@ $('#inputUserTraces').live("change",doReloadTraces);
 $('#inputPluginTraces').live("change",doReloadTraces);
 $('.detailHandle').live("click",doToggleDetails);
 
+$.ajax({
+	   url: "chrome-extension://knkiliagpcbbclfpiilchjkbabbhilbf/profile.html",
+	   type: "GET",
+	   complete: function(response){
+		   $('#profile').append(response.responseText)
+	   }
+	});
+
+
 $(document).ready(function () {
   chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
-	traces(response.data,'');
-  });
-  
+	  var uuid = response.data;
+	  chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
+		  traces(uuid,response.data);
+	  })
+  })
 });

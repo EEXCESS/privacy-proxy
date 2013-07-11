@@ -10,6 +10,9 @@ console.log("EEXCESS privacy plugin version "+version);
 //active tab's id
 var activeTabId = 0;
 
+//Envirronnement init
+localStorage["env"] == "home";
+
 // plugin's unique id
 var uuidUser = localStorage["uuid"];
 
@@ -158,7 +161,8 @@ function send_context(event, tabID, context){
 	var date = date_heure();
 	var trace = {
 		user: {
-			email: localStorage["privacy_email"]
+			email: localStorage["privacy_email"],
+			environnement: localStorage["env"]
 		},
 		plugin: {
 			version: version,
