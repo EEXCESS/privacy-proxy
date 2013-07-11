@@ -331,6 +331,9 @@ function updateAddress(){
 function doUpdate(field){
 	
 	userInfo[field.toLowerCase()] = $('.input'+field).val();
+	if (userInfo["birthdate"] == "") {
+		delete userInfo["birthdate"];
+	}
 	
 	var userDataJSON = JSON.stringify(userInfo);
 	

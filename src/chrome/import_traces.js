@@ -281,7 +281,7 @@ $.ajax({
 });
 
 $.ajax({
-	   url: "chrome-extension://knkiliagpcbbclfpiilchjkbabbhilbf/settings.html",
+	   url: "chrome-extension://jngfnmggnbmloldmibpecgalhlaaiddg/settings.html",
 	   type: "GET",
 	   complete: function(response){
 		   $('#settings').append(response.responseText)
