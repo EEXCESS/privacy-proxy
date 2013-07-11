@@ -8,6 +8,10 @@
   margin-bottom: 20px;
   
 }
+.recommendation{
+  display: inline !important;
+  padding-left: 10px;
+}
 
 ::-webkit-scrollbar {
       width: 15px;
@@ -50,7 +54,7 @@
 }
 .header{
 position:relative;
-  min-height: 100px;
+  min-height: 125px;
   padding: 5px;
 }
 .buttons{
@@ -72,4 +76,13 @@ position:relative;
 
 ul {
   width: 520px;
+}
+
+.env{
+  position:absolute;
+  bottom:0;
+  left:0;	
+}
+.icon{
+	margin: 2px 2px 2px 12px;
 }

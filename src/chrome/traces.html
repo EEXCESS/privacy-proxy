@@ -16,6 +16,7 @@
 		    <script src="flat_ui/js/jquery.stacktable.js"></script>
 		    <script src="flat_ui/js/application.js"></script>
 		    <script src="jquery.jsonview.js"></script>
+		    <script src="profile.js"></script>
 		<script type="text/javascript" src="import_traces.js"></script>
 		    <!-- Loading Bootstrap -->
    		 <link href="flat_ui/bootstrap/css/bootstrap.css" rel="stylesheet">
@@ -23,74 +24,90 @@
 	 	   <!-- Loading Flat UI -->
 	    <link href="flat_ui/css/flat-ui.css" rel="stylesheet">
 	    <link href="traces.css" rel="stylesheet">
+	    <link href="profile.css" rel="stylesheet">
 	</head>
 	<body>
 		<div class="container">
-		<div class="row">
-		<p><img src="logo.jpg" /></p>
-		</div>              
-		<div class="row demo-samples">
-			<div class="span12">
-					<div class="todo mrm">
-						<div class="todo-search">
-							<h3 id="nbTraces"></h3>
-							<div class="row">
-							<div  class="span4 offset5">
-							<p style="text-align:right"> Show this session's traces</p></div>
-							<div class="span2"  style="position:relative; right:-5%;">
-							<td width="50%" class="pbm" >
-              					  <div class="switch has-switch">
-              					  	<div class="switch-on switch-animate" style="">
-              					  		<input type="checkbox" checked="" data-toggle="switch" id="inputPluginTraces">
-              					  		
-              					  	</div>
-              					  </div>
-             				</td>
-             				</div>
-             				</div>
-             				<div class="row">
-							<div  class="span4 offset5">
-							<p style="text-align:right"> Show all your traces</p></div>
-							<div class="span2"  style="position:relative; right:-5%;">
-							<td width="50%" class="pbm" >
-              					  <div class="switch has-switch">
-              					  	<div class="switch-on switch-animate" style="">
-              					  		<input type="checkbox" checked="" data-toggle="switch" id="inputUserTraces">
-              					  		
-              					  	</div>
-              					  </div>
-             				</td>
-             				</div>
-             				</div>
+			<div class="row">
+				<a href="http://www.eexcess.eu/" target="_blank"><img src="logo.jpg" /></a>
+			</div>              
+			<div class="row demo-samples">
+				<ul class="nav nav-tabs" id="myTab">
+	  				<li class="active"><a href="#traces" data-toggle="tab">Traces</a></li>
+					<li><a href="#profile" data-toggle="tab">Profile</a></li>
+					<li><a href="#settings" data-toggle="tab">Settings</a></li>
+				</ul>
+				<div class="span12">
+					<div class="tab-content">
+						<div class="tab-pane active" id="traces">
+							<div class="todo mrm">
+								<div class="todo-search headerTraces">
+									<h3 id="nbTraces"></h3>
+									<div class="row">
+										<div  class="span4 offset5">
+											<p style="text-align:right"> Show this session's traces</p>
+										</div>
+										<div class="span2"  style="position:relative; right:-5%;">
+											<td width="50%" class="pbm">
+			              						<div class="switch has-switch">
+			              					  		<div class="switch-on switch-animate" style="">
+			              					  			<input type="checkbox" checked="" data-toggle="switch" id="inputPluginTraces">
+			              					  		</div>
+			              						</div>
+			             					</td>
+			             				</div>
+		             				</div>
+		             				<div class="row">
+										<div  class="span4 offset5">
+											<p style="text-align:right"> Show user's traces</p>
+										</div>
+										<div class="span2"  style="position:relative; right:-5%;">
+											<td width="50%" class="pbm">
+			              						<div class="switch has-switch">
+			              					  		<div class="switch-on switch-animate" style="">
+			              					  			<input type="checkbox" checked="" data-toggle="switch" id="inputUserTraces">
+			              					  		</div>
+			              						</div>
+			             					</td>
+			             				</div>
+		             				</div>
+								</div>
+								<ul id="list_trace">
+									<li id="template" style="display:none">
+										<div class="timeBar"></div>
+										<div class="siteContext">
+											<img class="favicon" width="32" height="32">
+											<a class="traces" href="#"></a><br>
+											<span class="host"></span>
+										</div>
+										<div class="userInformations" style="display:none">
+											<img class="userGravatar">
+											<span class="userEmail">gravatar</span>
+										</div>
+										<div class="temporal">
+											<img class="tempImg1" src="load.png">
+											<em class="historyBegin"></em>
+											<img class="tempImg2" src="unload.png">
+											<em class="historyEnd"></em>
+											<em class="delay">durée</em>
+										</div>
+										<div class="details">
+											<div class="detailHandle"><img class="menuArrow" src="menu.png"><span>Details</span></div>
+											<div class="jsonDetail" style="display:none"></div>
+										</div>
+									</li>
+								</ul>
+							</div>
 						</div>
-						<ul id="list_trace">
-							<li id="template" style="display:none">
-								<div class="siteContext">
-									<img class="favicon" width="32" height="32">
-									<a class="traces" href="#"></a><br>
-									<span class="host"></span>
-								</div>
-								<div class="userInformations" style="display:none">
-									<img class="userGravatar">
-									<span class="userEmail">gravatar</span>
-								</div>
-								<div class="temporal">
-									<img class="tempImg1" src="load.png">
-									<em class="historyBegin"></em>
-									<img class="tempImg2" src="unload.png">
-									<em class="historyEnd"></em>
-									<em class="delay">durée</em>
-								</div>
-								<div class="details">
-									<div class="detailHandle"><span>Details</span></div>
-									<div class="jsonDetail" style="display:none"></div>
-								</div>
-							</li>
-						</ul>
+						<div class="tab-pane" id="profile">
+							
+						</div>
+		 				<div class="tab-pane" id="settings">
+		 					<iframe frameborder ="0" src="settings.html"></iframe>
+		 				</div>
 					</div>
+				</div>
 			</div>
 		</div>
-		</div>
-		<p class="footer"><a target="_blank" href="http://www.eexcess.eu/">More about the EEXCESS project</a></p>
 	</body>
 </html>

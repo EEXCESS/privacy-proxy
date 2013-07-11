@@ -14,7 +14,8 @@
 	<xsl:template match="json:array[@name='hits']/json:object">
 		
 			<li>
-				<h4> 
+			<image src="http://www.econbiz.de/favicon.ico" alt="EconBiz"></image>
+				<h4 class="recommendation"> 
 					<xsl:choose>
 						<xsl:when test="current()/json:array[@name='identifier_url']/json:value">
 							  <a href="{current()/json:array[@name='identifier_url']/json:value/text()}" target="_blank" > 

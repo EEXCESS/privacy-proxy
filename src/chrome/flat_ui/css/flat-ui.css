@@ -565,7 +565,7 @@ h6 {
 .btn.btn-primary:active,
 .btn-group.open .btn.btn-primary.dropdown-toggle,
 .btn.btn-primary.active {
-  background-color: #39903A;
+  background-color: #4BBD4B;
 }
 .btn.btn-info {
   background-color: #3498db;
@@ -3816,7 +3816,7 @@ body.vjs-full-window {
 .mrm,
 .mhm,
 .mam {
-  margin-right: 10px;
+  margin-right: 20px;
 }
 .mrl,
 .mhl,

@@ -1,3 +1,5 @@
+$('.nav-tabs').button();
+
 function logout(){
 	localStorage.removeItem("privacy_email");
 	localStorage.removeItem("username");
@@ -12,6 +14,13 @@ function username() {
 		$('#username').html("Welcome "+localStorage["username"]);
 		$('#logout_btn').show();
 		$('#sign_in').hide();
+		
+		if (localStorage["env"] == "home"){
+			$('#home').addClass("active");
+		}
+		else{
+			$('#work').addClass("active");
+		}
 	}
 	
 	document.getElementById("logout_btn").addEventListener('click',logout);
@@ -28,7 +37,15 @@ document.addEventListener('DOMContentLoaded', function () {
   recommend();
 });
 
+if (localStorage["env"] == "work"){
+	$("#workButton").addClass("active");
+}
+else{
+	$("#homeButton").addClass("active");
+}
 
+$("#workButton").on("click",function(){localStorage["env"]="work";});
+$("#homeButton").on("click",function(){localStorage["env"]="home";});
 
 /*<script>
 		chrome.browserAction.setBadgeBackgroundColor({color:[190, 190, 190, 230]});
