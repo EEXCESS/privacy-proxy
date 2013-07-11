@@ -23,7 +23,7 @@ $(document).ready(function(){
 	   complete: function(response){ 
 	   		userInfo = JSON.parse(response.responseText);
 	   		idUser = userInfo["id"];
-	   		delete userInfo["id"];
+	   		userInfo = userInfo["values"];
 	   		generateProfilePage();
 	   }
 	})
