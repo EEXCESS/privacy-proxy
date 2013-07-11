@@ -273,7 +273,7 @@ $('#inputPluginTraces').live("change",doReloadTraces);
 $('.detailHandle').live("click",doToggleDetails);
 
 $.ajax({
-	   url: "chrome-extension://knkiliagpcbbclfpiilchjkbabbhilbf/profile.html",
+	   url: "chrome-extension://jngfnmggnbmloldmibpecgalhlaaiddg/profile.html",
 	   type: "GET",
 	   complete: function(response){
 		   $('#profile').append(response.responseText)
