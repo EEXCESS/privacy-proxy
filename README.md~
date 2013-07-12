@@ -1,0 +1,26 @@
+privacy-proxy
+=============
+
+The EEXCESS privacy preserving proxy server
+
+
+Requirements
+============
+The json-n-xml project needs to be intalled, you can get it at 
+	https://github.com/bhabegger/json-n-xml.git
+
+ElasticSearch on the same host, listening to default port ( 9200 )
+
+
+Installation 
+=============
+
+Run the proxy ( APIService.java )
+
+Run privacy-proxy/src/config/mapping.sh
+
+Install the Google Chrome plugin with developer mode enabled
+ ( privacy-proxy/src/chrome )
+
+
+
