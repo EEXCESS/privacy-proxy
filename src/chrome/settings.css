@@ -1,0 +1,40 @@
+.privacyToggleLeft{
+	background-color: #fff !important;
+}
+.privacyToggle{
+	border-color: #fff !important;
+}
+.email{
+	display: inline;
+}
+.gender{
+	display: inline;
+}
+.title{
+	display: inline;
+}
+
+#slider{
+	margin-top: 30px !important;
+}
+.submitAgeSetting{
+	display: inline-block;
+	position: absolute;
+	top: 15px;
+	right: 15px;
+}
+
+#sliderAddress{
+	margin-top: 30px !important;
+}
+.submitAddressSetting{
+	display: inline-block;
+	position: absolute;
+	top: 15px;
+	right: 15px;
+}
+
+.toggle{
+	display: inline;
+	float: right;
+}

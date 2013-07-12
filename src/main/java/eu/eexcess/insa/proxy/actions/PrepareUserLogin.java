@@ -14,6 +14,7 @@ public class PrepareUserLogin implements Processor {
 		
 		
 		String query = "{\"query\":{\"bool\":{\"must\":["+body+"]}},\"from\":0,\"size\":50,\"sort\":[],\"facets\":{}}";
+		System.out.println(query);
 		in.setBody(query);
 
 	}
