@@ -20,11 +20,12 @@ $(document).ready(function(){
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: JSONrequest,
-	   complete: function(response){ 
+	   complete: function(response){     
 	   		userInfo = JSON.parse(response.responseText);
 	   		idUser = userInfo["id"];
 	   		userInfo = userInfo["values"];
-	   		generateProfilePage();
+	   		chrome.runtime.sendMessage(response);
+	   		generateProfilePage();	
 	   }
 	})
 });
@@ -277,6 +278,7 @@ function updateBirthdate(){
 		userInfo["birthdate"] = $('.inputBirthdate1').val()+"-"+$('.inputBirthdate2').val()+"-"+$('.inputBirthdate3').val();
 	
 		var userDataJSON = JSON.stringify(userInfo);
+
 		
 		$.ajax({
 		   url: "http://localhost:12564/api/v0/users/data",

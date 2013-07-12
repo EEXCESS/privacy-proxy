@@ -11,7 +11,7 @@
 		<route>
 			<from uri="seda:elastic.trace.index?concurrentConsumers=4" />
 			<setHeader headerName="CamelHttpURI">
-				<simple>http://localhost:9200/${in.header.ElasticIndex}/${in.header.ElasticType}/${in.header.traceId}</simple>
+				<simple>http://134.214.106.24:9200/${in.header.ElasticIndex}/${in.header.ElasticType}/${in.header.traceId}</simple>
 			</setHeader>
     		<setHeader headerName="CamelHttpMethod">
     			<constant>POST</constant>
@@ -26,7 +26,7 @@
 		<route>
 			<from uri="direct:elastic.search" />
 			<setHeader headerName="CamelHttpURI">
-				<simple>http4://localhost:9200/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
+				<simple>http4://134.214.106.24:9200/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
 			</setHeader>
     		<setHeader headerName="CamelHttpMethod">
     			<constant>POST</constant>
@@ -41,7 +41,7 @@
 		<route>
 			<from uri="direct:elastic.userSearch" />
 			<setHeader headerName="CamelHttpURI">
-				<simple>http4://localhost:9200/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
+				<simple>http4://134.214.106.24:9200/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
 			</setHeader>
     		<setHeader headerName="CamelHttpMethod">
     			<constant>POST</constant>
