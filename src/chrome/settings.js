@@ -99,6 +99,25 @@ function initializeSettingsDisplay(){
 	}
 }
 
+function region(code){
+	
+	url = "http://api.geonames.org/postalCodeLookupJSON?postalcode="+code+"&country=FR&username=eexcess.insa";
+	
+	$.ajax({
+		   url: url,
+		   type: "GET",
+		   contentType: "text/json;charset=UTF-8",
+		   success: function(response) {
+				var resp = JSON.parse(response.responseText);
+				var result = resp.postalCode[0].adminName1;
+				alert(result);
+				return result;
+		   }
+		});
+	
+	
+}
+
 function ageSlider(id){
 	var indication = "What will be send: ";
 	var age;
@@ -143,6 +162,8 @@ function addressSlider(id){
 	}
 }
 
+
+
 window.onload = function() {
 
 $(document).ready(function(){
@@ -170,7 +191,6 @@ $(document).ready(function(){
 			addressSlider(ui.value);
 		}
 	});
-};
 
 	$('.titleSwitch').live("click",doSwitchTitle);
 	chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
@@ -182,4 +202,6 @@ $(document).ready(function(){
 		initializeSettingsDisplay();
 	});
 });
+
+}
 
