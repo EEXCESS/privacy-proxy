@@ -1,5 +1,7 @@
 var privacySettings;
-var userId
+var userId;
+
+var addressTooltips= {};
 
 function updateUserInfo(){
 	userDataJSON = 
@@ -63,6 +65,33 @@ function doSwitchTitle() {
 	updateUserInfo();
 }
 
+function triggerUpdateAddress(){
+	
+	url = "http://api.geonames.org/postalCodeLookupJSON?postalcode="+userInfo.address.postalcode+"&country=FR&username=eexcess.insa";
+	
+	$.ajax({
+	   url: url,
+	   type: "GET",
+	   contentType: "text/json;charset=UTF-8",
+	   success: function(response) {
+			doUpdateAddress(response);
+	   }
+	});
+}
+
+function doUpdateAddress(geoname){
+	addressTooltips[0] = "nothing";
+	addressTooltips[1] = userInfo.address.country;
+	addressTooltips[2] = geoname.postalcodes[0].adminName1;
+	addressTooltips[3] = geoname.postalcodes[0].adminName3;
+	addressTooltips[4] = userInfo.address.city;
+	addressTooltips[5] = userInfo.address.street +", "+userInfo.address.postalcode+" "+ userInfo.address.city+", "+userInfo.address.country;
+}
+
+function initTooltips(){
+	triggerUpdateAddress();
+}
+
 function initializeSettingsDisplay(){
 	if(privacySettings.privacy == undefined ){
 		privacySettings.privacy={};
@@ -99,25 +128,6 @@ function initializeSettingsDisplay(){
 	}
 }
 
-function region(code){
-	
-	url = "http://api.geonames.org/postalCodeLookupJSON?postalcode="+code+"&country=FR&username=eexcess.insa";
-	
-	$.ajax({
-		   url: url,
-		   type: "GET",
-		   contentType: "text/json;charset=UTF-8",
-		   success: function(response) {
-				var resp = JSON.parse(response.responseText);
-				var result = resp.postalCode[0].adminName1;
-				alert(result);
-				return result;
-		   }
-		});
-	
-	
-}
-
 function ageSlider(id){
 	var indication = "What will be send: ";
 	var age;
@@ -148,25 +158,20 @@ function ageSlider(id){
 	$('.ageExample').html(indication+age);
 }
 
-
-function addressSlider(id){
-	var indication = "What will be send: ";
-	
-	switch(id){
-	case 0: address = "nothing";
-			break;
-	case 1: address = userInfo.address.country;
-			break;
-	case 2: address = region(userInfo.address.postalcode);
-			break;
-	}
+function addressHoverIn(){
+	$(".slider-tip").show();
 }
 
+function addressHoverOut(){
+	$(".slider-tip").hide();
+}
 
 
 window.onload = function() {
 
 $(document).ready(function(){
+	
+	initTooltips();
 
 	$('.emailSwitch').live("click",doSwitchEmail);
 	$('.genderSwitch').live("click",doSwitchGender);
@@ -182,13 +187,26 @@ $(document).ready(function(){
 		}
 	});
 	
+	$("#sliderAddress").find(".ui-slider-handle").live("mouseenter",addressHoverIn).live("mouseleave",addressHoverOut);
+	
 	$("#sliderAddress").slider({
-		value:1,
+		value:2,
 		min: 0,
-		max: 4,
+		max: 5,
 		step: 1,
-		change: function( event, ui ) {
-			addressSlider(ui.value);
+		slide: function( event, ui ) {
+			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + addressTooltips[ui.value] + '</div></div>');
+			if(ui.value == 0){
+				$('.tooltip-inner').css("margin-left","85px");
+				$('.tooltip-arrow').css("margin-left","-52px");
+			}
+			if(ui.value == 5){
+				$('.tooltip-inner').css("margin-left","-60px");
+				$('.tooltip-arrow').css("margin-left","20px");
+			}
+		},
+		stop: function(){
+			$(".slider-tip").hide();
 		}
 	});
 

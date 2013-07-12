@@ -38,3 +38,10 @@
 	display: inline;
 	float: right;
 }
+
+.slider-tip {
+    opacity:1;
+    bottom:120%;
+    left: -95px;
+    margin-left: -10m;
+}
