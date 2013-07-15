@@ -37,7 +37,7 @@ You also need a Maven Integration Plugin for Eclipse, you can get one in the Ins
 	http://download.eclipse.org/technology/m2e/releases
 
 
-Downloading and setting the project
+Downloading and setting up the project
 -----------------------------------
 
 Import the projects with the git plugin : File > import , select Git > Projects from Git
@@ -55,7 +55,7 @@ Run privacy-proxy/src/config/mapping.sh to configure the ElasticSearch indexes
 Install the Google Chrome plugin :
 	chrome://extensions, enable the developer mode checkbox, load unpacked extension and select the privacy-proxy/src/chrome folder in the privacy-proxy sources.
 
-Run the proxy ( APIService.java )
+Run the proxy ( APIService.java ) as "java application"
 
 
 
