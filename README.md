@@ -45,7 +45,7 @@ You can download Eclipse's latest version at http://www.eclipse.org/downloads/
 ### Install a git integration plugin
 <a name="gitplugin"></a>
 You should have a git integration plugin already installed, but if it is not the case you can get it via the Eclipse menu "Help > Install New Software ...". Add a new site, the repository name is updates and the location http://download.eclipse.org/egit/updates
-Then you have to choose Eclipse Git Team Provider, and to follow the instructios to install it or to update it if you allready have it.
+Then you have to choose Eclipse Git Team Provider, and to follow the instructions to install it or to update it if you allready have it.
 
 ### Install a maven integration plugin
 <a name="mavenplugin"></a>
