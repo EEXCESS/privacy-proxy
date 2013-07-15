@@ -11,8 +11,7 @@ Contents
 --------
 <ul>
 	<li><a href="#elasticsearch">Install ElasticSearch</a></li>
-	<li>	<ul>
-			<li><a href="#eclipse">Install Eclipse</a></li>
+	<li><a href="#eclipse">Install Eclipse</a><ul>
 			<li><a href="#gitplugin">Install a git integration plugin</a></li>
 			<li><a href="#mavenplugin">Install a maven integration plugin</a></li>
 		</ul>
@@ -38,15 +37,17 @@ Then all you need is to open the following url into your web browser :
 ( doc : <http://mobz.github.io/elasticsearch-head/>   )
 
 
-Eclipse and the needed plugins
+Install Eclipse
 ------------------------------
 <a name="eclipse"></a>
 You can download Eclipse's latest version at http://www.eclipse.org/downloads/
 
+### Install a git integration plugin
 <a name="gitplugin"></a>
 You should have a git integration plugin already installed, but if it is not the case you can get it via the Eclipse menu "Help > Install New Software ...". Add a new site, the repository name is updates and the location http://download.eclipse.org/egit/updates
 Then you have to choose Eclipse Git Team Provider, and to follow the instructios to install it or to update it if you allready have it.
 
+### Install a maven integration plugin
 <a name="mavenplugin"></a>
 You also need a Maven Integration Plugin for Eclipse, you can get one in the Install New Software panel, at the following site : 
 	http://download.eclipse.org/technology/m2e/releases

@@ -7,36 +7,53 @@ The EEXCESS privacy preserving proxy server
 Installation 
 =============
 
+Contents
+--------
+<ul>
+	<li><a href="#elasticsearch">Install ElasticSearch</a></li>
+	<li><a href="#eclipse">Install Eclipse</a><ul>
+			<li><a href="#gitplugin">Install a git integration plugin</a></li>
+			<li><a href="#mavenplugin">Install a maven integration plugin</a></li>
+		</ul>
+	</li>
+	<li><a href="#project">Install and set up the project</a></li>
+</ul>
+
+
+
+<a name="elasticsearch"></a>
 ElasticSearch
 -------------
 Download and extract the latest version : http://www.elasticsearch.org/download/
 
-run : 
-	$ bin/elasticsearch
-
 You can get more informations about installing and setting elasticsearch at 
-	http://www.elasticsearch.org/guide/reference/setup/
+	<http://www.elasticsearch.org/guide/reference/setup/>
 
 You can add the head plugin which allows you to interact easily with your ElasticSearch cluster by running :
 	elasticsearch/bin/plugin -install mobz/elasticsearch-head
 Then all you need is to open the following url into your web browser :
-	http://localhost:9200/_plugin/head/
+	<http://localhost:9200/_plugin/head/>
 
-( doc : http://mobz.github.io/elasticsearch-head/   )
+( doc : <http://mobz.github.io/elasticsearch-head/>   )
 
 
-Eclipse and the needed plugins
+Install Eclipse
 ------------------------------
-
+<a name="eclipse"></a>
 You can download Eclipse's latest version at http://www.eclipse.org/downloads/
 
+### Install a git integration plugin
+<a name="gitplugin"></a>
 You should have a git integration plugin already installed, but if it is not the case you can get it via the Eclipse menu "Help > Install New Software ...". Add a new site, the repository name is updates and the location http://download.eclipse.org/egit/updates
 Then you have to choose Eclipse Git Team Provider, and to follow the instructios to install it or to update it if you allready have it.
 
+### Install a maven integration plugin
+<a name="mavenplugin"></a>
 You also need a Maven Integration Plugin for Eclipse, you can get one in the Install New Software panel, at the following site : 
 	http://download.eclipse.org/technology/m2e/releases
 
 
+<a name="project"></a>
 Downloading and setting up the project
 -----------------------------------
 
