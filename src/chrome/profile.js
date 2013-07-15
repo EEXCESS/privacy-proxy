@@ -4,7 +4,7 @@ var userInfo = {
 var idUser;
 
 
-$(document).ready(function(){
+function initUserInfo(){
 
 	var request ={
 		term:{
@@ -24,11 +24,12 @@ $(document).ready(function(){
 	   		userInfo = JSON.parse(response.responseText);
 	   		idUser = userInfo["id"];
 	   		userInfo = userInfo["values"];
-	   		chrome.runtime.sendMessage(response);
 	   		generateProfilePage();	
+	   		initSettings();
+
 	   }
 	})
-});
+};
 
 function generateProfilePage() {
 	$(".username").html("Username: " + userInfo.username);
