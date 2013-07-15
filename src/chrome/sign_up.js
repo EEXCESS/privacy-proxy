@@ -91,7 +91,7 @@ function validEmail(mail)
 
 function login() {
 	
-	var id = document.forms["login"].elements[1].value;
+	var id = document.forms["login"].elements[0].value;
 	var password = MD5(document.forms["login"].elements[1].value);	
 
 	if(validEmail(id)) {
