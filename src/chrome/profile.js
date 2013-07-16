@@ -103,21 +103,26 @@ function generateDateSelect(){
 
 function generateAddress(){
 	
-	
-	
-	$(".street").html("Address: " + userInfo.address.street);
-	$(".city").html(userInfo.address.postalcode+" "+userInfo.address.city);
-	$(".country").html(userInfo.address.country);
-	if(userInfo.address.street == "") {
-		$(".street").html("Adress: Not saved yet");
+	if (userInfo.address == undefined){
+		$(".street").html("Address");
 		$(".city").html("");
 		$(".country").html("");
 	}
-	
-	$('.inputStreet').val(userInfo.address.street);
-	$('.inputPostalcode').val(userInfo.address.postalcode);
-	$('.inputCity').val(userInfo.address.city);
-	$('.inputCountry').val(userInfo.address.country);
+	else{		
+		$(".street").html("Address: " + userInfo.address.street);
+		$(".city").html(userInfo.address.postalcode+" "+userInfo.address.city);
+		$(".country").html(userInfo.address.country);
+		if(userInfo.address.street == "") {
+			$(".street").html("Adress: Not saved yet");
+			$(".city").html("");
+			$(".country").html("");
+		}
+		
+		$('.inputStreet').val(userInfo.address.street);
+		$('.inputPostalcode').val(userInfo.address.postalcode);
+		$('.inputCity').val(userInfo.address.city);
+		$('.inputCountry').val(userInfo.address.country);
+	}
 }
 
 function doToggleEmail() {
