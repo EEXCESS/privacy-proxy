@@ -17,21 +17,15 @@
 #slider{
 	margin-top: 30px !important;
 }
-.submitAgeSetting{
+.submitSetting{
 	display: inline-block;
 	position: absolute;
-	top: 15px;
-	right: 15px;
+	top: 35px;
+	right: 120px;
 }
 
 #sliderAddress{
 	margin-top: 30px !important;
-}
-.submitAddressSetting{
-	display: inline-block;
-	position: absolute;
-	top: 15px;
-	right: 15px;
 }
 
 .toggle{
