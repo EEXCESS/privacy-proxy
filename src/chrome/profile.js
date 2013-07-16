@@ -24,7 +24,7 @@ $(document).ready(function(){
 	   		userInfo = JSON.parse(response.responseText);
 	   		idUser = userInfo["id"];
 	   		userInfo = userInfo["values"];
-	   		chrome.runtime.sendMessage(response);
+	   		chrome.runtime.sendMessage("infos are ready");
 	   		generateProfilePage();	
 	   }
 	})
@@ -62,6 +62,10 @@ function generateProfilePage() {
 	if(userInfo.birthdate == "") {
 		$(".birthdate").html("Birthdate: Not saved yet");
 	}
+	$(".pointsOfInterest").html("PointsOfInterest: " + userInfo.pointsOfInterest);
+	if(userInfo.pointsOfInterest == "") {
+		$(".pointsOfInterest").html("Points of Interest: Not defined yet");
+	}
 	
 	generateDateSelect();
 	
@@ -97,6 +101,8 @@ function generateDateSelect(){
 }
 
 function generateAddress(){
+	
+	
 	
 	$(".street").html("Address: " + userInfo.address.street);
 	$(".city").html(userInfo.address.postalcode+" "+userInfo.address.city);
@@ -194,6 +200,23 @@ function doToggleAddress() {
 	else {
 		$('.menuArrowAddress').css("-webkit-transform","none");
 		$('.addressChange').hide("slow");
+	}
+}
+function doTogglePointsOfInterest() {
+
+	if ($(".pointsOfInterestChange").css("display") == "none"){
+		if(!(userInfo.pointsOfInterest==null||userInfo.pointsOfInterest==undefined)){
+			var pois = userInfo.pointsOfInterest.split(",");
+			for(var i=0;pois[i];i++){
+				displayPointOfInterest(pois[i]);
+			}
+		}
+		$(".pointsOfInterestChange").show("slow");
+		$('.menuArrowPointsOfInterest').css("-webkit-transform","rotate(90deg)");		
+	}
+	else {
+		$('.menuArrowPointsOfInterest').css("-webkit-transform","none");
+		$('.pointsOfInterestChange').hide("slow");
 	}
 }
 
@@ -371,6 +394,65 @@ function validEmail(mail)
 	}
 }
 
+function updatePointsOfInterest(){
+	var values="";
+	var tags = document.getElementsByClassName("tag");
+	for(var i=0; i<tags.length;i++){
+		if(!values==""){
+			values = values +","+ tags[i].firstElementChild.innerText;
+		}
+		else{
+			values = values +tags[i].firstElementChild.innerText;
+		}
+	}
+	userInfo.pointsOfInterest=values;
+	var userDataJSON = JSON.stringify(userInfo);
+	
+	$.ajax({
+	   url: "http://localhost:12564/api/v0/users/data",
+	   type: "POST",
+	   contentType: "application/json;charset=UTF-8",
+	   data: userDataJSON,
+	   beforeSend: function (request)
+       {
+           request.setRequestHeader("traceid", idUser);
+       },
+	   success: function(response) {
+			document.getElementById('pointsOfInterestTitle').innerHTML= "Points of interest : "+userInfo.pointsOfInterest;
+		    document.getElementById('statePointOfInterest').innerHTML=("Changes saved");
+			localStorage["privacy_email"] = userInfo["email"];
+	   }
+	});
+}
+
+function doAddTag (){
+	
+	var newTag = document.createElement('span');
+	newTag.setAttribute('class','tag');
+	var innerSpan = document.createElement('span');
+	var tagValue = document.getElementById('tagsinput_tag').value;
+	document.getElementById('tagsinput_tag').value="";
+	innerSpan.innerHTML=tagValue+'<a class="tagsinput-remove-link"></a>';
+	newTag.appendChild(innerSpan);
+	document.getElementById('tagsinput_tagsinput').insertBefore(newTag,document.getElementById('tagsinput_addTag'));
+
+}
+
+
+function doRemoveTag(){
+	$(this).closest('.tag').remove();
+	
+}
+
+function displayPointOfInterest( poi ){
+	var newTag = document.createElement('span');
+	newTag.setAttribute('class','tag');
+	var innerSpan = document.createElement('span');
+	document.getElementById('tagsinput_tag').value="";
+	innerSpan.innerHTML=poi+'<a class="tagsinput-remove-link"></a>';
+	newTag.appendChild(innerSpan);
+	document.getElementById('tagsinput_tagsinput').insertBefore(newTag,document.getElementById('tagsinput_addTag'));
+}
 
 $(document).ready(function(){
 	$('.emailHandle').live("click",doToggleEmail);
@@ -380,6 +462,10 @@ $(document).ready(function(){
 	$('.genderHandle').live("click",doToggleGender);
 	$('.birthdateHandle').live("click",doToggleBirthdate);
 	$('.addressHandle').live("click",doToggleAddress);
+	$('.pointsOfInterestHandle').live("click",doTogglePointsOfInterest);
+	
+	$('.tagsinput-add').live("click",doAddTag);
+	$('.tagsinput-remove-link').live("click",doRemoveTag);
 	
 	$('.submitEmail').live("click",checkUpdate);
 	$('.submitTitle').live("click",updateTitle);
@@ -388,4 +474,5 @@ $(document).ready(function(){
 	$('.submitGender').live("click",updateGender);
 	$('.submitBirthdate').live("click",updateBirthdate);
 	$('.submitAddress').live("click",updateAddress);
+	$('.submitPointsOfInterest').live("click",updatePointsOfInterest);
 });

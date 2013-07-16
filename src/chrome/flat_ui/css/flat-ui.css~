@@ -565,7 +565,7 @@ h6 {
 .btn.btn-primary:active,
 .btn-group.open .btn.btn-primary.dropdown-toggle,
 .btn.btn-primary.active {
-  background-color: #39903A;
+  background-color: #4BBD4B;
 }
 .btn.btn-info {
   background-color: #3498db;
@@ -1793,7 +1793,7 @@ textarea[class*="span"] {
 }
 .tagsinput {
   background: white;
-  border: 2px solid #1abc9c;
+  border: 2px solid #1D904F;
   border-radius: 6px;
   height: 100px;
   margin-bottom: 18px;
@@ -1803,7 +1803,7 @@ textarea[class*="span"] {
 }
 .tagsinput .tag {
   border-radius: 4px;
-  background-color: #1abc9c;
+  background-color: #1D904F;
   color: #ffffff;
   cursor: pointer;
   margin-right: 5px;
@@ -2604,7 +2604,7 @@ textarea[class*="span"] {
   left: 0%;
 }
 .has-switch > div.switch-on label {
-  background-color: #144329;
+  background-color: #1D904F;
 }
 .has-switch input[type=checkbox] {
   display: none;
@@ -2912,14 +2912,6 @@ textarea[class*="span"] {
   -moz-border-radius: 0 0 6px 6px;
   border-radius: 0 0 6px 6px;
   padding-bottom: 18px;
-}
-.todo li.todo-done {
-  background: transparent url(../images/todo/done.png) 92% center no-repeat;
-  background-size: 20px 20px;
-  color: #1abc9c;
-}
-.todo li.todo-done .todo-name {
-  color: #1abc9c;
 }
 .todo-search {
   position: relative;
@@ -3824,7 +3816,7 @@ body.vjs-full-window {
 .mrm,
 .mhm,
 .mam {
-  margin-right: 10px;
+  margin-right: 20px;
 }
 .mrl,
 .mhl,
