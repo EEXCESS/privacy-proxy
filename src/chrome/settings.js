@@ -187,8 +187,8 @@ function doUpdateAge(){
 	if((currentM-birthM < 0) || (currentD-birthD < 0)) age - 1;
 	
 	ageTooltips[0] = "nothing";
-	ageTooltips[1] = age + ' years';
-	ageTooltips[2] = age - age%10+'\'s';
+	ageTooltips[1] = age - age%10+'\'s';
+	ageTooltips[2] = age + ' years';
 	ageTooltips[3] = userInfo.birthdate;
 	
 	settingsAgeReady();
