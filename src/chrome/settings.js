@@ -34,6 +34,7 @@ function doSwitchEmail() {
 }
 
 function doSwitchGender() {
+	
 	if($(".switch-gender").attr("class") == "switch-animate switch-gender switch-off"){
 		$(".switch-gender").removeClass("switch-off");
 		$(".switch-gender").addClass("switch-on");
@@ -52,6 +53,7 @@ function doSwitchGender() {
 }
 
 function doSwitchTitle() {
+	
 	if($(".switch-title").attr("class") == "switch-animate switch-title switch-off"){
 		$(".switch-title").removeClass("switch-off");
 		$(".switch-title").addClass("switch-on");
@@ -71,7 +73,7 @@ function triggerUpdateGeoloc() {
         var longitude = position.coords.longitude;
         
         url = "http://api.geonames.org/findNearbyPostalCodesJSON?lat="+latitude+"&lng=" + longitude +"&username=eexcess.insa";
-        
+        alert(url);
     	$.ajax({
     	   url: url,
     	   type: "GET",
@@ -86,6 +88,9 @@ function triggerUpdateGeoloc() {
 }
 
 function doUpdateGeoloc(geoname,coord){
+	
+	//if((userInfo. == undefined) || (userInfo.birthdate == "")) $('#ageSetting').hide();
+	
 	geolocTooltips[0] = "nothing";
 	geolocTooltips[1] = geoname.postalCodes[0].countryCode;
 	geolocTooltips[2] = geoname.postalCodes[0].adminName1;
@@ -98,19 +103,27 @@ function doUpdateGeoloc(geoname,coord){
 
 function triggerUpdateAddress(){
 	
-	url = "http://api.geonames.org/postalCodeLookupJSON?postalcode="+userInfo.address.postalcode+"&country=FR&username=eexcess.insa";
-		
-	$.ajax({
-	   url: url,
-	   type: "GET",
-	   contentType: "text/json;charset=UTF-8",
-	   success: function(response) {
-		   doUpdateAddress(response);
-	   }
-	});
+	
+	if((userInfo.address == undefined) || (userInfo.address.street == "")) {
+		$('#addressSetting').hide();
+	}
+	else{
+	
+		url = "http://api.geonames.org/postalCodeLookupJSON?postalcode="+userInfo.address.postalcode+"&country=FR&username=eexcess.insa";
+			
+		$.ajax({
+		   url: url,
+		   type: "GET",
+		   contentType: "text/json;charset=UTF-8",
+		   success: function(response) {
+			   doUpdateAddress(response);
+		   }
+		});
+	}
 }
 
 function doUpdateAddress(geoname){
+	
 	addressTooltips[0] = "nothing";
 	addressTooltips[1] = userInfo.address.country;
 	addressTooltips[2] = geoname.postalcodes[0].adminName1;
@@ -171,28 +184,33 @@ function initializeSettingsDisplay(){
 }
 	
 function doUpdateAge(){
-	var indication = "What will be send: ";
-	var age;
-	var birthY = userInfo.birthdate.split('-')[0];
-	var birthM = userInfo.birthdate.split('-')[1];
-	var birthD = userInfo.birthdate.split('-')[2];
 	
-	var date = new Date();
-	
-	var currentY = date.getFullYear();
-	var currentD = date.getDate();
-	var currentM = date.getMonth()+1;
-	
-	age = currentY-birthY;
-	if((currentM-birthM < 0) || (currentD-birthD < 0)) age - 1;
-	
-	ageTooltips[0] = "nothing";
-	ageTooltips[1] = age + ' years';
-	ageTooltips[2] = age - age%10+'\'s';
-	ageTooltips[3] = userInfo.birthdate;
-	
-	settingsAgeReady();
-	
+	if((userInfo.birthdate == undefined) || (userInfo.birthdate == "")) {
+		$('#ageSetting').hide();
+	}
+	else{
+		var indication = "What will be send: ";
+		var age;
+		var birthY = userInfo.birthdate.split('-')[0];
+		var birthM = userInfo.birthdate.split('-')[1];
+		var birthD = userInfo.birthdate.split('-')[2];
+		
+		var date = new Date();
+		
+		var currentY = date.getFullYear();
+		var currentD = date.getDate();
+		var currentM = date.getMonth()+1;
+		
+		age = currentY-birthY;
+		if((currentM-birthM < 0) || (currentD-birthD < 0)) age - 1;
+		
+		ageTooltips[0] = "nothing";
+		ageTooltips[1] = age - age%10+'\'s';
+		ageTooltips[2] = age + ' years';
+		ageTooltips[3] = userInfo.birthdate;
+		
+		settingsAgeReady();
+	}	
 }
 
 function initSettings(){
@@ -223,6 +241,16 @@ function initializeSettingsDisplay(){
 		 $(".switch-title").removeClass("switch-off");
 		 $(".switch-title").addClass("switch-on");
 	}
+	
+	if(userInfo.title == undefined || userInfo.title == "") $("#titleSetting").hide();
+	
+	if((userInfo.gender != undefined) && (userInfo.gender != "")) {
+		$('#genderSetting').show();
+	}
+	if((userInfo.title != undefined) && (userInfo.title != "") && (userInfo.gender == 1)) {
+		$('#titleSetting').show();
+	}
+	
 }
 
 function tracesHoverIn(){
