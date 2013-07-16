@@ -20,7 +20,7 @@ function initUserInfo(){
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: JSONrequest,
-	   complete: function(response){     
+	   complete: function(response){    
 	   		userInfo = JSON.parse(response.responseText);
 	   		idUser = userInfo["id"];
 	   		userInfo = userInfo["values"];
@@ -63,9 +63,9 @@ function generateProfilePage() {
 	if(userInfo.birthdate == "") {
 		$(".birthdate").html("Birthdate: Not saved yet");
 	}
-	$(".pointsOfInterest").html("PointsOfInterest: " + userInfo.pointsOfInterest);
-	if(userInfo.pointsOfInterest == "") {
-		$(".pointsOfInterest").html("Points of Interest: Not defined yet");
+	$(".topics").html("Topics: " + getTopicsStr());
+	if(getTopicsStr() == "") {
+		$(".topics").html("Topics : Not defined yet");
 	}
 	
 	generateDateSelect();
@@ -203,21 +203,24 @@ function doToggleAddress() {
 		$('.addressChange').hide("slow");
 	}
 }
-function doTogglePointsOfInterest() {
+function doToggleTopics() {
 
-	if ($(".pointsOfInterestChange").css("display") == "none"){
-		if(!(userInfo.pointsOfInterest==null||userInfo.pointsOfInterest==undefined)){
-			var pois = userInfo.pointsOfInterest.split(",");
-			for(var i=0;pois[i];i++){
-				displayPointOfInterest(pois[i]);
+	if ($(".topicsChange").css("display") == "none"){
+		if((!(userInfo.topics==null||userInfo.topics==undefined))&&userInfo.topics instanceof Array){
+			for(var i=0;i<userInfo.topics.length;i++){
+				if(userInfo.topics[i]!=undefined){
+					if($('span[name=\"'+userInfo.topics[i].label+'\"]').size()== 0){
+						displayTopics(userInfo.topics[i].label);
+					}
+				}
 			}
 		}
-		$(".pointsOfInterestChange").show("slow");
-		$('.menuArrowPointsOfInterest').css("-webkit-transform","rotate(90deg)");		
+		$(".topicsChange").show("slow");
+		$('.menuArrowTopics').css("-webkit-transform","rotate(90deg)");		
 	}
 	else {
-		$('.menuArrowPointsOfInterest').css("-webkit-transform","none");
-		$('.pointsOfInterestChange').hide("slow");
+		$('.menuArrowTopics').css("-webkit-transform","none");
+		$('.topicsChange').hide("slow");
 	}
 }
 
@@ -395,20 +398,14 @@ function validEmail(mail)
 	}
 }
 
-function updatePointsOfInterest(){
-	var values="";
+function updateTopics(){
+	var values=new Array();
 	var tags = document.getElementsByClassName("tag");
 	for(var i=0; i<tags.length;i++){
-		if(!values==""){
-			values = values +","+ tags[i].firstElementChild.innerText;
-		}
-		else{
-			values = values +tags[i].firstElementChild.innerText;
-		}
+		values[i]={label:tags[i].innerText};
 	}
-	userInfo.pointsOfInterest=values;
+	userInfo.topics=values;
 	var userDataJSON = JSON.stringify(userInfo);
-	
 	$.ajax({
 	   url: "http://localhost:12564/api/v0/users/data",
 	   type: "POST",
@@ -419,13 +416,30 @@ function updatePointsOfInterest(){
            request.setRequestHeader("traceid", idUser);
        },
 	   success: function(response) {
-			document.getElementById('pointsOfInterestTitle').innerHTML= "Points of interest : "+userInfo.pointsOfInterest;
-		    document.getElementById('statePointOfInterest').innerHTML=("Changes saved");
+		   
+		    $('#topicsTitle').html("Topics : "+getTopicsStr());
+			$('.stateTopics').html("Changes saved");
 			localStorage["privacy_email"] = userInfo["email"];
 	   }
 	});
 }
 
+
+function getTopicsStr()
+{
+	var topicsStr ="";
+    if (userInfo.topics instanceof Array){
+	for (var i = 0 ; i<userInfo.topics.length;i++){
+		   if(topicsStr == ""){
+			   topicsStr = topicsStr+userInfo.topics[i].label;
+		   }
+		   else{
+			   topicsStr = topicsStr+", "+userInfo.topics[i].label;
+		   }
+	  }
+    }
+	return topicsStr;
+}
 function doAddTag (){
 	
 	var newTag = document.createElement('span');
@@ -433,6 +447,7 @@ function doAddTag (){
 	var innerSpan = document.createElement('span');
 	var tagValue = document.getElementById('tagsinput_tag').value;
 	document.getElementById('tagsinput_tag').value="";
+	newTag.setAttribute('name',tagValue);
 	innerSpan.innerHTML=tagValue+'<a class="tagsinput-remove-link"></a>';
 	newTag.appendChild(innerSpan);
 	document.getElementById('tagsinput_tagsinput').insertBefore(newTag,document.getElementById('tagsinput_addTag'));
@@ -445,12 +460,13 @@ function doRemoveTag(){
 	
 }
 
-function displayPointOfInterest( poi ){
+function displayTopics( topic ){
 	var newTag = document.createElement('span');
 	newTag.setAttribute('class','tag');
+	newTag.setAttribute('name',topic);
 	var innerSpan = document.createElement('span');
 	document.getElementById('tagsinput_tag').value="";
-	innerSpan.innerHTML=poi+'<a class="tagsinput-remove-link"></a>';
+	innerSpan.innerHTML=topic+'<a class="tagsinput-remove-link"></a>';
 	newTag.appendChild(innerSpan);
 	document.getElementById('tagsinput_tagsinput').insertBefore(newTag,document.getElementById('tagsinput_addTag'));
 }
@@ -463,7 +479,7 @@ $(document).ready(function(){
 	$('.genderHandle').live("click",doToggleGender);
 	$('.birthdateHandle').live("click",doToggleBirthdate);
 	$('.addressHandle').live("click",doToggleAddress);
-	$('.pointsOfInterestHandle').live("click",doTogglePointsOfInterest);
+	$('.topicsHandle').live("click",doToggleTopics);
 	
 	$('.tagsinput-add').live("click",doAddTag);
 	$('.tagsinput-remove-link').live("click",doRemoveTag);
@@ -475,5 +491,5 @@ $(document).ready(function(){
 	$('.submitGender').live("click",updateGender);
 	$('.submitBirthdate').live("click",updateBirthdate);
 	$('.submitAddress').live("click",updateAddress);
-	$('.submitPointsOfInterest').live("click",updatePointsOfInterest);
+	$('.submitTopics').live("click",updateTopics);
 });
