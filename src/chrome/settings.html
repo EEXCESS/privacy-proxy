@@ -3,6 +3,8 @@
 		<h1 style="display:inline">Privacy Settings</h1>
 		<img class="gravatarProfile"></img>
 		<h4 class="username">User name</h4>
+		<span class="stateSettings"></span>
+		<button class="btn btn-primary submitSetting">Submit this setting</button>
 	</div>
 	<ul id="list_settings">
 		<li id="emailSetting">
@@ -20,7 +22,7 @@
 				</div>
 			</div>
 		</li>
-		<li id="genderSetting">
+		<li id="genderSetting" style="display:none">
 			<div class="genderInfo">
 				<h4 class="gender">Email</h4>
 				<div class="switch-animate toggle">
@@ -53,20 +55,27 @@
 		<li id="ageSetting">
 			<div class="ageInfo">
 				<h4 class="birthdate">Age</h4>
-				<button class="btn btn-primary submitAgeSetting">Submit this setting</button>
 				<div id="slider"></div>
-				<span class="ageExample"></span>
-				
 			</div>
 		</li>
 		<li id="addressSetting">
 			<div class="addressInfo">
-				<h4 class="street">Age</h4>
-				<h4 class="city">Age</h4>
-				<h4 class="country">Age</h4>
-				<button class="btn btn-primary submitAddressSetting">Submit this setting</button>
-				<div id="sliderAddress"></div>
-				<span class="addressExample"></span>				
+				<h4 class="street">Address</h4>
+				<h4 class="city">City</h4>
+				<h4 class="country">Country</h4>
+				<div id="sliderAddress"></div>				
+			</div>
+		</li>
+		<li id="geolocSetting">
+			<div class="geolocInfo">
+				<h4 class="geoloc">Geolocation</h4>
+				<div id="sliderGeoloc"></div>			
+			</div>
+		</li>
+		<li id="tracesSetting">
+			<div class="tracesInfo">
+				<h4 class="traces">Traces to send</h4>
+				<div id="sliderTraces"></div>
 			</div>
 		</li>
 	</ul>

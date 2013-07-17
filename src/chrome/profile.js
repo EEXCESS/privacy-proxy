@@ -4,7 +4,7 @@ var userInfo = {
 var idUser;
 
 
-$(document).ready(function(){
+function initUserInfo(){
 
 	var request ={
 		term:{
@@ -20,15 +20,16 @@ $(document).ready(function(){
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: JSONrequest,
-	   complete: function(response){     
+	   complete: function(response){    
 	   		userInfo = JSON.parse(response.responseText);
 	   		idUser = userInfo["id"];
 	   		userInfo = userInfo["values"];
-	   		chrome.runtime.sendMessage(response);
 	   		generateProfilePage();	
+	   		initSettings();
+
 	   }
 	})
-});
+};
 
 function generateProfilePage() {
 	$(".username").html("Username: " + userInfo.username);
@@ -61,6 +62,10 @@ function generateProfilePage() {
 	$(".birthdate").html("Birthdate: " + userInfo.birthdate);
 	if(userInfo.birthdate == "") {
 		$(".birthdate").html("Birthdate: Not saved yet");
+	}
+	$(".topics").html("Topics: " + getTopicsStr());
+	if(getTopicsStr() == "") {
+		$(".topics").html("Topics : Not defined yet");
 	}
 	
 	generateDateSelect();
@@ -98,19 +103,26 @@ function generateDateSelect(){
 
 function generateAddress(){
 	
-	$(".street").html("Address: " + userInfo.address.street);
-	$(".city").html(userInfo.address.postalcode+" "+userInfo.address.city);
-	$(".country").html(userInfo.address.country);
-	if(userInfo.address.street == "") {
-		$(".street").html("Adress: Not saved yet");
+	if (userInfo.address == undefined){
+		$(".street").html("Address");
 		$(".city").html("");
 		$(".country").html("");
 	}
-	
-	$('.inputStreet').val(userInfo.address.street);
-	$('.inputPostalcode').val(userInfo.address.postalcode);
-	$('.inputCity').val(userInfo.address.city);
-	$('.inputCountry').val(userInfo.address.country);
+	else{		
+		$(".street").html("Address: " + userInfo.address.street);
+		$(".city").html(userInfo.address.postalcode+" "+userInfo.address.city);
+		$(".country").html(userInfo.address.country);
+		if(userInfo.address.street == "") {
+			$(".street").html("Adress: Not saved yet");
+			$(".city").html("");
+			$(".country").html("");
+		}
+		
+		$('.inputStreet').val(userInfo.address.street);
+		$('.inputPostalcode').val(userInfo.address.postalcode);
+		$('.inputCity').val(userInfo.address.city);
+		$('.inputCountry').val(userInfo.address.country);
+	}
 }
 
 function doToggleEmail() {
@@ -194,6 +206,26 @@ function doToggleAddress() {
 	else {
 		$('.menuArrowAddress').css("-webkit-transform","none");
 		$('.addressChange').hide("slow");
+	}
+}
+function doToggleTopics() {
+
+	if ($(".topicsChange").css("display") == "none"){
+		if((!(userInfo.topics==null||userInfo.topics==undefined))&&userInfo.topics instanceof Array){
+			for(var i=0;i<userInfo.topics.length;i++){
+				if(userInfo.topics[i]!=undefined){
+					if($('span[name=\"'+userInfo.topics[i].label+'\"]').size()== 0){
+						displayTopics(userInfo.topics[i].label);
+					}
+				}
+			}
+		}
+		$(".topicsChange").show("slow");
+		$('.menuArrowTopics').css("-webkit-transform","rotate(90deg)");		
+	}
+	else {
+		$('.menuArrowTopics').css("-webkit-transform","none");
+		$('.topicsChange').hide("slow");
 	}
 }
 
@@ -371,6 +403,78 @@ function validEmail(mail)
 	}
 }
 
+function updateTopics(){
+	var values=new Array();
+	var tags = document.getElementsByClassName("tag");
+	for(var i=0; i<tags.length;i++){
+		values[i]={label:tags[i].innerText};
+	}
+	userInfo.topics=values;
+	var userDataJSON = JSON.stringify(userInfo);
+	$.ajax({
+	   url: "http://localhost:12564/api/v0/users/data",
+	   type: "POST",
+	   contentType: "application/json;charset=UTF-8",
+	   data: userDataJSON,
+	   beforeSend: function (request)
+       {
+           request.setRequestHeader("traceid", idUser);
+       },
+	   success: function(response) {
+		   
+		    $('#topicsTitle').html("Topics : "+getTopicsStr());
+			$('.stateTopics').html("Changes saved");
+			localStorage["privacy_email"] = userInfo["email"];
+	   }
+	});
+}
+
+
+function getTopicsStr()
+{
+	var topicsStr ="";
+    if (userInfo.topics instanceof Array){
+	for (var i = 0 ; i<userInfo.topics.length;i++){
+		   if(topicsStr == ""){
+			   topicsStr = topicsStr+userInfo.topics[i].label;
+		   }
+		   else{
+			   topicsStr = topicsStr+", "+userInfo.topics[i].label;
+		   }
+	  }
+    }
+	return topicsStr;
+}
+function doAddTag (){
+	
+	var newTag = document.createElement('span');
+	newTag.setAttribute('class','tag');
+	var innerSpan = document.createElement('span');
+	var tagValue = document.getElementById('tagsinput_tag').value;
+	document.getElementById('tagsinput_tag').value="";
+	newTag.setAttribute('name',tagValue);
+	innerSpan.innerHTML=tagValue+'<a class="tagsinput-remove-link"></a>';
+	newTag.appendChild(innerSpan);
+	document.getElementById('tagsinput_tagsinput').insertBefore(newTag,document.getElementById('tagsinput_addTag'));
+
+}
+
+
+function doRemoveTag(){
+	$(this).closest('.tag').remove();
+	
+}
+
+function displayTopics( topic ){
+	var newTag = document.createElement('span');
+	newTag.setAttribute('class','tag');
+	newTag.setAttribute('name',topic);
+	var innerSpan = document.createElement('span');
+	document.getElementById('tagsinput_tag').value="";
+	innerSpan.innerHTML=topic+'<a class="tagsinput-remove-link"></a>';
+	newTag.appendChild(innerSpan);
+	document.getElementById('tagsinput_tagsinput').insertBefore(newTag,document.getElementById('tagsinput_addTag'));
+}
 
 $(document).ready(function(){
 	$('.emailHandle').live("click",doToggleEmail);
@@ -380,6 +484,10 @@ $(document).ready(function(){
 	$('.genderHandle').live("click",doToggleGender);
 	$('.birthdateHandle').live("click",doToggleBirthdate);
 	$('.addressHandle').live("click",doToggleAddress);
+	$('.topicsHandle').live("click",doToggleTopics);
+	
+	$('.tagsinput-add').live("click",doAddTag);
+	$('.tagsinput-remove-link').live("click",doRemoveTag);
 	
 	$('.submitEmail').live("click",checkUpdate);
 	$('.submitTitle').live("click",updateTitle);
@@ -388,4 +496,5 @@ $(document).ready(function(){
 	$('.submitGender').live("click",updateGender);
 	$('.submitBirthdate').live("click",updateBirthdate);
 	$('.submitAddress').live("click",updateAddress);
+	$('.submitTopics').live("click",updateTopics);
 });

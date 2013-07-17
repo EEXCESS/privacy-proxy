@@ -280,7 +280,7 @@ $.ajax({
 	   url: URL+"profile.html",
 	   type: "GET",
 	   complete: function(response){
-		   $('#profile').append(response.responseText)
+		   $('#profile').append(response.responseText);
 	   }
 });
 
@@ -288,7 +288,8 @@ $.ajax({
 	   url: URL+"settings.html",
 	   type: "GET",
 	   complete: function(response){
-		   $('#settings').append(response.responseText)
+		   $('#settings').append(response.responseText);
+		   initUserInfo();
 	   }
 });
 
