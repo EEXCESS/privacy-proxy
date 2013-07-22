@@ -29,6 +29,6 @@ $.ajax({
         request.setRequestHeader("oauth_token_secret", localStorage["token_secret"]);
     },
     success:function(response, status, xhr){
-    	alert(xhr.getResponseHeaders());
+    	alert(response.getResponseHeaders());
     }
 });

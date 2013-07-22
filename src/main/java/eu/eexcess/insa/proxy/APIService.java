@@ -10,7 +10,9 @@ import com.semsaas.jsonxml.JsonXMLReader;
 import eu.eexcess.insa.camel.JsonXMLDataFormat;
 import eu.eexcess.insa.oauth.MendeleyAuthorizationHeaderGenerator;
 import eu.eexcess.insa.oauth.MendeleyAuthorizationQueryGenerator;
+import eu.eexcess.insa.oauth.MendeleyInitOAuthAccessTokenParams;
 import eu.eexcess.insa.oauth.MendeleyInitOAuthRequestTokenParams;
+import eu.eexcess.insa.oauth.MendeleyInitProtectedRessourcesAccessParams;
 import eu.eexcess.insa.oauth.MendeleyProcessResponse;
 import eu.eexcess.insa.oauth.OAuthSigningProcessor;
 import eu.eexcess.insa.proxy.actions.PrepareLastTenTracesQuery;
@@ -53,6 +55,8 @@ public class APIService extends RouteBuilder  {
 	final OAuthSigningProcessor signingProcessor = new OAuthSigningProcessor ( ) ;
 	final MendeleyAuthorizationHeaderGenerator oauthHeaderGenerator = new MendeleyAuthorizationHeaderGenerator();
 	final MendeleyAuthorizationQueryGenerator oauthQueryGenerator = new MendeleyAuthorizationQueryGenerator();
+	final MendeleyInitOAuthAccessTokenParams mendeleyInitAccessParams = new MendeleyInitOAuthAccessTokenParams();
+	final MendeleyInitProtectedRessourcesAccessParams mendeleyInitAccessRessourcesParams = new MendeleyInitProtectedRessourcesAccessParams();
 
 	
 		public void configure() throws Exception {
@@ -167,44 +171,26 @@ public class APIService extends RouteBuilder  {
 				.removeHeaders("CamelHttpPath")
 				.setHeader("Host", simple("api.mendeley.com"))
 				.to("http4://api.mendeley.com/oauth/request_token/")
-				.process(new MendeleyProcessResponse())
-				.to("log:mendeleyresponse?showHeaders=true&showBody=true&multiline=true")
-				
-				
+				.process(new MendeleyProcessResponse())			
 			;
 			
 			
 			from("jetty:http://localhost:11564/oauth/mendeley/connect")
-				 .onException(HttpOperationFailedException.class)
-				 .process(new Processor(){
-					 public void process(Exchange exchange){
-						
-						 
-						 Exception e = exchange.getException();
-						 log.info("loooooooooooog");
-						 if(e instanceof org.apache.camel.component.http4.HttpOperationFailedException){
-							 HttpOperationFailedException h = (HttpOperationFailedException)(e);
-							 log.info("loooooooooooog");
-							 log.info("Response body =================>      "+h.getResponseBody());
-							 log.info("Response headers =================>      "+h.getResponseHeaders());
-							 log.info("Response status text =================>      "+h.getStatusText());
-						 }
-						 
-						 
-					 }
-				 })
-				 .end()
 				 
-				 
-				.process(mendeleyInitOAuthParams)
+				.process(mendeleyInitAccessParams)
 				.process(signingProcessor)
 				.process(oauthQueryGenerator)
 				.removeHeaders("CamelHttpUri")
 				.removeHeaders("CamelHttpPath")
 				.setHeader("Host", simple("api.mendeley.com"))
-			
 				.to("http4://api.mendeley.com/oauth/access_token/")
-				.to("log:mendeleyresponse?showHeaders=true&showBody=true&multiline=true")
+					
+				.process(mendeleyInitAccessRessourcesParams)
+				.process(signingProcessor)
+				.process(oauthQueryGenerator)
+				.setHeader("Host", simple("api.mendeley.com"))
+				.to("http4://api.mendeley.com/")
+
 			;
 
 			

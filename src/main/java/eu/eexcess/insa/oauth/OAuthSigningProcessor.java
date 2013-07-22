@@ -58,13 +58,10 @@ public class OAuthSigningProcessor implements Processor {
 		baseString.append(Strings.encodeURL(in.getHeader(Exchange.HTTP_BASE_URI, String.class)));
 		baseString.append(Strings.encodeURL(in.getHeader(Exchange.HTTP_PATH, String.class)));
 		baseString.append('&');
-		
-		//System.out.println(parametersString.toString());
-		
+	
 		baseString.append(Strings.encodeURL(parametersString.toString()));
 		String res =  baseString.toString();
 		//exchange.setProperty("oauth_baseString",res);
-		System.out.println("base string : "+res);
 		return res;
 		
 	}
