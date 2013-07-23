@@ -1,0 +1,41 @@
+.privacyToggleLeft{
+	background-color: #fff !important;
+}
+.privacyToggle{
+	border-color: #fff !important;
+}
+.email{
+	display: inline;
+}
+.gender{
+	display: inline;
+}
+.title{
+	display: inline;
+}
+
+#slider{
+	margin-top: 30px !important;
+}
+.submitSetting{
+	display: inline-block;
+	position: absolute;
+	top: 35px;
+	right: 120px;
+}
+
+#sliderAddress{
+	margin-top: 30px !important;
+}
+
+.toggle{
+	display: inline;
+	float: right;
+}
+
+.slider-tip {
+    opacity:1;
+    bottom:120%;
+    left: -95px;
+    margin-left: -10m;
+}

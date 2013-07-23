@@ -1,11 +1,20 @@
 	package eu.eexcess.insa.proxy;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.http4.HttpOperationFailedException;
 
 import com.semsaas.jsonxml.JsonXMLReader;
 
 import eu.eexcess.insa.camel.JsonXMLDataFormat;
+import eu.eexcess.insa.oauth.MendeleyAuthorizationHeaderGenerator;
+import eu.eexcess.insa.oauth.MendeleyAuthorizationQueryGenerator;
+import eu.eexcess.insa.oauth.MendeleyInitOAuthAccessTokenParams;
+import eu.eexcess.insa.oauth.MendeleyInitOAuthRequestTokenParams;
+import eu.eexcess.insa.oauth.MendeleyInitProtectedRessourcesAccessParams;
+import eu.eexcess.insa.oauth.MendeleyProcessResponse;
+import eu.eexcess.insa.oauth.OAuthSigningProcessor;
 import eu.eexcess.insa.proxy.actions.PrepareLastTenTracesQuery;
 import eu.eexcess.insa.proxy.actions.PrepareRecommendationRequest;
 import eu.eexcess.insa.proxy.actions.PrepareRecommendationTermsPonderation;
@@ -16,13 +25,15 @@ import eu.eexcess.insa.proxy.actions.PrepareUserSearch;
 import eu.eexcess.insa.proxy.actions.PrepareUserLogin;
 import eu.eexcess.insa.proxy.actions.PrepareRespLogin;
 import eu.eexcess.insa.proxy.actions.PrepareUserProfile;
+import eu.eexcess.insa.proxy.connectors.CloseJsonObject;
 import eu.eexcess.insa.proxy.connectors.EconBizQueryMapper;
+import eu.eexcess.insa.proxy.connectors.EconBizResultFormater;
+import eu.eexcess.insa.proxy.connectors.MendeleyDocumentQueryMapper;
+import eu.eexcess.insa.proxy.connectors.MendeleyQueriesAggregator;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
+import eu.eexcess.insa.proxy.connectors.RecomendationResultAggregator;
 
-/**
- * Hello world!
- *
- */
+
 public class APIService extends RouteBuilder  {
 
 	final PrepareRequest prepReq = new PrepareRequest();
@@ -37,14 +48,19 @@ public class APIService extends RouteBuilder  {
 	final EconBizQueryMapper prepEconBizQuery = new EconBizQueryMapper ();
 	final PrepareLastTenTracesQuery prepLastTen = new PrepareLastTenTracesQuery();
 	final MendeleyQueryMapper prepMendeleyQuery = new MendeleyQueryMapper();
+	final MendeleyDocumentQueryMapper prepDocumentSearch = new MendeleyDocumentQueryMapper();
+	final CloseJsonObject closeJson = new CloseJsonObject();
+	final EconBizResultFormater econBizResultFormater = new EconBizResultFormater();
+	final MendeleyInitOAuthRequestTokenParams mendeleyInitOAuthParams = new MendeleyInitOAuthRequestTokenParams();
+	final OAuthSigningProcessor signingProcessor = new OAuthSigningProcessor ( ) ;
+	final MendeleyAuthorizationHeaderGenerator oauthHeaderGenerator = new MendeleyAuthorizationHeaderGenerator();
+	final MendeleyAuthorizationQueryGenerator oauthQueryGenerator = new MendeleyAuthorizationQueryGenerator();
+	final MendeleyInitOAuthAccessTokenParams mendeleyInitAccessParams = new MendeleyInitOAuthAccessTokenParams();
+	final MendeleyInitProtectedRessourcesAccessParams mendeleyInitAccessRessourcesParams = new MendeleyInitProtectedRessourcesAccessParams();
+
 	
 		public void configure() throws Exception {
-			/*from("jetty:http://localhost:8888/v0/eexcess/recommend")
-				.removeHeaders("CamelHttp*")
-				.process(prepReq)
-//				.to("http4://www.google.com/search")
-				.process(prepRes)
-			;*/
+			
 			
 			from("jetty:http://localhost:12564/api/v0/privacy/trace")
 				.setHeader("ElasticType").constant("trace")
@@ -63,7 +79,7 @@ public class APIService extends RouteBuilder  {
 			from("jetty:http://localhost:12564/api/v0/recommend")	
 				.removeHeaders("CamelHttp*")
 				.removeHeader("Host")	
-				.to("direct:recommend.econbiz")
+				.to("direct:recommend")
 				.setHeader("Content-Type").constant("text/html")
 			;
 			
@@ -104,7 +120,7 @@ public class APIService extends RouteBuilder  {
 			
 			
 			
-			from("direct:recommend.econbiz")
+			from("direct:recommend")
 				.process(prepLastTen)
 				.log("${in.body}")
 				.setHeader("ElasticType").constant("trace")
@@ -113,50 +129,70 @@ public class APIService extends RouteBuilder  {
 				.log("${out.body}")
 				.process(prepPonderation)
 				.log("${in.body}")
+				.setHeader("origin").simple("exchangeId")
+				.multicast().aggregationStrategy(new RecomendationResultAggregator())
+					.to("direct:recommend.econbiz")
+					.to("direct:recommend.mendeley")
+				.end()
+				.unmarshal().string("UTF-8")
+			    .unmarshal(new JsonXMLDataFormat())
+			    //.wireTap("file:///tmp/econbiz/?fileName=example.xml")
+			    .to("xslt:eu/eexcess/insa/xslt/results2html.xsl")
+			    // .wireTap("file:///tmp/econbiz/?fileName=example.html")
+			;
 				
-				//************Mendeley Part**********
-				.process(prepMendeleyQuery)
-				.recipientList().header("QueryEndpoint")
-				.unmarshal(new JsonXMLDataFormat())
-				.removeHeader("HTTP_URI")
-			    .wireTap("file:///tmp/mendeley/?fileName=example.xml")
-			    .to("xslt:eu/eexcess/insa/xslt/mendeley2html.xsl")
-			    .wireTap("file:///tmp/mendeley/?fileName=example.html")
-				
-			/*	// ***********  Econbiz part**************
-				
+			
+			    
+			    
+			from("direct:recommend.econbiz")
 				.process(prepEconBizQuery)
-				
-				.removeHeader("ElasticType")
-				.removeHeader("ElasticIndex")
-				.log("Query: ${in.header.CamelHttpQuery}")
-				.choice()
+			    .choice()
 					.when().simple("${in.header.CamelHttpQuery} != 'q='")
 						.to("http4://api.econbiz.de/v1/search")
 					.otherwise()
 						.to("string-template:templates/empty-results.tm")
 				.end()
-			    .unmarshal(new JsonXMLDataFormat())
-			    .wireTap("file:///tmp/econbiz/?fileName=example.xml")
-			    .to("xslt:eu/eexcess/insa/xslt/econbiz2html.xsl")
-			    .wireTap("file:///tmp/econbiz/?fileName=example.html")
-			  */  
-			    
+				.process(econBizResultFormater)
+			; 
+
+			from("direct:recommend.mendeley")
+			    .process(prepMendeleyQuery)
+			    .recipientList().header("QueryEndpoint")
+			    .process(prepDocumentSearch)
+			    .recipientList(header("QueryEndPoint").tokenize(",")).aggregationStrategy(new MendeleyQueriesAggregator())
+			    .process(closeJson)
+			;
+						
+			from("jetty:http://localhost:11564/oauth/mendeley/init")	
+				.process(mendeleyInitOAuthParams)
+				.process(signingProcessor)
+				.process(oauthQueryGenerator)
+				.removeHeaders("CamelHttpUri")
+				.removeHeaders("CamelHttpPath")
+				.setHeader("Host", simple("api.mendeley.com"))
+				.to("http4://api.mendeley.com/oauth/request_token/")
+				.process(new MendeleyProcessResponse())			
 			;
 			
 			
-			
-			
-			
-			
-			from("direct:essai")
-			.unmarshal().string("UTF-8")
-			.to("file:///tmp/econbiz/?fileName=debug.txt");
-			
-			
-			from("direct:essaiRequete")
-			.unmarshal().string("UTF-8")
-			.to("file:///tmp/econbiz/?fileName=debugRequete.txt");
+			from("jetty:http://localhost:11564/oauth/mendeley/connect")
+				 
+				.process(mendeleyInitAccessParams)
+				.process(signingProcessor)
+				.process(oauthQueryGenerator)
+				.removeHeaders("CamelHttpUri")
+				.removeHeaders("CamelHttpPath")
+				.setHeader("Host", simple("api.mendeley.com"))
+				.to("http4://api.mendeley.com/oauth/access_token/")
+					
+				.process(mendeleyInitAccessRessourcesParams)
+				.process(signingProcessor)
+				.process(oauthQueryGenerator)
+				.setHeader("Host", simple("api.mendeley.com"))
+				.to("http4://api.mendeley.com/")
+
+			;
+
 			
 		}
 

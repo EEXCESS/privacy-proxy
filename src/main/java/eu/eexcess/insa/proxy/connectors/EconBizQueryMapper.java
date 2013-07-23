@@ -13,7 +13,7 @@ import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 
 public class EconBizQueryMapper implements Processor { 
-
+public int itemsPerPage = 5; //maximum amount of responses we get ftom mendeley
 
 /*It is assumed the message's body contains an array of query object in Json form
  * 
@@ -57,8 +57,9 @@ public class EconBizQueryMapper implements Processor {
 	    		query.append(" OR ");
 	    	}
 	    }
-	   
-	    in.setHeader(Exchange.HTTP_QUERY,"q="+URLEncoder.encode(query.toString(), "UTF8"));
+	    //query.append("&size="+itemsPerPage);
+	   String encodedQuery = URLEncoder.encode(query.toString(), "UTF8"); 
+	    in.setHeader(Exchange.HTTP_QUERY,"q="+encodedQuery+"&size="+itemsPerPage);
 	    in.setHeader(Exchange.HTTP_METHOD, "GET");
 	}
 

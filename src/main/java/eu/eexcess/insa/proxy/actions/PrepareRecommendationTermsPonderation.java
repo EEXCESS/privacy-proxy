@@ -98,7 +98,8 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    Utils.writeWeightedQuery(stringWriter, ponderatedTerms);
 	    logger.info(ponderatedTerms.toString());
 	    in.setBody(stringWriter.toString());
-
+	    
+	    //in.setHeader("origin",exchange.getExchangeId());
 		
 		
 		

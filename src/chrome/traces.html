@@ -2,22 +2,7 @@
 	<head>
 		<meta charset = "utf-8">
 		<!-- <link rel="stylesheet" type="text/css" href="main.css"> -->
-		<script src="md5.js"></script>
-		   <script src="flat_ui/js/jquery-1.8.3.min.js"></script>
- 		   <script src="flat_ui/js/jquery-ui-1.10.3.custom.min.js"></script>
-   			 <script src="flat_ui/js/jquery.ui.touch-punch.min.js"></script>
-   			 <script src="flat_ui/js/bootstrap.min.js"></script>
-		    <script src="flat_ui/js/bootstrap-select.js"></script>
-		    <script src="flat_ui/js/bootstrap-switch.js"></script>
-		    <script src="flat_ui/js/flatui-checkbox.js"></script>
-		    <script src="flat_ui/js/flatui-radio.js"></script>
-		    <script src="flat_ui/js/jquery.tagsinput.js"></script>
-		    <script src="flat_ui/js/jquery.placeholder.js"></script>
-		    <script src="flat_ui/js/jquery.stacktable.js"></script>
-		    <script src="flat_ui/js/application.js"></script>
-		    <script src="jquery.jsonview.js"></script>
-		    <script src="profile.js"></script>
-		<script type="text/javascript" src="import_traces.js"></script>
+
 		    <!-- Loading Bootstrap -->
    		 <link href="flat_ui/bootstrap/css/bootstrap.css" rel="stylesheet">
 
@@ -25,6 +10,7 @@
 	    <link href="flat_ui/css/flat-ui.css" rel="stylesheet">
 	    <link href="traces.css" rel="stylesheet">
 	    <link href="profile.css" rel="stylesheet">
+		<link href="settings.css" rel="stylesheet">
 	</head>
 	<body>
 		<div class="container">
@@ -48,13 +34,11 @@
 											<p style="text-align:right"> Show this session's traces</p>
 										</div>
 										<div class="span2"  style="position:relative; right:-5%;">
-											<td width="50%" class="pbm">
-			              						<div class="switch has-switch">
-			              					  		<div class="switch-on switch-animate" style="">
-			              					  			<input type="checkbox" checked="" data-toggle="switch" id="inputPluginTraces">
-			              					  		</div>
-			              						</div>
-			             					</td>
+			              					<div class="switch has-switch">
+			              					  	<div class="switch-on switch-animate" style="">
+			              					  		<input type="checkbox" checked="" data-toggle="switch" id="inputPluginTraces">
+			              					  	</div>
+			              					</div>
 			             				</div>
 		             				</div>
 		             				<div class="row">
@@ -62,13 +46,11 @@
 											<p style="text-align:right"> Show user's traces</p>
 										</div>
 										<div class="span2"  style="position:relative; right:-5%;">
-											<td width="50%" class="pbm">
-			              						<div class="switch has-switch">
-			              					  		<div class="switch-on switch-animate" style="">
-			              					  			<input type="checkbox" checked="" data-toggle="switch" id="inputUserTraces">
-			              					  		</div>
-			              						</div>
-			             					</td>
+		              						<div class="switch has-switch">
+		              					  		<div class="switch-on switch-animate" style="">
+		              					  			<input type="checkbox" checked="" data-toggle="switch" id="inputUserTraces">
+		              					  		</div>
+		              						</div>
 			             				</div>
 		             				</div>
 								</div>
@@ -103,11 +85,28 @@
 							
 						</div>
 		 				<div class="tab-pane" id="settings">
-		 					<iframe frameborder ="0" src="settings.html"></iframe>
+
 		 				</div>
 					</div>
 				</div>
 			</div>
 		</div>
+		<script src="md5.js"></script>
+		<script src="flat_ui/js/jquery-1.8.3.min.js"></script>
+		<script src="flat_ui/js/jquery-ui-1.10.3.custom.min.js"></script>
+		<script type="text/javascript" src="settings.js"></script>
+		<script src="flat_ui/js/jquery.ui.touch-punch.min.js"></script>
+		<script src="flat_ui/js/bootstrap.min.js"></script>
+		<script src="flat_ui/js/bootstrap-select.js"></script>
+		<script src="flat_ui/js/bootstrap-switch.js"></script>
+		<script src="flat_ui/js/flatui-checkbox.js"></script>
+		<script src="flat_ui/js/flatui-radio.js"></script>
+		<script src="flat_ui/js/jquery.tagsinput.js"></script>
+		<script src="flat_ui/js/jquery.placeholder.js"></script>
+		<script src="flat_ui/js/jquery.stacktable.js"></script>
+		<script src="flat_ui/js/application.js"></script>
+		<script src="jquery.jsonview.js"></script>
+		<script src="profile.js"></script>
+		<script type="text/javascript" src="import_traces.js"></script>
 	</body>
 </html>

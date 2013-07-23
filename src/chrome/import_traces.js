@@ -272,13 +272,26 @@ $('#inputUserTraces').live("change",doReloadTraces);
 $('#inputPluginTraces').live("change",doReloadTraces);
 $('.detailHandle').live("click",doToggleDetails);
 
+var URL = $(document)[0].URL;
+var urlSplit = URL.split("/");
+URL = urlSplit[0]+"//"+urlSplit[2]+"/";
+
 $.ajax({
-	   url: "chrome-extension://knkiliagpcbbclfpiilchjkbabbhilbf/profile.html",
+	   url: URL+"profile.html",
 	   type: "GET",
 	   complete: function(response){
-		   $('#profile').append(response.responseText)
+		   $('#profile').append(response.responseText);
 	   }
-	});
+});
+
+$.ajax({
+	   url: URL+"settings.html",
+	   type: "GET",
+	   complete: function(response){
+		   $('#settings').append(response.responseText);
+		   initUserInfo();
+	   }
+});
 
 
 $(document).ready(function () {

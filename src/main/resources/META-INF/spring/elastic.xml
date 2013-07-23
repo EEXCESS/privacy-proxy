@@ -6,12 +6,14 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
-
+	
     <camelContext xmlns="http://camel.apache.org/schema/spring" useMDCLogging="true">
+	    <propertyPlaceholder id="properties" location="config.properties"/>
+    
 		<route>
 			<from uri="seda:elastic.trace.index?concurrentConsumers=4" />
 			<setHeader headerName="CamelHttpURI">
-				<simple>http://localhost:9200/${in.header.ElasticIndex}/${in.header.ElasticType}/${in.header.traceId}</simple>
+				<simple>{{elastic.url}}/${in.header.ElasticIndex}/${in.header.ElasticType}/${in.header.traceId}</simple>
 			</setHeader>
     		<setHeader headerName="CamelHttpMethod">
     			<constant>POST</constant>
@@ -19,6 +21,7 @@
     		<setProperty propertyName="CamelCharsetName">
     			<constant>UTF-8</constant>
     		</setProperty>
+    		<to uri="log:indextrace?showHeaders=true" />
 			<to uri="http4://localhost:9200/" />
 			<removeHeaders pattern="CamelHttp*" />
 		</route>
@@ -26,7 +29,7 @@
 		<route>
 			<from uri="direct:elastic.search" />
 			<setHeader headerName="CamelHttpURI">
-				<simple>http4://localhost:9200/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
+				<simple>{{elastic.url}}/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
 			</setHeader>
     		<setHeader headerName="CamelHttpMethod">
     			<constant>POST</constant>
@@ -41,7 +44,7 @@
 		<route>
 			<from uri="direct:elastic.userSearch" />
 			<setHeader headerName="CamelHttpURI">
-				<simple>http4://localhost:9200/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
+				<simple>{{elastic.url}}/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
 			</setHeader>
     		<setHeader headerName="CamelHttpMethod">
     			<constant>POST</constant>

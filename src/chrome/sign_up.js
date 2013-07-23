@@ -91,7 +91,7 @@ function validEmail(mail)
 
 function login() {
 	
-	var id = document.forms["login"].elements[1].value;
+	var id = document.forms["login"].elements[0].value;
 	var password = MD5(document.forms["login"].elements[1].value);	
 
 	if(validEmail(id)) {
@@ -124,6 +124,19 @@ function login() {
 		});
 	}
 	
+}
+
+function oauthMendeley(){
+	$.ajax({
+		   	url: "http://localhost:11564/oauth/mendeley/init",
+		    type: "POST",
+		    contentType: "application/json;charset=UTF-8",
+		    success:function(response, status, xhr){
+		    	var token = xhr.getResponseHeader("oauth_token");
+		    	localStorage["token_secret"] = xhr.getResponseHeader("oauth_token_secret");
+		    	window.location = "http://api.mendeley.com/oauth/authorize/?oauth_token="+token;
+		    }
+		});
 }
 
 function click_btn() {
@@ -183,6 +196,8 @@ function click_btn() {
 			this.value='Full Name';
 		}
 	});
+	
+	$('.mendeleyConnect').click(oauthMendeley);
 
 }
 
