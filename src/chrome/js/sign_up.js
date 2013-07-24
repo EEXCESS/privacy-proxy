@@ -126,6 +126,19 @@ function login() {
 	
 }
 
+function oauthMendeley(){
+	$.ajax({
+		   	url: "http://localhost:11564/oauth/mendeley/init",
+		    type: "POST",
+		    contentType: "application/json;charset=UTF-8",
+		    success:function(response, status, xhr){
+		    	var token = xhr.getResponseHeader("oauth_token");
+		    	localStorage["token_secret"] = xhr.getResponseHeader("oauth_token_secret");
+		    	window.location = "http://api.mendeley.com/oauth/authorize/?oauth_token="+token;
+		    }
+		});
+}
+
 function click_btn() {
 	document.getElementById("sign_up").addEventListener('click',valideIDs);
 	document.getElementById("sign_in").addEventListener('click',login);
@@ -183,6 +196,8 @@ function click_btn() {
 			this.value='Full Name';
 		}
 	});
+	
+	$('.mendeleyConnect').click(oauthMendeley);
 
 }
 
