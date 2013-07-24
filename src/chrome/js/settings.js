@@ -73,7 +73,7 @@ function triggerUpdateGeoloc() {
         var longitude = position.coords.longitude;
         
         url = "http://api.geonames.org/findNearbyPostalCodesJSON?lat="+latitude+"&lng=" + longitude +"&username=eexcess.insa";
-        alert(url);
+
     	$.ajax({
     	   url: url,
     	   type: "GET",
