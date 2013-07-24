@@ -104,7 +104,7 @@ function parseDate(date){
 	}
 }
 
-function traces(plugin_id,user_id) {
+function traces(user_id,email) {
 	// a query is send to the elasticsearch database
 	var url = "http://localhost:11564/user/traces";
 	var method = 'POST';
@@ -112,14 +112,14 @@ function traces(plugin_id,user_id) {
 	var request = new XMLHttpRequest();
 	
 	var body = '';
-	if(plugin_id != '') {
-		body = body + "{\"term\":{\"trace.plugin.uuid\": \""+plugin_id+"\"}}";
+	if(user_id != '') {
+		body = body + "{\"term\":{\"trace.plugin.uuid\": \""+user_id+"\"}}";
 	}
-	if (plugin_id != '' && user_id!='') {
+	if (user_id != '' && email!='') {
 		body = body + ",";
 	}
-	if(user_id != '') {
-		body = body + "{\"term\":{\"_id\": \""+user_id+"\"}}"; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	if(email != '') {
+		body = body + "{\"term\":{\"trace.user.email\": \""+email+"\"}}";
 	}	
 	
 	request.open(method, url, async);	
@@ -184,10 +184,10 @@ function traces(plugin_id,user_id) {
 		$(clone).find('.host').html(parseUrl(content["_source"].document.url));
 		
 		if (content["_source"].events.begin == "focus") {
-			$(clone).find('.tempImg1').attr("src","focus.png");
+			$(clone).find('.tempImg1').attr("src","media/focus.png");
 		}
 		if (content["_source"].events.end == "blur") {
-			$(clone).find('.tempImg2').attr("src","blur.png");
+			$(clone).find('.tempImg2').attr("src","media/blur.png");
 		}
 		
 		var parsedUrl = parseUrl(content["_source"].document.url);
@@ -297,7 +297,7 @@ $.ajax({
 $(document).ready(function () {
   chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
 	  var uuid = response.data;
-	  chrome.extension.sendRequest({method: "getLocalStorage", key: "user_id"}, function(response) {
+	  chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
 		  traces(uuid,response.data);
 	  })
   })

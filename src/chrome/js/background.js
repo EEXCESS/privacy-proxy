@@ -161,7 +161,7 @@ function send_context(event, tabID, context){
 	var date = date_heure();
 	var trace = {
 		user: {
-			user_id: localStorage["user_id"],
+			email: localStorage["privacy_email"],
 			environnement: localStorage["env"]
 		},
 		plugin: {

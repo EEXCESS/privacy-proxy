@@ -14,7 +14,7 @@ function updateUserInfo(){
 	       {
 	           request.setRequestHeader("traceid", idUser);
 	       },
-		   complete: function(response) {
+		   success: function(response) {
 			   $('.stateSettings').html("Changes saved");
 		   }
 		});
@@ -73,14 +73,15 @@ function triggerUpdateGeoloc() {
         var longitude = position.coords.longitude;
         
         url = "http://api.geonames.org/findNearbyPostalCodesJSON?lat="+latitude+"&lng=" + longitude +"&username=eexcess.insa";
+
     	$.ajax({
     	   url: url,
     	   type: "GET",
     	   contentType: "text/json;charset=UTF-8",
-    	   complete: function(response) {
+    	   success: function(response) {
     		   coord = "lat="+latitude+",lng="+longitude;
     		   $(".geoloc").html("Geolocation: Latitude "+latitude+" , Longitude "+longitude);
-    		   doUpdateGeoloc(JSON.parse(response.responseText),coord);
+    		   doUpdateGeoloc(response,coord);
     	   }
     	});
     });
@@ -114,8 +115,8 @@ function triggerUpdateAddress(){
 		   url: url,
 		   type: "GET",
 		   contentType: "text/json;charset=UTF-8",
-		   complete: function(response) {
-			   doUpdateAddress(JSON.parse(response.responseText));
+		   success: function(response) {
+			   doUpdateAddress(response);
 		   }
 		});
 	}

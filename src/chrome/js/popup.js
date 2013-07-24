@@ -1,11 +1,8 @@
 $('.nav-tabs').button();
 
 function logout(){
+	localStorage.removeItem("privacy_email");
 	localStorage.removeItem("username");
-	localStorage.removeItem("recommend");
-	localStorage.removeItem("env");
-	localStorage.removeItem("token_secret");
-	localStorage.removeItem("user_id");
 	$('#username').html("Good Bye !");
 	$('#logout_btn').hide();
 	$('#sign_in').show();
