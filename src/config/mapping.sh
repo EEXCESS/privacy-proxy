@@ -13,6 +13,12 @@ index :
     number_of_replicas : 1
 '
 
+curl -XPUT 'http://localhost:9200/profiles/' -d '
+index :
+    number_of_shards : 5
+    number_of_replicas : 1
+'
+
 curl -XPUT "http://localhost:9200/users/data/_mapping" -d '
 {
 	"data": {

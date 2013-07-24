@@ -17,7 +17,6 @@ queryComponents.forEach(function(element){
 	}
 });
 
-alert('test:'+token);
 $.ajax({
    	url: "http://localhost:11564/oauth/mendeley/connect",
     type: "GET",
@@ -27,8 +26,12 @@ $.ajax({
         request.setRequestHeader("oauth_verifier", verifier);
         request.setRequestHeader("oauth_token", token);
         request.setRequestHeader("oauth_token_secret", localStorage["token_secret"]);
+        request.setRequestHeader("user_id", localStorage["user_id"]);
     },
-    success:function(response, status, xhr){
-    	alert(response.getResponseHeaders());
+    complete: function(response, status, xhr){
+    	alert(response.responseText);
+    	
+    	
+    	
     }
 });

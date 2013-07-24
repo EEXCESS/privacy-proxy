@@ -104,7 +104,7 @@ function parseDate(date){
 	}
 }
 
-function traces(user_id,email) {
+function traces(plugin_id,user_id) {
 	// a query is send to the elasticsearch database
 	var url = "http://localhost:11564/user/traces";
 	var method = 'POST';
@@ -112,14 +112,14 @@ function traces(user_id,email) {
 	var request = new XMLHttpRequest();
 	
 	var body = '';
-	if(user_id != '') {
-		body = body + "{\"term\":{\"trace.plugin.uuid\": \""+user_id+"\"}}";
+	if(plugin_id != '') {
+		body = body + "{\"term\":{\"trace.plugin.uuid\": \""+plugin_id+"\"}}";
 	}
-	if (user_id != '' && email!='') {
+	if (plugin_id != '' && user_id!='') {
 		body = body + ",";
 	}
-	if(email != '') {
-		body = body + "{\"term\":{\"trace.user.email\": \""+email+"\"}}";
+	if(user_id != '') {
+		body = body + "{\"term\":{\"_id\": \""+user_id+"\"}}"; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	}	
 	
 	request.open(method, url, async);	
@@ -297,7 +297,7 @@ $.ajax({
 $(document).ready(function () {
   chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
 	  var uuid = response.data;
-	  chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
+	  chrome.extension.sendRequest({method: "getLocalStorage", key: "user_id"}, function(response) {
 		  traces(uuid,response.data);
 	  })
   })

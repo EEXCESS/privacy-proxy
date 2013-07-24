@@ -1,6 +1,6 @@
 /*************************************************************
 *    This script saves the user email in the localStorage.   *
-*    More informations may be add later.                     *
+*    More informations may be added later.                     *
 *************************************************************/
 
 
@@ -64,10 +64,13 @@ function register(){
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: userDataJSON,
-	   success: function(response) {
+	   complete: function(response, status, error) {
+			var id = response.responseText;
+			localStorage["user_id"] = id;
 			document.getElementById('successSignup').innerHTML='Registration Successfull';
 			document.getElementById("successLogin").innerHTML = "Successful Sign in";
 			document.location.href="traces.html";
+			
 	   }
 	});
 	
@@ -115,7 +118,7 @@ function login() {
 					document.getElementById("successLogin").innerHTML = "Wrong identification";
 				}
 				else {
-					localStorage["privacy_email"] = response["email"];
+					localStorage["user_id"] = response["id"];
 					localStorage["username"] = response["username"];
 					document.getElementById("successLogin").innerHTML = "Successful Sign in";
 					document.location.href="traces.html";

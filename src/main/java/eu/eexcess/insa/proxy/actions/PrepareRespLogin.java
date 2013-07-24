@@ -41,18 +41,21 @@ public class PrepareRespLogin implements Processor {
 	    }
 	    */
 	    
-	    
+
 	    InputStream is = in.getBody(InputStream.class);
+	    
 	    JsonParser jp = factory.createJsonParser(is);
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
 	    JsonNode entryNode = rootNode.path("hits").path("hits").path(0);
 	    
 	    String loginValid = rootNode.path("hits").path("total").asText();
-	    String email = entryNode.path("_source").path("email").asText();
+	    String id = entryNode.path("_id").asText();
+	    System.out.println(id);
+	    //String email = entryNode.path("_source").path("email").asText();
 	    String username = entryNode.path("_source").path("username").asText();
 	    
-	    String body = "{\"loginValid\": \""+loginValid+"\",\"email\":\""+email+"\",\"username\":\""+username+"\"}";
+	    String body = "{\"loginValid\": \""+loginValid+"\",\"id\":\""+id+"\",\"username\":\""+username+"\"}";
 	    in.setBody(body);
 	}
 

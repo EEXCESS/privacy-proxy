@@ -15,6 +15,7 @@ public class MendeleyInitOAuthAccessTokenParams implements Processor {
 	final private String consumerSecret = "6faa629a8339f4bf61d9f41be70c536f";
 	
 	public void process(Exchange exchange) throws Exception {
+		
 		exchange.setProperty("oauth_consumer_key", consumerKey);
 		exchange.setProperty("oauth_consumer_secret", consumerSecret);
 		exchange.setProperty("oauth_signature_method", "HMAC-SHA1");
@@ -31,6 +32,13 @@ public class MendeleyInitOAuthAccessTokenParams implements Processor {
 		
 		
 		Message in = exchange.getIn();
+		if( in.getHeader("user_id") != null){
+			String user_id = in.getHeader("user_id",String.class);
+			in.removeHeader("user_id");
+			exchange.setProperty( "user_id", user_id ) ;
+		}
+		
+		
 		exchange.setProperty("oauth_token", in.getHeader("oauth_token",String.class));
 		exchange.setProperty("oauth_token_secret", in.getHeader("oauth_token_secret",String.class));
 		exchange.setProperty("oauth_verifier", in.getHeader("oauth_verifier",String.class));

@@ -21,7 +21,6 @@
     		<setProperty propertyName="CamelCharsetName">
     			<constant>UTF-8</constant>
     		</setProperty>
-    		<to uri="log:indextrace?showHeaders=true" />
 			<to uri="http4://localhost:9200/" />
 			<removeHeaders pattern="CamelHttp*" />
 		</route>
