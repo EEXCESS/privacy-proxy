@@ -26,10 +26,10 @@ public class PrepareLastTenTracesQuery implements Processor{
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
 		
-	    String email = "";
+	    String user_id = "";
 	    String uuid = "";
-		if ( !rootNode.path("user").path("email").isMissingNode()){
-			email = rootNode.path("user").path("email").asText();
+		if ( !rootNode.path("user").path("user_id").isMissingNode()){
+			user_id = rootNode.path("user").path("user_id").asText();
 			
 		}
 		if ( !rootNode.path("plugin").path("uuid").isMissingNode()){
@@ -41,8 +41,9 @@ public class PrepareLastTenTracesQuery implements Processor{
 		
 	
 		
-		String query ="{\"query\": {\"bool\": {\"must\": [{\"bool\": {\"should\": [{\"term\": {\"user.email\": \""+email+"\"}},{\"term\": {\"plugin.uuid\": \""+uuid+"\"}}]}}]}},\"from\": 0,\"size\": 10,\"sort\": [{\"temporal.begin\": \"desc\"}]}";
-		
+		String query ="{\"query\": {\"bool\": {\"must\": [{\"bool\": {\"should\": [{\"term\": {\"user.user_id\": \""+user_id+"\"}},{\"term\": {\"plugin.uuid\": \""+uuid+"\"}}]}}]}},\"from\": 0,\"size\": 10,\"sort\": [{\"temporal.begin\": \"desc\"}]}";
+		System.out.println("query------------->");
+		System.out.println(query);
 		
 		in.setBody(query);
 		

@@ -33,8 +33,15 @@ public class ProfileVerifier implements Processor {
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
 		
-		String is = in.getBody(String.class);
 		
+		in.removeHeader("HOST");
+		in.removeHeader(Exchange.HTTP_QUERY);
+		in.removeHeader(Exchange.HTTP_BASE_URI);
+		in.removeHeader(Exchange.HTTP_PATH);
+		in.setHeader(Exchange.HTTP_METHOD, "POST");
+		
+		
+		String is = in.getBody(String.class);
 		exchange.setProperty("mendeleyProfile",is);
 		
 		JsonFactory factory = new JsonFactory();
@@ -43,6 +50,7 @@ public class ProfileVerifier implements Processor {
 	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
 	    
 	    String id = rootNode.path("main").path("profile_id").asText();
+	    exchange.setProperty("mendeley_id", id);
 	    
 	    String query = "{"+
 			  "\"query\": {" +
@@ -50,7 +58,12 @@ public class ProfileVerifier implements Processor {
 			      "\"must\": ["+
 			        "{"+
 			          "\"term\": {"+
-			            "\"data.mendeley.main.profile_id\": \" + id + \""+
+			            "\"data.profile_info.main.profile_id\": \"" + id + "\""+
+			          "}"+
+			        "},"+
+			        "{"+
+			          "\"term\": {"+
+			            "\"data.source\": \"mendeley\""+
 			          "}"+
 			        "}"+
 			      "]"+

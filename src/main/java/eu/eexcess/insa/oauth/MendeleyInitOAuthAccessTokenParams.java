@@ -21,6 +21,10 @@ public class MendeleyInitOAuthAccessTokenParams implements Processor {
 		exchange.setProperty("oauth_signature_method", "HMAC-SHA1");
 		exchange.setProperty("oauth_timestamp", String.valueOf(new Date().getTime()));
 		
+		
+		
+		
+		
 		SecureRandom random = new SecureRandom();
 	    byte bytes[] = new byte[10];
 	    random.nextBytes(bytes);

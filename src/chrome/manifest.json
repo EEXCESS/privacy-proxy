@@ -14,13 +14,13 @@
   "content_scripts": [
   	{
   	  "matches": ["http://*/*", "https://*/*"],
-  	  "js": ["inject.js"]
+  	  "js": ["js/inject.js"]
     }
   ],
   
   
   "background": {
-    "scripts": ["jquery-1.10.1.min.js","background.js"]
+    "scripts": ["lib/jquery-1.10.1.min.js","js/background.js"]
   },
   
   "permissions": [

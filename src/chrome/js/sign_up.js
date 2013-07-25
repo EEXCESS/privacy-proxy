@@ -117,6 +117,7 @@ function login() {
 				else {
 					localStorage["privacy_email"] = response["email"];
 					localStorage["username"] = response["username"];
+					localStorage["user_id"] = response["id"];
 					document.getElementById("successLogin").innerHTML = "Successful Sign in";
 					document.location.href="traces.html";
 				}

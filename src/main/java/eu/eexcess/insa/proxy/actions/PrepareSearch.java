@@ -9,14 +9,23 @@ public class PrepareSearch implements Processor {
 	public void process(Exchange exchange) throws Exception {
 
 		Message in = exchange.getIn();
+		in.removeHeader(Exchange.HTTP_BASE_URI);
+		in.removeHeader(Exchange.HTTP_PATH);
+		in.removeHeader(Exchange.HTTP_URI);
+		in.removeHeader("CamelHttpUrl");
+		in.removeHeader("CamelServletContextPath");
+		//in.setHeader(Exchange.HTTP_URI, value)
+		in.removeHeader("CamelHttpServletRequest");
 		String body = in.getBody(String.class);
-		
+		in.setHeader("ElasticType", "trace");
+		in.setHeader("ElasticIndex", "privacy");
+		in.setHeader(Exchange.HTTP_METHOD, "POST");
 		body = "{\"query\":{\"bool\":{\"should\":["+body+"]}}}";
-		//System.out.println(body);
+		System.out.println("body ------------->");
+		System.out.println(body);
 		in.setBody(body);
 		
-		//in.setHeader("Content-Type","text/html");
-		//in.setBody("<ul><li>toto</li><li>titi</li></ul>");
+
 	}
 
 }

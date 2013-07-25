@@ -8,7 +8,7 @@ function initUserInfo(){
 
 	var request ={
 		term:{
-			email: localStorage["privacy_email"]
+			_id: localStorage["user_id"]
 		}
 	};
 	
@@ -321,7 +321,7 @@ function updateBirthdate(){
 	       {
 	           request.setRequestHeader("traceid", idUser);
 	       },
-		   success: function(response) {
+		   complete: function(response) {
 				$('.birthdate').html("Birthdate: "+userInfo["birthdate"]);
 				$('.stateBirthdate').html("Changes saved");
 		   }
@@ -352,7 +352,7 @@ function updateAddress(){
        {
            request.setRequestHeader("traceid", idUser);
        },
-	   success: function(response) {
+	   complete: function(response) {
 		    $(".street").html("Address: " + userInfo.address.street);
 			$(".city").html(userInfo.address.postalcode+" "+userInfo.address.city);
 			$(".country").html(userInfo.address.country);
@@ -380,7 +380,7 @@ function doUpdate(field){
        {
            request.setRequestHeader("traceid", idUser);
        },
-	   success: function(response) {
+	   complete: function(response) {
 			$('.'+field.toLowerCase()).html(field+": "+userInfo[field.toLowerCase()]);
 			$('.state'+field).html("Changes saved");
 			localStorage["privacy_email"] = userInfo["email"];
@@ -420,7 +420,7 @@ function updateTopics(){
        {
            request.setRequestHeader("traceid", idUser);
        },
-	   success: function(response) {
+	   complete: function(response) {
 		   
 		    $('#topicsTitle').html("Topics : "+getTopicsStr());
 			$('.stateTopics').html("Changes saved");

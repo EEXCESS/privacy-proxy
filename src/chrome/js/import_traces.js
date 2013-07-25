@@ -113,13 +113,13 @@ function traces(user_id,email) {
 	
 	var body = '';
 	if(user_id != '') {
-		body = body + "{\"term\":{\"trace.plugin.uuid\": \""+user_id+"\"}}";
+		body = body + "{\"term\":{\"plugin.uuid\": \""+user_id+"\"}}";
 	}
 	if (user_id != '' && email!='') {
 		body = body + ",";
 	}
 	if(email != '') {
-		body = body + "{\"term\":{\"trace.user.email\": \""+email+"\"}}";
+		body = body + "{\"term\":{\"user.user_id\": \""+email+"\"}}";
 	}	
 	
 	request.open(method, url, async);	
@@ -297,7 +297,7 @@ $.ajax({
 $(document).ready(function () {
   chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
 	  var uuid = response.data;
-	  chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
+	  chrome.extension.sendRequest({method: "getLocalStorage", key: "user_id"}, function(response) {
 		  traces(uuid,response.data);
 	  })
   })

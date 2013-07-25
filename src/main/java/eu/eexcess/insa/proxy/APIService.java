@@ -16,6 +16,7 @@ import eu.eexcess.insa.oauth.MendeleyInitProtectedRessourcesAccessParams;
 import eu.eexcess.insa.oauth.MendeleyProcessResponse;
 import eu.eexcess.insa.oauth.OAuthSigningProcessor;
 import eu.eexcess.insa.proxy.actions.GetUserId;
+import eu.eexcess.insa.proxy.actions.GetUserProfiles;
 import eu.eexcess.insa.proxy.actions.PrepareLastTenTracesQuery;
 import eu.eexcess.insa.proxy.actions.PrepareRecommendationRequest;
 import eu.eexcess.insa.proxy.actions.PrepareRecommendationTermsPonderation;
@@ -27,11 +28,12 @@ import eu.eexcess.insa.proxy.actions.PrepareUserLogin;
 import eu.eexcess.insa.proxy.actions.PrepareRespLogin;
 import eu.eexcess.insa.proxy.actions.ProfileVerifier;
 import eu.eexcess.insa.proxy.actions.PrepareUserProfile;
+import eu.eexcess.insa.proxy.actions.UpdateEEXCESSProfile;
 import eu.eexcess.insa.proxy.connectors.CloseJsonObject;
 import eu.eexcess.insa.proxy.connectors.EconBizQueryMapper;
 import eu.eexcess.insa.proxy.connectors.EconBizResultFormater;
 import eu.eexcess.insa.proxy.connectors.MendeleyDocumentQueryMapper;
-import eu.eexcess.insa.proxy.connectors.MendeleyGetProfileInfo;
+import eu.eexcess.insa.proxy.connectors.MendeleyUpdateProfileInfo;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueriesAggregator;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
 import eu.eexcess.insa.proxy.connectors.RecomendationResultAggregator;
@@ -61,8 +63,11 @@ public class APIService extends RouteBuilder  {
 	final MendeleyInitOAuthAccessTokenParams mendeleyInitAccessParams = new MendeleyInitOAuthAccessTokenParams();
 	final MendeleyInitProtectedRessourcesAccessParams mendeleyInitAccessRessourcesParams = new MendeleyInitProtectedRessourcesAccessParams();
 	final GetUserId getUserId = new GetUserId();
-	final MendeleyGetProfileInfo mendeleyGetProfileInfo = new MendeleyGetProfileInfo();  
+	final MendeleyUpdateProfileInfo mendeleyUpdateProfileInfo = new MendeleyUpdateProfileInfo();  
 	final ProfileVerifier verifyProfile = new ProfileVerifier(); 
+	final UpdateEEXCESSProfile updateEexcessProfile = new UpdateEEXCESSProfile();
+	final GetUserProfiles getProfiles = new GetUserProfiles();
+	final JsonXMLDataFormat jsonDataFormat =new JsonXMLDataFormat(); 
 	
 		public void configure() throws Exception {
 			
@@ -106,6 +111,7 @@ public class APIService extends RouteBuilder  {
 				.setHeader("ElasticType").constant("trace")
 				.setHeader("ElasticIndex").constant("privacy")
 				.process(prepSearch)
+				.removeHeader("Host")	
 				.to("direct:elastic.search")
 			;
 			
@@ -117,16 +123,31 @@ public class APIService extends RouteBuilder  {
 			from("jetty:http://localhost:12564/api/v0/users/data")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("profiles")
+				.process(updateEexcessProfile)
 				.to("seda:elastic.trace.index")
-				.to("direct:merge.profiles")
-				.setHeader("ElasticType").constant("data")
-				.setHeader("ElasticIndex").constant("users")
-				.to("seda:elastic.trace.index")
+				
+				//.to("direct:merge.profiles")
+				//.setHeader("ElasticType").constant("data")
+				//.setHeader("ElasticIndex").constant("users")
+				//.to("seda:elastic.trace.index")
 				//.log("user registered")
 				//.log("${in.body}")
 				//.log("${out.body}")
 				.process(getUserId)	
+				.to("direct:profiles.merge")
 			;
+			
+			/*
+			 *  Route to directly save the privacy settings into the user index ( without merging the data with other profiles first )
+			 */
+			from("jetty:http://localhost:12564/api/v0/users/privacy_settings")
+			.setHeader("ElasticType").constant("data")
+			.setHeader("ElasticIndex").constant("users")
+			.to("seda:elastic.trace.index")
+			
+			.process(getUserId)	
+		;
+			
 
 			/* Route to check if given username and email currently exit
 			 * 
@@ -219,8 +240,8 @@ public class APIService extends RouteBuilder  {
 				.process(new MendeleyProcessResponse())			
 			;
 			
-			/* Route to continue Mendeley Oauth authentifiaction
-			 *  (get access token and othe informations)
+			/* Route to continue Mendeley Oauth authentification
+			 *  (get access token and other informations)
 			 */
 			from("jetty:http://localhost:11564/oauth/mendeley/connect")
 				 
@@ -253,11 +274,33 @@ public class APIService extends RouteBuilder  {
 				
 				.process(verifyProfile)
 				.setHeader("ElasticType").constant("data")
-				.setHeader("ElasticIndex").constant("users")
-				to()
-				//.process(mendeleyGetProfileInfo)
-				.log("jada")
+				.setHeader("ElasticIndex").constant("profiles")
+				.to("direct:elastic.userSearch")
+				.process(mendeleyUpdateProfileInfo)
+				.to("seda:elastic.trace.index")
+				
 			;
+			
+			/* Route to merge the user's different profiles
+			 * 
+			 */
+			from("direct:profiles.merge")
+				.process(getProfiles)
+				.to("direct:elastic.userSearch")
+				//.log("${in.body}")
+				//.log("${out.body}")
+				.unmarshal().string("UTF-8")
+			    .unmarshal(jsonDataFormat)
+			    .wireTap("file:///tmp/merge/?fileName=example.xml")
+			    .to("xslt:eu/eexcess/insa/xslt/mergeProfiles.xsl")
+			    .marshal(jsonDataFormat)
+			     .wireTap("file:///tmp/merge/?fileName=result.json")
+			     .log("${in.body}")
+			     .to("jetty:http://localhost:12564/api/v0/users/privacy_settings")
+				
+			;
+			
+			
 		}
 
 	public static void main( String[] args ) {

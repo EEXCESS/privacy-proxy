@@ -6,7 +6,7 @@ var tracesTooltips= ["Only the current page will be sent","Your account traces o
 function updateUserInfo(){
 	userDataJSON = 
 	$.ajax({
-		   url: "http://localhost:12564/api/v0/users/data",
+		   url: "http://localhost:12564/api/v0/users/privacy_settings",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
 		   data: JSON.stringify(userInfo),
@@ -14,7 +14,7 @@ function updateUserInfo(){
 	       {
 	           request.setRequestHeader("traceid", idUser);
 	       },
-		   success: function(response) {
+		   complete: function(response) {
 			   $('.stateSettings').html("Changes saved");
 		   }
 		});
