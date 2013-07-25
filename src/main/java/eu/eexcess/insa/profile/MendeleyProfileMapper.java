@@ -15,11 +15,11 @@ public class MendeleyProfileMapper implements Processor {
 
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
-		JsonNode existingProfile = in.getBody(JsonNode.class);
+		//JsonNode existingProfile = in.getBody(JsonNode.class);
 		JsonNode medeleyProfile = exchange.getProperty("profile.mendeley",JsonNode.class);
 		
 		
-		// Map main.location -> address.city + address.country
+		// Map main.location -> addressCity + addressCountry
 		{
 			String mendeleyUserLocation = medeleyProfile.path("main").path("location").getTextValue();
 			Matcher userLocationMatcher = locationPattern.matcher(mendeleyUserLocation);
@@ -27,9 +27,37 @@ public class MendeleyProfileMapper implements Processor {
 				String userCity = userLocationMatcher.group(1);
 				String userCountry = userLocationMatcher.group(2);
 				fillHeader(in, "ProfileAddressCity", userCity);
-				fillHeader(in, "ProfileAddressCity", userCity);
+				fillHeader(in, "ProfileAddressCountry", userCountry);
 			}
 		}
+		
+		// Map main.name -> profileLastName + profileFirstName
+		{
+			String mendeleyUserName = medeleyProfile.path("main").path("name").getTextValue();
+			String[]splittedName = mendeleyUserName.split(" ");
+			if(splittedName[0] != null ){
+				fillHeader(in, "ProfileFirstName", splittedName[0]);
+			}
+			if(splittedName[1] != null ){
+				fillHeader(in, "ProfileLastName", splittedName[1]);
+			}		
+		}
+		
+		// Map contact.zipcode -> profileAddressPostalCode
+		{
+			String mendeleyZipcode = medeleyProfile.path("contact").path("zipcode").getTextValue();
+			fillHeader(in, "ProfileAddressPostalCode", mendeleyZipcode);
+								
+		}
+		
+		// Map contact.zipcode -> profileAddressStreet
+		{
+			String mendeleyAddress = medeleyProfile.path("contact").path("address").getTextValue();
+			fillHeader(in, "ProfileAddressStreet", mendeleyAddress);
+								
+		}
+		
+		
 		
 		
 	}

@@ -15,6 +15,9 @@ import eu.eexcess.insa.oauth.MendeleyInitOAuthRequestTokenParams;
 import eu.eexcess.insa.oauth.MendeleyInitProtectedRessourcesAccessParams;
 import eu.eexcess.insa.oauth.MendeleyProcessResponse;
 import eu.eexcess.insa.oauth.OAuthSigningProcessor;
+import eu.eexcess.insa.profile.EexcessProfileMapper;
+import eu.eexcess.insa.profile.MendeleyProfileMapper;
+import eu.eexcess.insa.profile.ProfileSplitter;
 import eu.eexcess.insa.proxy.actions.GetUserId;
 import eu.eexcess.insa.proxy.actions.GetUserProfiles;
 import eu.eexcess.insa.proxy.actions.PrepareLastTenTracesQuery;
@@ -68,6 +71,9 @@ public class APIService extends RouteBuilder  {
 	final UpdateEEXCESSProfile updateEexcessProfile = new UpdateEEXCESSProfile();
 	final GetUserProfiles getProfiles = new GetUserProfiles();
 	final JsonXMLDataFormat jsonDataFormat =new JsonXMLDataFormat(); 
+	final EexcessProfileMapper eexcessProfileMapper = new EexcessProfileMapper();
+	final MendeleyProfileMapper mendeleyProfileMapper = new MendeleyProfileMapper(); 
+	final ProfileSplitter profileSplitter = new ProfileSplitter();
 	
 		public void configure() throws Exception {
 			
@@ -287,16 +293,14 @@ public class APIService extends RouteBuilder  {
 			from("direct:profiles.merge")
 				.process(getProfiles)
 				.to("direct:elastic.userSearch")
-				//.log("${in.body}")
-				//.log("${out.body}")
-				.unmarshal().string("UTF-8")
-			    .unmarshal(jsonDataFormat)
-			    .wireTap("file:///tmp/merge/?fileName=example.xml")
-			    .to("xslt:eu/eexcess/insa/xslt/mergeProfiles.xsl")
-			    .marshal(jsonDataFormat)
-			     .wireTap("file:///tmp/merge/?fileName=result.json")
-			     .log("${in.body}")
-			     .to("jetty:http://localhost:12564/api/v0/users/privacy_settings")
+				.process(profileSplitter)
+				.process(eexcessProfileMapper)
+				.process(mendeleyProfileMapper)
+				.to("string-template:templates/profile.tm")
+				.log("${in.body}")
+				//.to("jetty:http://localhost:12564/api/v0/users/privacy_settings")
+
+				
 				
 			;
 			
