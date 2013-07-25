@@ -6,12 +6,32 @@ Endpoints are given as relative URLs. In
 
 
 Endpoints
-=========
+---------
+### `/api/v0/privacy/trace`
 
-`/user/traces`
---------------
+Send user browsing activity to the privacy proxy.
+
+### `/api/v0/users/profile`
+
+Fetch user's profile information
+
+### `/api/v0/users/data`
+
+Update information about the user
+
+### `/api/v0/recommend`
+
+Fetch recommendations for the user based on his browsing activities
+
+### `/api/v0/recommend/document`
+
+### `/user/traces`
+
+### `/user/verify`
+
+### `/user/login`
 
 
 Data formats
-============
+------------
 
