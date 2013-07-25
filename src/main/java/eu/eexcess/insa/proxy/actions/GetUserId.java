@@ -1,23 +1,19 @@
 package eu.eexcess.insa.proxy.actions;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
 
-public class PrepareRequest implements Processor {
+public class GetUserId implements Processor {
 
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
+		String response = in.getBody( String.class );
 		
-		//in.getBody(String.class);
-		if (in.hasHeaders()){
-			Object header = in.getHeader("traceId");
-		}
-
+		String subString = response.substring(response.indexOf("_id")+6);
+		String id = subString.substring(0,subString.indexOf("\""));
+		in.setBody(id);
+		
 	}
 
 }

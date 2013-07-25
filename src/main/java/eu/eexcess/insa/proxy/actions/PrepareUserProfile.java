@@ -18,7 +18,6 @@ public class PrepareUserProfile implements Processor {
 	public void process(Exchange exchange) throws Exception {
 		
 		Message in = exchange.getIn();
-		  
 		InputStream is = in.getBody(InputStream.class);
 		
 	    JsonParser jp = factory.createJsonParser(is);

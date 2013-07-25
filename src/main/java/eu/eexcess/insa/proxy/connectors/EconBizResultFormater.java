@@ -35,8 +35,7 @@ public class EconBizResultFormater implements Processor {
 	    JsonNode nodeBuffer;
 	    
 	    Iterator<JsonNode> itNodes = rootNode.path("hits").path("hits").getElements();
-	    String termBuffer = "";
-	    String scoreBuffer = "";
+
 	   
 	    jg.writeStartObject();
 	    jg.writeArrayFieldStart("documents");

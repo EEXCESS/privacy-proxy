@@ -184,10 +184,10 @@ function traces(user_id,email) {
 		$(clone).find('.host').html(parseUrl(content["_source"].document.url));
 		
 		if (content["_source"].events.begin == "focus") {
-			$(clone).find('.tempImg1').attr("src","focus.png");
+			$(clone).find('.tempImg1').attr("src","media/focus.png");
 		}
 		if (content["_source"].events.end == "blur") {
-			$(clone).find('.tempImg2').attr("src","blur.png");
+			$(clone).find('.tempImg2').attr("src","media/blur.png");
 		}
 		
 		var parsedUrl = parseUrl(content["_source"].document.url);

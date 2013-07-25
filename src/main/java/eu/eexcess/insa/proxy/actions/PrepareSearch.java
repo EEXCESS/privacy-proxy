@@ -12,6 +12,7 @@ public class PrepareSearch implements Processor {
 		String body = in.getBody(String.class);
 		
 		body = "{\"query\":{\"bool\":{\"should\":["+body+"]}}}";
+		//System.out.println(body);
 		in.setBody(body);
 		
 		//in.setHeader("Content-Type","text/html");

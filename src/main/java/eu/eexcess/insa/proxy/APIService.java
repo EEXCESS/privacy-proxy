@@ -15,6 +15,7 @@ import eu.eexcess.insa.oauth.MendeleyInitOAuthRequestTokenParams;
 import eu.eexcess.insa.oauth.MendeleyInitProtectedRessourcesAccessParams;
 import eu.eexcess.insa.oauth.MendeleyProcessResponse;
 import eu.eexcess.insa.oauth.OAuthSigningProcessor;
+import eu.eexcess.insa.proxy.actions.GetUserId;
 import eu.eexcess.insa.proxy.actions.PrepareLastTenTracesQuery;
 import eu.eexcess.insa.proxy.actions.PrepareRecommendationRequest;
 import eu.eexcess.insa.proxy.actions.PrepareRecommendationTermsPonderation;
@@ -24,11 +25,13 @@ import eu.eexcess.insa.proxy.actions.PrepareSearch;
 import eu.eexcess.insa.proxy.actions.PrepareUserSearch;
 import eu.eexcess.insa.proxy.actions.PrepareUserLogin;
 import eu.eexcess.insa.proxy.actions.PrepareRespLogin;
+import eu.eexcess.insa.proxy.actions.ProfileVerifier;
 import eu.eexcess.insa.proxy.actions.PrepareUserProfile;
 import eu.eexcess.insa.proxy.connectors.CloseJsonObject;
 import eu.eexcess.insa.proxy.connectors.EconBizQueryMapper;
 import eu.eexcess.insa.proxy.connectors.EconBizResultFormater;
 import eu.eexcess.insa.proxy.connectors.MendeleyDocumentQueryMapper;
+import eu.eexcess.insa.proxy.connectors.MendeleyGetProfileInfo;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueriesAggregator;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
 import eu.eexcess.insa.proxy.connectors.RecomendationResultAggregator;
@@ -57,17 +60,24 @@ public class APIService extends RouteBuilder  {
 	final MendeleyAuthorizationQueryGenerator oauthQueryGenerator = new MendeleyAuthorizationQueryGenerator();
 	final MendeleyInitOAuthAccessTokenParams mendeleyInitAccessParams = new MendeleyInitOAuthAccessTokenParams();
 	final MendeleyInitProtectedRessourcesAccessParams mendeleyInitAccessRessourcesParams = new MendeleyInitProtectedRessourcesAccessParams();
-
+	final GetUserId getUserId = new GetUserId();
+	final MendeleyGetProfileInfo mendeleyGetProfileInfo = new MendeleyGetProfileInfo();  
+	final ProfileVerifier verifyProfile = new ProfileVerifier(); 
 	
 		public void configure() throws Exception {
 			
-			
+			/* Route used to register traces
+			 * 
+			 */
 			from("jetty:http://localhost:12564/api/v0/privacy/trace")
 				.setHeader("ElasticType").constant("trace")
 				.setHeader("ElasticIndex").constant("privacy")
 				.to("seda:elastic.trace.index")
 			;	
 			
+			/* Route used to retrieve use profile data
+			 * 
+			 */
 			from("jetty:http://localhost:12564/api/v0/users/profile")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
@@ -76,6 +86,10 @@ public class APIService extends RouteBuilder  {
 				.process(prepUserProfile)
 			;
 				
+			
+			/*
+			 *  Route to get recommendations 
+			 */
 			from("jetty:http://localhost:12564/api/v0/recommend")	
 				.removeHeaders("CamelHttp*")
 				.removeHeader("Host")	
@@ -83,12 +97,11 @@ public class APIService extends RouteBuilder  {
 				.setHeader("Content-Type").constant("text/html")
 			;
 			
-			from("jetty:http://localhost:12564/api/v0/recommend/document")
-				.setHeader("ElasticType").constant("document")
-				.setHeader("ElasticIndex").constant("recommend")
-				.to("seda:elastic.trace.index")
-			;
 			
+			
+			/* Route to retrieve the user's traces
+			 * 
+			 */
 			from("jetty:http://localhost:11564/user/traces")
 				.setHeader("ElasticType").constant("trace")
 				.setHeader("ElasticIndex").constant("privacy")
@@ -96,12 +109,28 @@ public class APIService extends RouteBuilder  {
 				.to("direct:elastic.search")
 			;
 			
+			
+			/* Route to update and retrieve user information
+			 * 
+			 * 
+			 */
 			from("jetty:http://localhost:12564/api/v0/users/data")
+				.setHeader("ElasticType").constant("data")
+				.setHeader("ElasticIndex").constant("profiles")
+				.to("seda:elastic.trace.index")
+				.to("direct:merge.profiles")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.to("seda:elastic.trace.index")
+				//.log("user registered")
+				//.log("${in.body}")
+				//.log("${out.body}")
+				.process(getUserId)	
 			;
 
+			/* Route to check if given username and email currently exit
+			 * 
+			 */
 			from("jetty:http://localhost:11564/user/verify")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
@@ -110,6 +139,9 @@ public class APIService extends RouteBuilder  {
 				.process(prepRes)
 			;
 			
+			/*Route to log a user in
+			 * 
+			 */
 			from("jetty:http://localhost:11564/user/login")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
@@ -118,17 +150,22 @@ public class APIService extends RouteBuilder  {
 				.process(prepRespUser)
 			;
 			
+			/*=========================================================================
+			 *  Recommendation routes
+			 *=========================================================================*/
 			
-			
+			/*route to get recommendation content
+			 * 
+			 */
 			from("direct:recommend")
 				.process(prepLastTen)
-				.log("${in.body}")
+				//.log("${in.body}")
 				.setHeader("ElasticType").constant("trace")
 				.setHeader("ElasticIndex").constant("privacy")
 				.to("direct:elastic.userSearch")
-				.log("${out.body}")
+				//.log("${out.body}")
 				.process(prepPonderation)
-				.log("${in.body}")
+				//.log("${in.body}")
 				.setHeader("origin").simple("exchangeId")
 				.multicast().aggregationStrategy(new RecomendationResultAggregator())
 					.to("direct:recommend.econbiz")
@@ -143,7 +180,9 @@ public class APIService extends RouteBuilder  {
 				
 			
 			    
-			    
+			 /* route to get recommendation content from EconBiz
+			  *    
+			  */
 			from("direct:recommend.econbiz")
 				.process(prepEconBizQuery)
 			    .choice()
@@ -154,7 +193,10 @@ public class APIService extends RouteBuilder  {
 				.end()
 				.process(econBizResultFormater)
 			; 
-
+			
+			/* Route to get recommendation content from Mendeley
+			 * 
+			 */
 			from("direct:recommend.mendeley")
 			    .process(prepMendeleyQuery)
 			    .recipientList().header("QueryEndpoint")
@@ -162,7 +204,10 @@ public class APIService extends RouteBuilder  {
 			    .recipientList(header("QueryEndPoint").tokenize(",")).aggregationStrategy(new MendeleyQueriesAggregator())
 			    .process(closeJson)
 			;
-						
+			
+			/* Route to initialize Mendeley OAuth authentifiaction
+			 *  ( get request token and other informations
+			 */
 			from("jetty:http://localhost:11564/oauth/mendeley/init")	
 				.process(mendeleyInitOAuthParams)
 				.process(signingProcessor)
@@ -174,7 +219,9 @@ public class APIService extends RouteBuilder  {
 				.process(new MendeleyProcessResponse())			
 			;
 			
-			
+			/* Route to continue Mendeley Oauth authentifiaction
+			 *  (get access token and othe informations)
+			 */
 			from("jetty:http://localhost:11564/oauth/mendeley/connect")
 				 
 				.process(mendeleyInitAccessParams)
@@ -184,16 +231,33 @@ public class APIService extends RouteBuilder  {
 				.removeHeaders("CamelHttpPath")
 				.setHeader("Host", simple("api.mendeley.com"))
 				.to("http4://api.mendeley.com/oauth/access_token/")
+				.to("direct:oauth.access")
+			;
 					
+			/* Route to get user's Mendely profile informations
+			 * 
+			 */
+			from("direct:oauth.access")
 				.process(mendeleyInitAccessRessourcesParams)
 				.process(signingProcessor)
 				.process(oauthQueryGenerator)
 				.setHeader("Host", simple("api.mendeley.com"))
 				.to("http4://api.mendeley.com/")
-
+				.to("direct:elastic.save")
 			;
-
 			
+			/* Route to save user's Mendeley profile informations to ElasticSearch
+			 * 
+			 */
+			from("direct:elastic.save")
+				
+				.process(verifyProfile)
+				.setHeader("ElasticType").constant("data")
+				.setHeader("ElasticIndex").constant("users")
+				to()
+				//.process(mendeleyGetProfileInfo)
+				.log("jada")
+			;
 		}
 
 	public static void main( String[] args ) {
