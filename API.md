@@ -8,8 +8,8 @@ Endpoints are given as relative URLs. In
 Endpoints
 =========
 
-/user/traces
-------------
+`/user/traces`
+--------------
 
 
 Data formats
