@@ -35,3 +35,7 @@ Fetch recommendations for the user based on his browsing activities
 Data formats
 ------------
 
+
+<pre><code>
+
+</code></pre>
