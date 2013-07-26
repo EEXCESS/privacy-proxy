@@ -284,6 +284,7 @@ public class APIService extends RouteBuilder  {
 				.to("direct:elastic.userSearch")
 				.process(mendeleyUpdateProfileInfo)
 				.to("seda:elastic.trace.index")
+				.to("direct:profiles.merge")
 				
 			;
 			
@@ -293,13 +294,18 @@ public class APIService extends RouteBuilder  {
 			from("direct:profiles.merge")
 				.process(getProfiles)
 				.to("direct:elastic.userSearch")
+				.unmarshal().string("UTF-8")
+				//.wireTap("file:///tmp/merge/?fileName=example.json")
 				.process(profileSplitter)
 				.process(eexcessProfileMapper)
 				.process(mendeleyProfileMapper)
 				.to("string-template:templates/profile.tm")
-				.log("${in.body}")
+				//.log("${in.body}")
 				//.to("jetty:http://localhost:12564/api/v0/users/privacy_settings")
-
+				.setHeader("ElasticType").constant("data")
+				.setHeader("ElasticIndex").constant("users")
+				.setHeader("traceId").property("user_id")
+				.to("seda:elastic.trace.index")
 				
 				
 			;

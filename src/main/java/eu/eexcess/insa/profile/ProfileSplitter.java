@@ -21,7 +21,7 @@ public class ProfileSplitter implements Processor {
 		JsonParser jp = factory.createJsonParser(is);
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode profileHits = mapper.readValue(jp, JsonNode.class);
-		
+		System.out.println("profilehits : "+profileHits);
 	    
 		JsonNode hitsArray = profileHits.path("hits").path("hits");
 		Iterator<JsonNode> it = hitsArray.getElements();

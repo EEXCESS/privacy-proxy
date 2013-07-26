@@ -29,9 +29,11 @@ $.ajax({
         request.setRequestHeader("user_id", localStorage["user_id"]);
     },
     complete: function(response, status, xhr){
-    	alert(response.responseText);
-    	
-    	
-    	
+    	var idJSON = JSON.parse(response.responseText);
+    	var id = idJSON["_id"];
+    	localStorage["user_id"] = id;
+    	var redirect = url.split("oauth/index.html")[0];
+    	redirect += "traces.html";
+    	document.location.href = redirect;
     }
 });

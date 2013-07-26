@@ -23,6 +23,7 @@
         "country": "<headers.profileAddressCountry>"
     },
     "topics": [
-       <headers.profileTopics>
+	    <first(headers.profileTopics):{v | { "label": "<v>" \}}>
+	    <rest(headers.profileTopics):{v | , { "label": "<v>" \}}>
     ]
 }

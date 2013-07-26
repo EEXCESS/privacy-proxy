@@ -16,12 +16,12 @@ public class MendeleyProfileMapper implements Processor {
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
 		//JsonNode existingProfile = in.getBody(JsonNode.class);
-		JsonNode medeleyProfile = exchange.getProperty("profile.mendeley",JsonNode.class);
-		
+		JsonNode mendeleyProfile = exchange.getProperty("profile.mendeley",JsonNode.class);
+		System.out.println(mendeleyProfile);
 		
 		// Map main.location -> addressCity + addressCountry
 		{
-			String mendeleyUserLocation = medeleyProfile.path("main").path("location").getTextValue();
+			String mendeleyUserLocation = mendeleyProfile.path("main").path("location").getTextValue();
 			Matcher userLocationMatcher = locationPattern.matcher(mendeleyUserLocation);
 			if(userLocationMatcher.find()) {
 				String userCity = userLocationMatcher.group(1);
@@ -33,7 +33,7 @@ public class MendeleyProfileMapper implements Processor {
 		
 		// Map main.name -> profileLastName + profileFirstName
 		{
-			String mendeleyUserName = medeleyProfile.path("main").path("name").getTextValue();
+			String mendeleyUserName = mendeleyProfile.path("main").path("name").getTextValue();
 			String[]splittedName = mendeleyUserName.split(" ");
 			if(splittedName[0] != null ){
 				fillHeader(in, "ProfileFirstName", splittedName[0]);
@@ -45,14 +45,14 @@ public class MendeleyProfileMapper implements Processor {
 		
 		// Map contact.zipcode -> profileAddressPostalCode
 		{
-			String mendeleyZipcode = medeleyProfile.path("contact").path("zipcode").getTextValue();
+			String mendeleyZipcode = mendeleyProfile.path("contact").path("zipcode").getTextValue();
 			fillHeader(in, "ProfileAddressPostalCode", mendeleyZipcode);
 								
 		}
 		
 		// Map contact.zipcode -> profileAddressStreet
 		{
-			String mendeleyAddress = medeleyProfile.path("contact").path("address").getTextValue();
+			String mendeleyAddress = mendeleyProfile.path("contact").path("address").getTextValue();
 			fillHeader(in, "ProfileAddressStreet", mendeleyAddress);
 								
 		}

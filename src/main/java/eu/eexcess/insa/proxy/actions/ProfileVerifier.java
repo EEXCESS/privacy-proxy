@@ -58,7 +58,7 @@ public class ProfileVerifier implements Processor {
 			      "\"must\": ["+
 			        "{"+
 			          "\"term\": {"+
-			            "\"data.profile_info.main.profile_id\": \"" + id + "\""+
+			            "\"data.profile_data.main.profile_id\": \"" + id + "\""+
 			          "}"+
 			        "},"+
 			        "{"+
@@ -71,7 +71,8 @@ public class ProfileVerifier implements Processor {
 			  "}"+
 			"}";
 	    
-	    
+	    System.out.println("john query :");
+	    System.out.println(query);
 		in.setBody(query);
 		
 		
