@@ -310,6 +310,16 @@ public class APIService extends RouteBuilder  {
 	public static void main( String[] args ) {
     	final org.apache.camel.spring.Main main = new org.apache.camel.spring.Main();
     	main.addRouteBuilder(new APIService());
+    	
+    	Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {			
+			public void run() {
+				try {
+					main.stop();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}));
     	try {
 			main.run();
 		} catch (Exception e) {

@@ -17,6 +17,17 @@
   	<lucene.version>4.3.0</lucene.version>
   </properties>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>eu.eexcess.insa.proxy.APIService</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
  
   <dependencies>
     <dependency>
