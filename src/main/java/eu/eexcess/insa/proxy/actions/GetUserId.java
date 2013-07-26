@@ -13,6 +13,7 @@ public class GetUserId implements Processor {
 		String subString = response.substring(response.indexOf("_id")+6);
 		String id = subString.substring(0,subString.indexOf("\""));
 		in.setBody(id);
+		exchange.setProperty("user_id", id);
 		
 	}
 
