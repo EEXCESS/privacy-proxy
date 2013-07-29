@@ -38,10 +38,14 @@ function generateProfilePage() {
 	$('.gravatarProfile').attr('src',gravatar);
 	
 	$(".email").html("Email: " + userInfo.email);
+	$("#fullEmail").html(userInfo.email);
+	
 	
 	$(".title").html("Title: " + userInfo.title);
+	$("#fullTitle").html(userInfo.title);
 	if(userInfo.title == "") {
 		$(".title").html("Title: Not saved yet");
+		$("#fullTitle").html("Title: Not saved yet");
 	}
 	
 	$(".lastname").html("Lastname: " + userInfo.lastname);
@@ -55,13 +59,17 @@ function generateProfilePage() {
 	}
 	
 	$(".gender").html("Gender: " + userInfo.gender);
+	$("#fullGender").html(userInfo.gender);
 	if(userInfo.gender == "") {
 		$(".gender").html("Gender: Not saved yet");
+		$("#fullGender").html("Gender: Not saved yet");
 	}
 	
 	$(".birthdate").html("Birthdate: " + userInfo.birthdate);
+	$("#fullAge").html(userInfo.birthdate);
 	if(userInfo.birthdate == "") {
 		$(".birthdate").html("Birthdate: Not saved yet");
+		$("#fullAge").html("Birthdate: Not saved yet");
 	}
 	$(".topics").html("Topics: " + getTopicsStr());
 	if(getTopicsStr() == "") {

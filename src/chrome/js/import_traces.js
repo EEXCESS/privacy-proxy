@@ -293,6 +293,15 @@ $.ajax({
 	   }
 });
 
+$.ajax({
+	   url: URL+"privacySandbox.html",
+	   type: "GET",
+	   complete: function(response){
+		   $('#sandbox').append(response.responseText);
+		   initSandbox();
+	   }
+});
+
 
 $(document).ready(function () {
   chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {

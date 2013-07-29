@@ -29,13 +29,28 @@
 }
 
 .toggle{
-	display: inline;
-	float: right;
+	
+	//float: none;
+	//height:15px;
+	margin-bottom:2em;
+	
 }
+
+#list_settings .switch{
+	display: block;
+	
+	float:right;
+	
+	
+}
+
 
 .slider-tip {
     opacity:1;
     bottom:120%;
     left: -95px;
     margin-left: -10m;
+}
+h4{
+    font-size: 120%;
 }

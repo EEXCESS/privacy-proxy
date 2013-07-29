@@ -25,11 +25,13 @@ function doSwitchEmail() {
 		$(".switch-email").removeClass("switch-off");
 		$(".switch-email").addClass("switch-on");
 		userInfo["privacy"]["email"] = 1;
+		$("#list_settings").find(".email").html("Email: " + userInfo.email);
 	}
 	else{
 		$(".switch-email").removeClass("switch-on");
 		$(".switch-email").addClass("switch-off");
 		userInfo["privacy"]["email"]= 0;
+		$("#list_settings").find(".email").html("Email: nothing");
 	}
 }
 
@@ -40,15 +42,18 @@ function doSwitchGender() {
 		$(".switch-gender").addClass("switch-on");
 		$("#titleSetting").show();
 		userInfo["privacy"]["gender"] = 1;
+		$("#list_settings").find(".gender").html("Gender: " + userInfo.gender);
 	}
 	else{
 		$(".switch-gender").removeClass("switch-on");
 		$(".switch-gender").addClass("switch-off");
 		$("#titleSetting").hide();
 		userInfo["privacy"]["gender"] = 0;
+		$("#list_settings").find(".gender").html("Gender: nothing");
 		$(".switch-title").removeClass("switch-on");
 		$(".switch-title").addClass("switch-off");
 		userInfo["privacy"]["title"] = 0;
+		$("#list_settings").find(".title").html("Title: nothing");
 	}
 }
 
@@ -58,11 +63,14 @@ function doSwitchTitle() {
 		$(".switch-title").removeClass("switch-off");
 		$(".switch-title").addClass("switch-on");
 		userInfo["privacy"]["title"] = 1;
+		$("#list_settings").find(".title").html("Title: "+userInfo.title);
+
 	}
 	else{
 		$(".switch-title").removeClass("switch-on");
 		$(".switch-title").addClass("switch-off");
 		userInfo["privacy"]["title"] = 0;
+		$("#list_settings").find(".title").html("Title: nothing");
 	}
 }
 
@@ -143,31 +151,37 @@ function initializeSettingsDisplay(){
 		userInfo.privacy.email = 1 ;
 		$(".switch-email").removeClass("switch-off");
 		$(".switch-email").addClass("switch-on");
+		$("#list_settings").find(".email").html("Email: " + userInfo.email);
 	}
 	else if(  userInfo.privacy.email == 0 ){
 		$(".switch-email").removeClass("switch-on");
 		$(".switch-email").addClass("switch-off");
+		$("#list_settings").find(".email").html("Email: nothing");
 	}
 	if ( userInfo.privacy.gender == undefined ||  userInfo.privacy.gender == 1 ){
 		userInfo.privacy.gender = 1 ;
 		 $(".switch-gender").removeClass("switch-off");
 		$(".switch-gender").addClass("switch-on");
+		$("#list_settings").find(".gender").html("Gender: " + userInfo.gender);
 		$("#titleSetting").show();
 	}
 	else if(  userInfo.privacy.gender == 0 ){
 		$(".switch-gender").removeClass("switch-on");
 		$(".switch-gender").addClass("switch-off");
 		$("#titleSetting").hide();
+		$("#list_settings").find(".gender").html("Gender: nothing");
 		$("#titlePrivacy").attr("checked","false");
 	}
 	if ( userInfo.privacy.title == undefined ||  userInfo.privacy.title == 1 ){
 		userInfo.privacy.title = 1 ;
 		 $(".switch-title").removeClass("switch-off");
 			$(".switch-title").addClass("switch-on");
+			$("#list_settings").find(".title").html("Title: " + userInfo.title);
 	}
 	else if(  userInfo.privacy.title == 0 ){
 		$(".switch-title").removeClass("switch-on");
 		$(".switch-title").addClass("switch-off");
+		$("#list_settings").find(".title").html("Title: nothing");
 	}
 	if ( userInfo.privacy.age == undefined ||  userInfo.privacy.age == 3 ){
 		userInfo.privacy.title = 1 ;
@@ -315,8 +329,10 @@ function settingsAgeReady(){
 		max: 3,
 		step: 1,
 		create:function(){
+			$("#fullAge").html(ageTooltips[3]);
 			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + ageTooltips[userInfo.privacy.age] + '</div></div>');
 			$(this).find(".slider-tip").hide();
+			$("#list_settings").find(".birthdate").html("Birthdate : " + ageTooltips[userInfo.privacy.age]);
 			if(userInfo.privacy.age == 0){
 				$(this).find('.tooltip-inner').css("margin-left","85px");
 				$(this).find('.tooltip-arrow').css("margin-left","-52px");
@@ -340,6 +356,7 @@ function settingsAgeReady(){
 				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
 			}
 			userInfo.privacy.age = ui.value;
+			$("#list_settings").find(".birthdate").html("Birthdate : " + ageTooltips[userInfo.privacy.age]);
 			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(ageTooltips[userInfo.privacy.age]);
 		},
 		stop: function(){
@@ -356,6 +373,8 @@ function settingsAddressReady(){
 		max: 5,
 		step: 1,
 		create:function(){
+			$("#fullAddress").html(addressTooltips[5]);
+			$("#list_settings").find(".street").html("Address : " + addressTooltips[userInfo.privacy.address]);
 			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + addressTooltips[userInfo.privacy.address] + '</div></div>');
 			$(this).find(".slider-tip").hide();
 			if(userInfo.privacy.address == 0){
@@ -381,6 +400,8 @@ function settingsAddressReady(){
 				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
 			}
 			userInfo.privacy.address = ui.value;
+			$("#list_settings").find(".street").html("Address : " + addressTooltips[userInfo.privacy.address]);
+
 			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(addressTooltips[userInfo.privacy.address]);
 		},
 		stop: function(){
@@ -390,7 +411,7 @@ function settingsAddressReady(){
 };
 
 function settingsGeolocReady(){
-			
+	
 	if (userInfo.privacy.geoloc == undefined) userInfo.privacy.geoloc = 0;
 	
 	$("#sliderGeoloc").slider({
@@ -399,7 +420,9 @@ function settingsGeolocReady(){
 		max: 5,
 		step: 1,
 		create:function(){
+			$("#fullGeoloc").html(geolocTooltips[5]);	
 			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + geolocTooltips[userInfo.privacy.geoloc] + '</div></div>');
+			$("#list_settings").find(".geoloc").html("Geolocation : " + geolocTooltips[userInfo.privacy.geoloc]);
 			$(this).find(".slider-tip").hide();
 			if(userInfo.privacy.geoloc == 0){
 				$(this).find('.tooltip-inner').css("margin-left","85px");
@@ -424,6 +447,7 @@ function settingsGeolocReady(){
 				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
 			}
 			userInfo.privacy.geoloc = ui.value;
+			$("#list_settings").find(".geoloc").html("Geolocation : " + geolocTooltips[userInfo.privacy.geoloc]);
 			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(geolocTooltips[userInfo.privacy.geoloc]);
 		},
 		stop: function(){
@@ -442,8 +466,10 @@ function settingsTracesReady(){
 		max: 2,
 		step: 1,
 		create:function(){
+			$("#fullTraces").html(tracesTooltips[2]);
 			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + tracesTooltips[userInfo.privacy.traces] + '</div></div>');
 			$(this).find(".slider-tip").hide();
+			$("#list_settings").find(".traces").html("Traces to send : " + tracesTooltips[userInfo.privacy.traces]);
 			if(userInfo.privacy.traces == 0){
 				$(this).find('.tooltip-inner').css("margin-left","85px");
 				$(this).find('.tooltip-arrow').css("margin-left","-52px");
@@ -467,6 +493,7 @@ function settingsTracesReady(){
 				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
 			}
 			userInfo.privacy.traces = ui.value;
+			$("#list_settings").find(".traces").html("Traces to send : " + tracesTooltips[userInfo.privacy.traces]);
 			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(tracesTooltips[userInfo.privacy.traces]);
 		},
 		stop: function(){
@@ -474,6 +501,9 @@ function settingsTracesReady(){
 		}
 	}).addSliderSegments(3,tracesTooltips);
 }
+
+
+
 
 $(document).ready(function(){
 	
@@ -488,6 +518,7 @@ $(document).ready(function(){
 	$('.genderSwitch').live("click",doSwitchGender);
 	$('.titleSwitch').live("click",doSwitchTitle);  
 	$('.submitSetting').live("click",updateUserInfo);
+
 });
 
 
