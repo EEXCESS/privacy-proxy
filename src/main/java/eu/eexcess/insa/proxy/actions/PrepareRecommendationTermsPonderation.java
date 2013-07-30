@@ -60,7 +60,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 		
 		
 		HashMap<String, Integer> ponderatedTerms = extractQueryFromTraces(isTraces);
-		extractQueryFromProfile( ponderatedTerms, isUserProfile); 
+		extractQueryFromProfile( ponderatedTerms, isUserProfile, exchange); 
 		
 		
 	    StringWriter stringWriter = new StringWriter();
@@ -79,18 +79,36 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	/*
 	 *  The user's profile is assumed to have been already filtered following the privacy settings
 	 */
-	private HashMap<String, Integer> extractQueryFromProfile ( HashMap<String, Integer> tracesQuery, InputStream is ) throws JsonParseException, IOException{
+	private HashMap<String, Integer> extractQueryFromProfile ( HashMap<String, Integer> tracesQuery, InputStream is, Exchange exchange ) throws JsonParseException, IOException{
 	
 		JsonFactory factory = new JsonFactory();
 		JsonParser jp = factory.createJsonParser(is);
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
 	    
+	    // the topics are for now the only information from the user's profile we take in consideration
 	    List<String> topics = extractTopicsFromProfile( rootNode );
-	   
+	    HashMap<String, Integer> ponderatedTopics = ponderateTopics( topics ) ;
+	    // the topics are saved into an exchange property to be used later by the specific query mappers
+	    exchange.setProperty("ponderated_topics", ponderatedTopics);
 	    
-		
+	    
+		// the query terms aren't modified for now 
 		return tracesQuery;
+	}
+	
+	
+	private HashMap<String, Integer> ponderateTopics( List<String> topics ){
+		
+		HashMap<String, Integer> ponderatedTopics = new HashMap<String, Integer>();
+		Iterator<String> it = topics.iterator();
+		//for now all topics are given a fixed ponderation value
+		final int PONDERATION_VALUE = 1;
+		while ( it.hasNext()){
+			ponderatedTopics.put(it.next(), PONDERATION_VALUE);
+		}
+		return ponderatedTopics;
+		
 	}
 	
 	
