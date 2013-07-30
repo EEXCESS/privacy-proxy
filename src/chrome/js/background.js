@@ -206,14 +206,16 @@ function recommend(traces){
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: traces,
-	   complete: function(response){
+	   complete: function(response, status, xhr){
 	   
 			var xml = $(response.responseText);
 			var hitCount = $(xml).attr("data-hits");
 			localStorage["recommend"] = response.responseText;
+			
 			if (hitCount != 0) {
 				chrome.browserAction.setBadgeText({text: hitCount});
 			}
+			localStorage["recommendation_query"] = response.getResponseHeader("recommendation_query");
 	   }
 	});
 	

@@ -6,7 +6,9 @@
 	<ul id="list_settings">
 		<li id="emailSetting">
 			<div class="emailInfo">
-				<h4 class="email">Email</h4>
+				<h4 class="email">Email : <span class="effective_data"></span></h4>
+				<p id="fullEmail" class="fullInfo">
+				</p>
 				<div class="switch-animate toggle">
 					<div class="switch has-switch emailSwitch">
 						<div class="switch-animate switch-email switch-off" style="">
@@ -17,13 +19,14 @@
 						</div>
 					</div>
 				</div>
-				<p id="fullEmail" class="fullInfo">
-				</p>
+				
 			</div>
 		</li>
 		<li id="genderSetting" style="display:none">
 			<div class="genderInfo">
-				<h4 class="gender">Email</h4>
+				<h4 class="gender">Gender: <span class="effective_data"></span></h4>
+				<p id="fullGender" class="fullInfo">
+				</p>
 				<div class="switch-animate toggle">
 					<div class="switch has-switch genderSwitch">
 						<div class="switch-animate switch-gender switch-off" style="">
@@ -34,13 +37,14 @@
 						</div>
 					</div>
 				</div>
-				<p id="fullGender" class="fullInfo">
-				</p>
+				
 			</div>
 		</li>
 		<li id="titleSetting" style="display:none">
 			<div class="titleInfo">
-				<h4 class="title">Email</h4>
+				<h4 class="title">Title : <span class="effective_data"></span></h4>
+				<p id="fullTitle" class="fullInfo">
+				</p>
 				<div class="switch-animate toggle">
 					<div class="switch has-switch titleSwitch">
 						<div class="switch-animate switch-title switch-off" style="">
@@ -51,43 +55,46 @@
 						</div>
 					</div>
 				</div>
-				<p id="fullTitle" class="fullInfo">
-				</p>
+				
 			</div>
 		</li>
 		<li id="ageSetting">
 			<div class="ageInfo">
-				<h4 class="birthdate">Age</h4>
-				<div id="slider"></div>
+				<h4 class="birthdate">Birthdate : <span class="effective_data"></span></h4>
 				<p id="fullAge" class="fullInfo">
 				</p>
+				<div id="slider"></div>
+				
 			</div>
 		</li>
 		<li id="addressSetting">
 			<div class="addressInfo">
-				<h4 class="street">Address</h4>
+				<h4 class="street">Address : <span class="effective_data"></span></h4>
+				<p id="fullAddress" class="fullInfo">
+				</p>
 				<!--<h4 class="city">City</h4>
 				<h4 class="country">Country</h4> -->
 				<div id="sliderAddress"></div>	
-				<p id="fullAddress" class="fullInfo">
-				</p>			
+							
 			</div>
 		</li>
 		<li id="geolocSetting">
 			<div class="geolocInfo">
-				<h4 class="geoloc">Geolocation</h4>
-				<div id="sliderGeoloc"></div>	
+				<h4 class="geoloc">Geolocation : <span class="effective_data"></span></h4>
 				<p id="fullGeoloc" class="fullInfo">
-				</p>		
+				</p>
+				<div id="sliderGeoloc"></div>	
+						
 			</div>
 		</li>
 		<li id="tracesSetting">
 			<div class="tracesInfo">
-				<h4 class="traces">Traces to send</h4>
+				<h4 class="traces">Traces to send : <span class="effective_data"></span></h4>
+				<p id="fullTraces" class="fullInfo">
+				</p>
 				<div id="sliderTraces"></div>
 			</div>
-			<p id="fullTraces" class="fullInfo">
-			</p>
+			
 		</li>
 	</ul>
 </div>
@@ -115,7 +122,7 @@
 			
 			<li class="querySandbox">
 				<h3>Query</h3>
-				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed congue ipsum ac odio accumsan egestas. Proin at purus elit. Pellentesque vulputate tristique ante sed rutrum. Integer eu sagittis tortor. Curabitur auctor enim vitae velit vestibulum, in tempor erat lobortis. Quisque tincidunt blandit justo rutrum malesuada. Cras metus nisi, rutrum vitae ligula nec, volutpat tempor elit.
+				<p id="recommendation_query">
 				</p>
 			</li>
 		</ul>

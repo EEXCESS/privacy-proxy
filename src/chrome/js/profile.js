@@ -7,9 +7,9 @@ var idUser;
 function initUserInfo(){
 
 	var request ={
-		term:{
-			_id: localStorage["user_id"]
-		}
+		
+		_id: localStorage["user_id"]
+		
 	};
 	
 	
@@ -37,38 +37,38 @@ function generateProfilePage() {
 	var gravatar = "http://www.gravatar.com/avatar/"+MD5(userInfo.email);
 	$('.gravatarProfile').attr('src',gravatar);
 	
-	$(".email").html("Email: " + userInfo.email);
+	$(".emailTitle").html("Email: " + userInfo.email);
 	$("#fullEmail").html(userInfo.email);
 	
 	
-	$(".title").html("Title: " + userInfo.title);
+	$(".titleTitle").html("Title: " + userInfo.title);
 	$("#fullTitle").html(userInfo.title);
 	if(userInfo.title == "") {
-		$(".title").html("Title: Not saved yet");
+		$(".titleTitle").html("Title: Not saved yet");
 		$("#fullTitle").html("Title: Not saved yet");
 	}
 	
-	$(".lastname").html("Lastname: " + userInfo.lastname);
+	$(".lastnameTitle").html("Lastname: " + userInfo.lastname);
 	if(userInfo.lastname == "") {
-		$(".lastname").html("Lastname: Not saved yet");
+		$(".lastnameTitle").html("Lastname: Not saved yet");
 	}
 	
-	$(".firstname").html("Firstname: " + userInfo.firstname);
+	$(".firstnameTitle").html("Firstname: " + userInfo.firstname);
 	if(userInfo.firstname == "") {
-		$(".firstname").html("Firstname: Not saved yet");
+		$(".firstnameTitle").html("Firstname: Not saved yet");
 	}
 	
-	$(".gender").html("Gender: " + userInfo.gender);
+	$(".genderTitle").html("Gender: " + userInfo.gender);
 	$("#fullGender").html(userInfo.gender);
 	if(userInfo.gender == "") {
-		$(".gender").html("Gender: Not saved yet");
+		$(".genderTitle").html("Gender: Not saved yet");
 		$("#fullGender").html("Gender: Not saved yet");
 	}
 	
-	$(".birthdate").html("Birthdate: " + userInfo.birthdate);
+	$(".birthdateTitle").html("Birthdate: " + userInfo.birthdate);
 	$("#fullAge").html(userInfo.birthdate);
 	if(userInfo.birthdate == "") {
-		$(".birthdate").html("Birthdate: Not saved yet");
+		$(".birthdateTitle").html("Birthdate: Not saved yet");
 		$("#fullAge").html("Birthdate: Not saved yet");
 	}
 	$(".topics").html("Topics: " + getTopicsStr());
@@ -112,18 +112,18 @@ function generateDateSelect(){
 function generateAddress(){
 	
 	if (userInfo.address == undefined){
-		$(".street").html("Address");
-		$(".city").html("");
-		$(".country").html("");
+		$(".streetTitle").html("Address");
+		$(".cityTitle").html("");
+		$(".countryTitle").html("");
 	}
 	else{		
-		$(".street").html("Address: " + userInfo.address.street);
-		$(".city").html(userInfo.address.postalcode+" "+userInfo.address.city);
-		$(".country").html(userInfo.address.country);
+		$(".streetTitle").html("Address: " + userInfo.address.street);
+		$(".cityTitle").html(userInfo.address.postalcode+" "+userInfo.address.city);
+		$(".countryTitle").html(userInfo.address.country);
 		if(userInfo.address.street == "") {
-			$(".street").html("Adress: Not saved yet");
-			$(".city").html("");
-			$(".country").html("");
+			$(".streetTitle").html("Adress: Not saved yet");
+			$(".cityTitle").html("");
+			$(".countryTitle").html("");
 		}
 		
 		$('.inputStreet').val(userInfo.address.street);
@@ -330,7 +330,7 @@ function updateBirthdate(){
 	           request.setRequestHeader("traceid", idUser);
 	       },
 		   complete: function(response) {
-				$('.birthdate').html("Birthdate: "+userInfo["birthdate"]);
+				$('.birthdateTitle').html("Birthdate: "+userInfo["birthdate"]);
 				$('.stateBirthdate').html("Changes saved");
 		   }
 		});
@@ -361,9 +361,9 @@ function updateAddress(){
            request.setRequestHeader("traceid", idUser);
        },
 	   complete: function(response) {
-		    $(".street").html("Address: " + userInfo.address.street);
-			$(".city").html(userInfo.address.postalcode+" "+userInfo.address.city);
-			$(".country").html(userInfo.address.country);
+		    $(".streetTitle").html("Address: " + userInfo.address.street);
+			$(".cityTitle").html(userInfo.address.postalcode+" "+userInfo.address.city);
+			$(".countryTitle").html(userInfo.address.country);
 			$('.stateAddress').html("Changes saved");
 	   }
 	});

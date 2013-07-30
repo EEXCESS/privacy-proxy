@@ -110,9 +110,17 @@
 .toggle{
 	//display:inline !important;
 	//margin-top: 30px !important;
+	height: 0.2%;
+	float:right;
+	margin-top: -25px;
 }
 
 .fullInfo{
 	font-size:75%;
 	color: #34495e;
+}
+
+
+.effective_data{
+	font-size:0.85em;
 }

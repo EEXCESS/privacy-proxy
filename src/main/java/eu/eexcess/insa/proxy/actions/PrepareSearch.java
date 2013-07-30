@@ -21,8 +21,6 @@ public class PrepareSearch implements Processor {
 		in.setHeader("ElasticIndex", "privacy");
 		in.setHeader(Exchange.HTTP_METHOD, "POST");
 		body = "{\"query\":{\"bool\":{\"should\":["+body+"]}}}";
-		System.out.println("body ------------->");
-		System.out.println(body);
 		in.setBody(body);
 		
 

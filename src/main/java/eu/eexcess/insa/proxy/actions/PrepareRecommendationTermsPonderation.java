@@ -1,5 +1,6 @@
 package eu.eexcess.insa.proxy.actions;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.text.ParseException;
@@ -18,7 +19,9 @@ import org.apache.camel.Processor;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,16 +45,68 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	
 	
 	/**
-	 * Takes a list of obsels and processes it into 
+	 * Takes a user context
 	 * a list of terms with coefficients
 	 * 
 	 * @see org.apache.camel.Processor#process(org.apache.camel.Exchange)
 	 */
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
-		InputStream is = in.getBody(InputStream.class);
-
 		
+		InputStream isTraces = exchange.getProperty("user_context-traces",InputStream.class);
+		//String isTraces = exchange.getProperty("user_context-traces",String.class);
+		
+		InputStream isUserProfile = exchange.getProperty("user_context-profile",InputStream.class);
+		
+		
+		HashMap<String, Integer> ponderatedTerms = extractQueryFromTraces(isTraces);
+		extractQueryFromProfile( ponderatedTerms, isUserProfile); 
+		
+		
+	    StringWriter stringWriter = new StringWriter();
+	    Utils.writeWeightedQuery(stringWriter, ponderatedTerms);
+	    logger.info(ponderatedTerms.toString());
+	    String q = stringWriter.toString();
+	    in.setBody(q);
+	    logger.info("recommendation query : "+q);
+	    exchange.setProperty("recommendation_query", q);
+	    //in.setHeader("origin",exchange.getExchangeId());
+	}
+		
+		
+		
+	
+	/*
+	 *  The user's profile is assumed to have been already filtered following the privacy settings
+	 */
+	private HashMap<String, Integer> extractQueryFromProfile ( HashMap<String, Integer> tracesQuery, InputStream is ) throws JsonParseException, IOException{
+	
+		JsonFactory factory = new JsonFactory();
+		JsonParser jp = factory.createJsonParser(is);
+	    ObjectMapper mapper = new ObjectMapper();
+	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
+	    
+	    List<String> topics = extractTopicsFromProfile( rootNode );
+	   
+	    
+		
+		return tracesQuery;
+	}
+	
+	
+	private List<String> extractTopicsFromProfile ( JsonNode rootNode ){
+		ArrayList<String> topics = new ArrayList<String>();
+		JsonNode topicsNode = rootNode.path("hits").path("hits").get(0).path("topics");
+		Iterator<JsonNode> it = topicsNode.getElements();
+		while ( it.hasNext()){
+			topics.add(it.next().asText());
+		}
+		
+		return topics;
+	}
+	
+		
+	private HashMap<String, Integer> extractQueryFromTraces( InputStream is ) throws ParseException, JsonParseException, JsonMappingException, IOException{
 		//coefficients are calculated for each term from the obsel's title 
 		// ************************************************************
 		JsonFactory factory = new JsonFactory();
@@ -92,18 +147,8 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    	
 	    	
 	    }
-	    
-	    
-	    StringWriter stringWriter = new StringWriter();
-	    Utils.writeWeightedQuery(stringWriter, ponderatedTerms);
-	    logger.info(ponderatedTerms.toString());
-	    in.setBody(stringWriter.toString());
-	    
-	    //in.setHeader("origin",exchange.getExchangeId());
-		
-		
-		
-		
+	    return ponderatedTerms;
+
 	}
 
 	

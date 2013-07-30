@@ -285,20 +285,12 @@ $.ajax({
 });
 
 $.ajax({
-	   url: URL+"settings.html",
-	   type: "GET",
-	   complete: function(response){
-		   $('#settings').append(response.responseText);
-		   initUserInfo();
-	   }
-});
-
-$.ajax({
 	   url: URL+"privacySandbox.html",
 	   type: "GET",
 	   complete: function(response){
 		   $('#sandbox').append(response.responseText);
 		   initSandbox();
+		   initUserInfo();
 	   }
 });
 

@@ -7,13 +7,22 @@ import org.apache.camel.Processor;
 
 public class PrepareUserSearch implements Processor {
 
+	
+	/* This processor creates an elasticsearch query which is stored into the message body
+	 * 
+	 *  The query will retrieve a user's data
+	 *  The user's id must be stored in the "user_id" exchange property
+	 * 
+	 * (non-Javadoc)
+	 * @see org.apache.camel.Processor#process(org.apache.camel.Exchange)
+	 */
 	public void process(Exchange exchange) throws Exception {
 
 		Message in = exchange.getIn();
 		String body = in.getBody(String.class);
 		
 		
-		String query = "{\"query\":{\"bool\":{\"should\":["+body+"]}},\"from\":0,\"size\":50,\"sort\":[],\"facets\":{}}";
+		String query = "{\"query\":{\"bool\":{\"should\":[{\"term\":{\"_id\":\""+exchange.getProperty("user_id", String.class)+"\"}}]}},\"from\":0,\"size\":50,\"sort\":[],\"facets\":{}}";
 		in.setBody(query);
 		
 		

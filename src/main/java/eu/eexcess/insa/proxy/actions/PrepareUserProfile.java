@@ -20,6 +20,8 @@ public class PrepareUserProfile implements Processor {
 		Message in = exchange.getIn();
 		InputStream is = in.getBody(InputStream.class);
 		
+		
+		
 	    JsonParser jp = factory.createJsonParser(is);
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);

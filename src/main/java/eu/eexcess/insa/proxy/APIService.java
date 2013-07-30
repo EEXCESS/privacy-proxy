@@ -19,6 +19,7 @@ import eu.eexcess.insa.profile.EexcessProfileMapper;
 import eu.eexcess.insa.profile.MendeleyProfileMapper;
 import eu.eexcess.insa.profile.ProfileSplitter;
 import eu.eexcess.insa.proxy.actions.GetUserId;
+import eu.eexcess.insa.proxy.actions.GetUserIdFromBody;
 import eu.eexcess.insa.proxy.actions.GetUserProfiles;
 import eu.eexcess.insa.proxy.actions.PrepareLastTenTracesQuery;
 import eu.eexcess.insa.proxy.actions.PrepareRecommendationRequest;
@@ -74,6 +75,7 @@ public class APIService extends RouteBuilder  {
 	final EexcessProfileMapper eexcessProfileMapper = new EexcessProfileMapper();
 	final MendeleyProfileMapper mendeleyProfileMapper = new MendeleyProfileMapper(); 
 	final ProfileSplitter profileSplitter = new ProfileSplitter();
+	final GetUserIdFromBody getUserIdFromBdy = new GetUserIdFromBody();
 	
 		public void configure() throws Exception {
 			
@@ -86,15 +88,21 @@ public class APIService extends RouteBuilder  {
 				.to("seda:elastic.trace.index")
 			;	
 			
-			/* Route used to retrieve use profile data
+			/* Route used to retrieve user's profile data
 			 * 
 			 */
 			from("jetty:http://localhost:12564/api/v0/users/profile")
+				.process(getUserIdFromBdy)
+				.to("direct:get.user.data")
+				.process(prepUserProfile)
+			;
+				
+			
+			from("direct:get.user.data")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.process(prepUserSearch)
 				.to("direct:elastic.userSearch")
-				.process(prepUserProfile)
 			;
 				
 			
@@ -106,6 +114,7 @@ public class APIService extends RouteBuilder  {
 				.removeHeader("Host")	
 				.to("direct:recommend")
 				.setHeader("Content-Type").constant("text/html")
+				.setHeader("recommendation_query", property("recommendation_query"));
 			;
 			
 			
@@ -185,12 +194,16 @@ public class APIService extends RouteBuilder  {
 			 * 
 			 */
 			from("direct:recommend")
-				.process(prepLastTen)
+				.process(prepLastTen)  //this sets the user_id exchange property
 				//.log("${in.body}")
 				.setHeader("ElasticType").constant("trace")
 				.setHeader("ElasticIndex").constant("privacy")
 				.to("direct:elastic.userSearch")
-				//.log("${out.body}")
+				//.log("${in.body}")
+				.setProperty("user_context-traces",simple("${in.body}", String.class))
+				.to("direct:get.user.data")
+				.setProperty("user_context-profile",simple("${in.body}", String.class))
+				
 				.process(prepPonderation)
 				//.log("${in.body}")
 				.setHeader("origin").simple("exchangeId")

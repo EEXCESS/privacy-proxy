@@ -13,19 +13,11 @@
 .title{
 	display: inline;
 }
-
-#slider{
-	margin-top: 30px !important;
-}
 .submitSetting{
 	display: inline-block;
 	position: absolute;
 	top: 35px;
 	right: 120px;
-}
-
-#sliderAddress{
-	margin-top: 30px !important;
 }
 
 .toggle{
