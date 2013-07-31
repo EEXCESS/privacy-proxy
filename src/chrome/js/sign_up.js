@@ -64,9 +64,10 @@ function register(){
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: userDataJSON,
-	   success: function(response) {
+	   success: function(response, status, xhr) {
 			document.getElementById('successSignup').innerHTML='Registration Successfull';
 			document.getElementById("successLogin").innerHTML = "Successful Sign in";
+			localStorage["user_id"] = xhr.getResponseHeader("traceId");
 			document.location.href="traces.html";
 	   }
 	});

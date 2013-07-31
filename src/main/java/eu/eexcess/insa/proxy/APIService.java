@@ -156,12 +156,12 @@ public class APIService extends RouteBuilder  {
 			 *  Route to directly save the privacy settings into the user index ( without merging the data with other profiles first )
 			 */
 			from("jetty:http://localhost:12564/api/v0/users/privacy_settings")
-			.setHeader("ElasticType").constant("data")
-			.setHeader("ElasticIndex").constant("users")
-			.to("seda:elastic.trace.index")
-			
-			.process(getUserId)	
-		;
+				.setHeader("ElasticType").constant("data")
+				.setHeader("ElasticIndex").constant("users")
+				.to("seda:elastic.trace.index")
+				
+				.process(getUserId)	
+			;
 			
 
 			/* Route to check if given username and email currently exit
@@ -183,6 +183,7 @@ public class APIService extends RouteBuilder  {
 				.setHeader("ElasticIndex").constant("users")
 				.process(prepUserLogin)
 				.to("direct:elastic.userSearch")
+				.removeHeader(Exchange.HTTP_URI)
 				.process(prepRespUser)
 			;
 			
@@ -208,8 +209,9 @@ public class APIService extends RouteBuilder  {
 				//.log("${in.body}")
 				.setHeader("origin").simple("exchangeId")
 				.multicast().aggregationStrategy(new RecomendationResultAggregator())
-					.to("direct:recommend.econbiz")
-					.to("direct:recommend.mendeley")
+					.parallelProcessing().timeout(2000L)
+					.to("direct:recommend.econbiz","direct:recommend.mendeley")
+					
 				.end()
 				.unmarshal().string("UTF-8")
 			    .unmarshal(new JsonXMLDataFormat())
@@ -243,6 +245,7 @@ public class APIService extends RouteBuilder  {
 			    .process(prepDocumentSearch)
 			    .recipientList(header("QueryEndPoint").tokenize(",")).aggregationStrategy(new MendeleyQueriesAggregator())
 			    .process(closeJson)
+			    
 			;
 			
 			/* Route to initialize Mendeley OAuth authentifiaction
@@ -306,24 +309,24 @@ public class APIService extends RouteBuilder  {
 			 */
 			from("direct:profiles.merge")
 				.process(getProfiles)
+				.setHeader("ElasticType").constant("data")
+				.setHeader("ElasticIndex").constant("profiles")
+				.to("log:ex1.1?showAll=true") 
+				
+							
 				.to("direct:elastic.userSearch")
 				.unmarshal().string("UTF-8")
-				//.wireTap("file:///tmp/merge/?fileName=example.json")
+				.wireTap("file:///tmp/merge/?fileName=example.json")
 				.process(profileSplitter)
 				.process(eexcessProfileMapper)
 				.process(mendeleyProfileMapper)
 				.to("string-template:templates/profile.tm")
-				//.log("${in.body}")
-				//.to("jetty:http://localhost:12564/api/v0/users/privacy_settings")
+
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.setHeader("traceId").property("user_id")
 				.to("seda:elastic.trace.index")
-				
-				
 			;
-			
-			
 		}
 
 	public static void main( String[] args ) {

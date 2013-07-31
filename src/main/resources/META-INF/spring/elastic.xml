@@ -13,7 +13,7 @@
 		<route>
 			<from uri="seda:elastic.trace.index?concurrentConsumers=4" />
 			<setHeader headerName="CamelHttpURI">
-				<simple>{{elastic.url}}/${in.header.ElasticIndex}/${in.header.ElasticType}/${in.header.traceId}</simple>
+				<simple>{{elastic.url}}/${in.header.ElasticIndex}/${in.header.ElasticType}/${in.header.traceId}?refresh=true</simple>
 			</setHeader>
     		<setHeader headerName="CamelHttpMethod">
     			<constant>POST</constant>

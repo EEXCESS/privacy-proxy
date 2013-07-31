@@ -47,8 +47,10 @@ public class GetUserProfiles implements Processor {
 		
 		jg.writeEndObject();
 		jg.close();
-		
-		in.setBody(sw.toString());
+		String q = sw.toString();
+		System.out.println(q);
+		in.setBody(q);
+		//in.setHeader(Exchange.HTTP_PATH, value)
 		
 	}
 

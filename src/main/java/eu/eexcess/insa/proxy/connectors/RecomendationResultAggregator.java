@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.processor.aggregate.AggregationStrategy;
+import org.apache.camel.processor.aggregate.TimeoutAwareAggregationStrategy;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
@@ -17,7 +18,7 @@ import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 
 
-public class RecomendationResultAggregator implements AggregationStrategy {
+public class RecomendationResultAggregator implements TimeoutAwareAggregationStrategy {
 
 	final int nbSources = 2; // number of messages we have to wait for until we have retrieved
 							 //all the informations we asked for and can start ordering them
@@ -35,69 +36,76 @@ public class RecomendationResultAggregator implements AggregationStrategy {
 				newExchange.getIn().setBody(results);
 			}
 			else{ // all messages have been retrieved
-				JsonFactory factory = new JsonFactory();
-				ObjectMapper mapper = new ObjectMapper();
-				ArrayList<JsonNode> resultNodes = new ArrayList<JsonNode>();
-				Iterator<String> it = results.iterator();
-				while (it.hasNext()){
-					JsonParser jp;
-					try {
-						jp = factory.createJsonParser(it.next());
-						resultNodes.add(mapper.readValue(jp, JsonNode.class));
-					} catch (JsonParseException e) {		
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				   
-				}
-				StringWriter sWriter = new StringWriter(); 
-				JsonGenerator jg;
-				try {
-					jg = factory.createJsonGenerator(sWriter);
-					jg.writeStartObject();
-					jg.writeArrayFieldStart("Documents");
-					Vector<Iterator<JsonNode>> documentIterators = new Vector<Iterator<JsonNode>>();
-					Iterator<JsonNode> itNodes = resultNodes.iterator();
-					while(itNodes.hasNext()){
-						documentIterators.add(itNodes.next().path("documents").getElements());
-					}
-					boolean writeMore = true;
-					boolean[] ct = new boolean[documentIterators.size()];
-					for ( int i = 0 ; i < ct.length; i++ ){
-						ct[i]= true;
-					}
-					while (writeMore){
-						for ( int i = 0 ; i < documentIterators.size(); i++ ){
-							if ( documentIterators.get(i).hasNext() ){
-								//jg.writeTree(documentIterators.get(i).next());
-								copyObject(jg, documentIterators.get(i).next());
-							}
-							else{
-								ct[i]=false;
-							}
-						}
-						writeMore = false;
-						for ( int i = 0 ; i < ct.length ; i++ ){
-							writeMore = writeMore || ct[i];
-						}
-						
-					}
-
-					jg.writeEndArray();
-					jg.writeEndObject();
-					jg.close();
-					newExchange.getIn().setBody(sWriter.toString());
 				
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				
+				newExchange = doParsing(  newExchange, results );
 				
 				
 			}
 		}
 			
+		return newExchange;
+	}
+	
+	Exchange doParsing (  Exchange newExchange, ArrayList<String> results ){
+		
+		JsonFactory factory = new JsonFactory();
+		ObjectMapper mapper = new ObjectMapper();
+		ArrayList<JsonNode> resultNodes = new ArrayList<JsonNode>();
+		Iterator<String> it = results.iterator();
+		while (it.hasNext()){
+			JsonParser jp;
+			try {
+				jp = factory.createJsonParser(it.next());
+				resultNodes.add(mapper.readValue(jp, JsonNode.class));
+			} catch (JsonParseException e) {		
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		   
+		}
+		StringWriter sWriter = new StringWriter(); 
+		JsonGenerator jg;
+		try {
+			jg = factory.createJsonGenerator(sWriter);
+			jg.writeStartObject();
+			jg.writeArrayFieldStart("Documents");
+			Vector<Iterator<JsonNode>> documentIterators = new Vector<Iterator<JsonNode>>();
+			Iterator<JsonNode> itNodes = resultNodes.iterator();
+			while(itNodes.hasNext()){
+				documentIterators.add(itNodes.next().path("documents").getElements());
+			}
+			boolean writeMore = true;
+			boolean[] ct = new boolean[documentIterators.size()];
+			for ( int i = 0 ; i < ct.length; i++ ){
+				ct[i]= true;
+			}
+			while (writeMore){
+				for ( int i = 0 ; i < documentIterators.size(); i++ ){
+					if ( documentIterators.get(i).hasNext() ){
+						//jg.writeTree(documentIterators.get(i).next());
+						copyObject(jg, documentIterators.get(i).next());
+					}
+					else{
+						ct[i]=false;
+					}
+				}
+				writeMore = false;
+				for ( int i = 0 ; i < ct.length ; i++ ){
+					writeMore = writeMore || ct[i];
+				}
+				
+			}
+
+			jg.writeEndArray();
+			jg.writeEndObject();
+			jg.close();
+			newExchange.getIn().setBody(sWriter.toString());
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		return newExchange;
 	}
 	
@@ -153,6 +161,12 @@ public class RecomendationResultAggregator implements AggregationStrategy {
 			jg.writeString("");
 		}
 		jg.writeEndObject();
+	}
+
+	public void timeout(Exchange oldExchange, int index, int total, long timeout) {
+		ArrayList<String> results = (ArrayList<String>)(oldExchange.getIn().getBody(ArrayList.class)); 
+		oldExchange = doParsing( oldExchange, results);
+		
 	}
 
 }

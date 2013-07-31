@@ -86,6 +86,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
 	    
+	    
 	    // the topics are for now the only information from the user's profile we take in consideration
 	    List<String> topics = extractTopicsFromProfile( rootNode );
 	    HashMap<String, Integer> ponderatedTopics = ponderateTopics( topics ) ;
@@ -114,12 +115,22 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	
 	private List<String> extractTopicsFromProfile ( JsonNode rootNode ){
 		ArrayList<String> topics = new ArrayList<String>();
-		JsonNode topicsNode = rootNode.path("hits").path("hits").get(0).path("topics");
-		Iterator<JsonNode> it = topicsNode.getElements();
-		while ( it.hasNext()){
-			topics.add(it.next().asText());
+		if ( !rootNode.path("hits").isMissingNode()){
+			if(!rootNode.path("hits").path("hits").isMissingNode()){
+				if( rootNode.path("hits").path("hits").get(0) != null){
+					if(!rootNode.path("hits").path("hits").get(0).path("topics").isMissingNode()){
+				
+			
+					
+						JsonNode topicsNode = rootNode.path("hits").path("hits").get(0).path("topics");
+						Iterator<JsonNode> it = topicsNode.getElements();
+						while ( it.hasNext()){
+							topics.add(it.next().asText());
+						}
+					}
+				}
+			}
 		}
-		
 		return topics;
 	}
 	

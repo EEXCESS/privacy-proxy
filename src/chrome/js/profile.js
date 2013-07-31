@@ -67,7 +67,7 @@ function generateProfilePage() {
 	
 	$(".birthdateTitle").html("Birthdate: " + userInfo.birthdate);
 	$("#fullAge").html(userInfo.birthdate);
-	if(userInfo.birthdate == "") {
+	if(userInfo.birthdate == "" || userInfo.birthdate == undefined) {
 		$(".birthdateTitle").html("Birthdate: Not saved yet");
 		$("#fullAge").html("Birthdate: Not saved yet");
 	}

@@ -15,15 +15,15 @@
     "lastname": "<headers.profileLastName>",
     "firstname": "<headers.profileFirstName>",
     "gender": "<headers.profileGender>",
-    "birthdate": "<headers.profileBirthDate>",
+    <if(headers.profileBirthDate)>"birthdate": "<headers.profileBirthDate>,"<endif>
     "address": {
         "street": "<headers.profileAddressStreet>",
         "postalcode": "<headers.profileAddressPostalCode>",
         "city": "<headers.profileAddressCity>",
         "country": "<headers.profileAddressCountry>"
     },
-    "topics": [
+    "topics": <if(headers.profileTopics)>[
 	    <first(headers.profileTopics):{v | { "label": "<v>" \}}>
 	    <rest(headers.profileTopics):{v | , { "label": "<v>" \}}>
-    ]
+    ] <else>{}<endif>
 }
