@@ -131,8 +131,8 @@ public class EexcessProfileMapper implements Processor {
 				
 				int nbTopics = userGivenProfile.path("topics").size();
 				String[] topics = new String[ nbTopics ];
-				for ( int i = 0 ; i < nbTopics ; i ++ ){
-					topics[i] = userGivenProfile.path("topics").get( i ).path("label").getTextValue();
+				for ( int i = 0 ; i < nbTopics ; i+=2 ){
+					topics[i] = "\"label\":\""+userGivenProfile.path("topics").get( i ).path("label").getTextValue() + "\",\"env\":\""+userGivenProfile.path("topics").get( i ).path("env").getTextValue()+"\"";
 				}
 				fillHeader(in, "profileTopics" , topics);
 			}

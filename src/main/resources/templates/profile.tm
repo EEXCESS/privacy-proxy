@@ -23,7 +23,7 @@
         "country": "<headers.profileAddressCountry>"
     },
     "topics": <if(headers.profileTopics)>[
-	    <first(headers.profileTopics):{v | { "label": "<v>" \}}>
-	    <rest(headers.profileTopics):{v | , { "label": "<v>" \}}>
+	    <first(headers.profileTopics):{v | "<v>"}>
+	    <rest(headers.profileTopics):{v | , "<v>"}>
     ] <else>{}<endif>
 }
