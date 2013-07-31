@@ -115,11 +115,44 @@
 				<h4 class ="topics" id="topicsTitle">Topics</h4>
 				<div class="topicsHandle"><img class="menuArrowTopics" src="media/menu.png"><span>Change topics</span></div>
 				<div class="topicsChange" style="display:none">
-					<div id="tagsinput_tagsinput" class="tagsinput" style="height: 15%;">
-						<div class="tagsinput-add-container" id="tagsinput_addTag">
-							<div class="tagsinput-add">
+					<div class="span2 offset1">
+						<span>Never show</span>
+						<div id="tagsinput_tagsinput_nothing" class="tagsinput" style="height: 35%; display: inline-block">
+							<div class="tagsinput-add-container" id="tagsinput_addTag_nothing">
+								<div class="tagsinput-add nothing">
+								</div>
+								<input id="tagsinput_tag_nothing" value data-default style="color: rgb(102,102,102); width: 43%;">
 							</div>
-							<input id="tagsinput_tag" value data-default style="color: rgb(102,102,102); width: 43%;">
+						</div>
+					</div>
+					<div class="span2">
+						<span>Use at home</span>
+						<div id="tagsinput_tagsinput_home" class="tagsinput" style="height: 35%; display: inline-block">
+							<div class="tagsinput-add-container" id="tagsinput_addTag_home">
+								<div class="tagsinput-add home">
+								</div>
+								<input id="tagsinput_tag_home" value data-default style="color: rgb(102,102,102); width: 43%;">
+							</div>
+						</div>
+					</div>
+					<div class="span2">
+						<span>Use at work</span>
+						<div id="tagsinput_tagsinput_work" class="tagsinput" style="height: 35%; display: inline-block">
+							<div class="tagsinput-add-container" id="tagsinput_addTag_work">
+								<div class="tagsinput-add work">
+								</div>
+								<input id="tagsinput_tag_work" value data-default style="color: rgb(102,102,102); width: 43%;">
+							</div>
+						</div>
+					</div>
+					<div class="span2">
+						<span>Always use</span>
+						<div id="tagsinput_tagsinput_all" class="tagsinput" style="height: 35%; display: inline-block">
+							<div class="tagsinput-add-container" id="tagsinput_addTag_all">
+								<div class="tagsinput-add all">
+								</div>
+								<input id="tagsinput_tag_all" value data-default style="color: rgb(102,102,102); width: 43%;">
+							</div>
 						</div>
 					</div>
 					<button class="btn btn-primary submitTopics">Submit these topics</button>

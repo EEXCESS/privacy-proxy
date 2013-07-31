@@ -223,7 +223,7 @@ function doToggleTopics() {
 			for(var i=0;i<userInfo.topics.length;i++){
 				if(userInfo.topics[i]!=undefined){
 					if($('span[name=\"'+userInfo.topics[i].label+'\"]').size()== 0){
-						displayTopics(userInfo.topics[i].label);
+						displayTopics(userInfo.topics[i].label,userInfo.topics[i].env);
 					}
 				}
 			}
@@ -415,10 +415,14 @@ function updateTopics(){
 	var values=new Array();
 	var tags = document.getElementsByClassName("tag");
 	for(var i=0; i<tags.length;i++){
-		values[i]={label:tags[i].innerText};
+		var env = tags[i].parentNode.id;
+		alert(env);
+		env = env.split("_")[2];
+		values[i]={label:tags[i].innerText,env:env};
 	}
 	userInfo.topics=values;
 	var userDataJSON = JSON.stringify(userInfo);
+	alert(userDataJSON);
 	$.ajax({
 	   url: "http://localhost:12564/api/v0/users/data",
 	   type: "POST",
@@ -453,18 +457,30 @@ function getTopicsStr()
     }
 	return topicsStr;
 }
-function doAddTag (){
+function doAddTag (env){
 	
 	var newTag = document.createElement('span');
 	newTag.setAttribute('class','tag');
 	var innerSpan = document.createElement('span');
-	var tagValue = document.getElementById('tagsinput_tag').value;
-	document.getElementById('tagsinput_tag').value="";
+	var tagValue = document.getElementById('tagsinput_tag_'+env).value;
+	document.getElementById('tagsinput_tag_'+env).value="";
 	newTag.setAttribute('name',tagValue);
 	innerSpan.innerHTML=tagValue+'<a class="tagsinput-remove-link"></a>';
 	newTag.appendChild(innerSpan);
-	document.getElementById('tagsinput_tagsinput').insertBefore(newTag,document.getElementById('tagsinput_addTag'));
+	document.getElementById('tagsinput_tagsinput_'+env).insertBefore(newTag,document.getElementById('tagsinput_addTag_'+env));
+}
 
+function nothingTopic(){
+	doAddTag("nothing");
+}
+function homeTopic(){
+	doAddTag("home");
+}
+function workTopic(){
+	doAddTag("work");
+}
+function allTopic(){
+	doAddTag("all");
 }
 
 
@@ -473,15 +489,15 @@ function doRemoveTag(){
 	
 }
 
-function displayTopics( topic ){
+function displayTopics( topic,env ){
 	var newTag = document.createElement('span');
 	newTag.setAttribute('class','tag');
 	newTag.setAttribute('name',topic);
 	var innerSpan = document.createElement('span');
-	document.getElementById('tagsinput_tag').value="";
+	document.getElementById('tagsinput_tag_'+env).value="";
 	innerSpan.innerHTML=topic+'<a class="tagsinput-remove-link"></a>';
 	newTag.appendChild(innerSpan);
-	document.getElementById('tagsinput_tagsinput').insertBefore(newTag,document.getElementById('tagsinput_addTag'));
+	document.getElementById('tagsinput_tagsinput_'+env).insertBefore(newTag,document.getElementById('tagsinput_addTag'));
 }
 
 $(document).ready(function(){
@@ -494,7 +510,10 @@ $(document).ready(function(){
 	$('.addressHandle').live("click",doToggleAddress);
 	$('.topicsHandle').live("click",doToggleTopics);
 	
-	$('.tagsinput-add').live("click",doAddTag);
+	$('.nothing').live("click",nothingTopic);
+	$('.home').live("click",homeTopic);
+	$('.work').live("click",workTopic);
+	$('.all').live("click",allTopic);
 	$('.tagsinput-remove-link').live("click",doRemoveTag);
 	
 	$('.submitEmail').live("click",checkUpdate);
