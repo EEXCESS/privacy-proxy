@@ -209,7 +209,7 @@ public class APIService extends RouteBuilder  {
 				//.log("${in.body}")
 				.setHeader("origin").simple("exchangeId")
 				.multicast().aggregationStrategy(new RecomendationResultAggregator())
-					.parallelProcessing().timeout(2000L)
+					.parallelProcessing().timeout(3800L)
 					.to("direct:recommend.econbiz","direct:recommend.mendeley")
 					
 				.end()

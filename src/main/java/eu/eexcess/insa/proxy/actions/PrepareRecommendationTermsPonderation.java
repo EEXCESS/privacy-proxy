@@ -91,9 +91,9 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    List<String> topics = extractTopicsFromProfile( rootNode );
 	    HashMap<String, Integer> ponderatedTopics = ponderateTopics( topics ) ;
 	    // the topics are saved into an exchange property to be used later by the specific query mappers
+
 	    exchange.setProperty("ponderated_topics", ponderatedTopics);
-	    
-	    
+
 		// the query terms aren't modified for now 
 		return tracesQuery;
 	}
@@ -115,19 +115,19 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	
 	private List<String> extractTopicsFromProfile ( JsonNode rootNode ){
 		ArrayList<String> topics = new ArrayList<String>();
+		System.out.println("rootnode = "+rootNode);
 		if ( !rootNode.path("hits").isMissingNode()){
 			if(!rootNode.path("hits").path("hits").isMissingNode()){
 				if( rootNode.path("hits").path("hits").get(0) != null){
-					if(!rootNode.path("hits").path("hits").get(0).path("topics").isMissingNode()){
-				
-			
-					
-						JsonNode topicsNode = rootNode.path("hits").path("hits").get(0).path("topics");
-						Iterator<JsonNode> it = topicsNode.getElements();
-						while ( it.hasNext()){
-							topics.add(it.next().asText());
+					if(!rootNode.path("hits").path("hits").get(0).path("_source").isMissingNode())
+						if(!rootNode.path("hits").path("hits").get(0).path("_source").path("topics").isMissingNode()){
+							
+							JsonNode topicsNode = rootNode.path("hits").path("hits").get(0).path("_source").path("topics");
+							Iterator<JsonNode> it = topicsNode.getElements();
+							while ( it.hasNext()){
+								topics.add(it.next().path("label").asText());
+							}
 						}
-					}
 				}
 			}
 		}
@@ -269,7 +269,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 				* (1 / k) + B * (beginTrace - endTrace))
 				/ (Math.log((k * T + b) / b) * (1 / k) + B * T);
 		//double truncatedCoefficient = coefficient - coefficient % 0.001;
-		double truncatedCoefficient = Math.round(coefficient*300);
+		double truncatedCoefficient = Math.round(coefficient*10);
 		return (int)(truncatedCoefficient);
 	}
 
