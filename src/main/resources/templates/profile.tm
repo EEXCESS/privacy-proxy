@@ -15,7 +15,7 @@
     "lastname": "<headers.profileLastName>",
     "firstname": "<headers.profileFirstName>",
     "gender": "<headers.profileGender>",
-    <if(headers.profileBirthDate)>"birthdate": "<headers.profileBirthDate>,"<endif>
+    <if(headers.profileBirthDate)>"birthdate": "<headers.profileBirthDate>",<endif>
     "address": {
         "street": "<headers.profileAddressStreet>",
         "postalcode": "<headers.profileAddressPostalCode>",
