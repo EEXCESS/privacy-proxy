@@ -223,11 +223,16 @@ function doToggleTopics() {
 			for(var i=0;i<userInfo.topics.length;i++){
 				if(userInfo.topics[i]!=undefined){
 					if($('span[name=\"'+userInfo.topics[i].label+'\"]').size()== 0){
-						displayTopics(userInfo.topics[i].label,userInfo.topics[i].env);
+						displayTopics(userInfo.topics[i].label,userInfo.topics[i].env,userInfo.topics[i].source);
 					}
 				}
 			}
 		}
+		
+	/*	$('.tagsinput').droppable({
+			accept: ".tag"
+		});*/
+		
 		$(".topicsChange").show("slow");
 		$('.menuArrowTopics').css("-webkit-transform","rotate(90deg)");		
 	}
@@ -416,13 +421,11 @@ function updateTopics(){
 	var tags = document.getElementsByClassName("tag");
 	for(var i=0; i<tags.length;i++){
 		var env = tags[i].parentNode.id;
-		alert(env);
 		env = env.split("_")[2];
 		values[i]={label:tags[i].innerText,env:env};
 	}
 	userInfo.topics=values;
 	var userDataJSON = JSON.stringify(userInfo);
-	alert(userDataJSON);
 	$.ajax({
 	   url: "http://localhost:12564/api/v0/users/data",
 	   type: "POST",
@@ -465,7 +468,7 @@ function doAddTag (env){
 	var tagValue = document.getElementById('tagsinput_tag_'+env).value;
 	document.getElementById('tagsinput_tag_'+env).value="";
 	newTag.setAttribute('name',tagValue);
-	innerSpan.innerHTML=tagValue+'<a class="tagsinput-remove-link"></a>';
+	innerSpan.innerHTML='<img class="imgTag" src="media/icon.png">'+tagValue+'<a class="tagsinput-remove-link"></a>';
 	newTag.appendChild(innerSpan);
 	document.getElementById('tagsinput_tagsinput_'+env).insertBefore(newTag,document.getElementById('tagsinput_addTag_'+env));
 }
@@ -489,15 +492,17 @@ function doRemoveTag(){
 	
 }
 
-function displayTopics( topic,env ){
+function displayTopics( topic,env,source ){
 	var newTag = document.createElement('span');
 	newTag.setAttribute('class','tag');
 	newTag.setAttribute('name',topic);
 	var innerSpan = document.createElement('span');
 	document.getElementById('tagsinput_tag_'+env).value="";
-	innerSpan.innerHTML=topic+'<a class="tagsinput-remove-link"></a>';
+	innerSpan.innerHTML="";
+	if (source == "eexcess") innerSpan.innerHTML='<img class="imgTag" src="media/icon.png">';
+	innerSpan.innerHTML+=topic+'<a class="tagsinput-remove-link"></a>';
 	newTag.appendChild(innerSpan);
-	document.getElementById('tagsinput_tagsinput_'+env).insertBefore(newTag,document.getElementById('tagsinput_addTag'));
+	document.getElementById('tagsinput_tagsinput_'+env).insertBefore(newTag,document.getElementById('tagsinput_addTag_'+env));
 }
 
 $(document).ready(function(){
@@ -524,4 +529,7 @@ $(document).ready(function(){
 	$('.submitBirthdate').live("click",updateBirthdate);
 	$('.submitAddress').live("click",updateAddress);
 	$('.submitTopics').live("click",updateTopics);
+
+
 });
+

@@ -110,11 +110,11 @@
 					tagslist.push(value);
 				
 					$('#'+id+'_tag').val('');
-					if (options.focus) {
+					/*if (options.focus) {
 						$('#'+id+'_tag').focus();
 					} else {		
 						$('#'+id+'_tag').blur();
-					}
+					}*/
 					
 					$.fn.tagsInput.updateTagsField(this,tagslist);
 					
