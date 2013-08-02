@@ -261,7 +261,7 @@ function addressHoverOut(){
 
 function ageHoverIn(){
 	if ($(this).find(".tooltip-inner").html() == "undefined"){
-		$(this).find(".tooltip-inner").html(granularity("birthdate",userInfo.birthdate,userInfo.privacy.age));
+		$(this).find(".tooltip-inner").html(privacy.apply("birthdate",userInfo.birthdate,userInfo.privacy.age));
 	}
 	$(this).find(".slider-tip").show();
 }
@@ -281,17 +281,17 @@ function hoverOut(){
 function settingsAgeReady(){
 	
 
-	var ageContent = [granularity("birthdate",userInfo.birthdate,0),granularity("birthdate",userInfo.birthdate,1),granularity("birthdate",userInfo.birthdate,2),granularity("birthdate",userInfo.birthdate,3)];
+	var ageContent = [privacy.apply("birthdate",userInfo.birthdate,0),privacy.apply("birthdate",userInfo.birthdate,1),privacy.apply("birthdate",userInfo.birthdate,2),privacy.apply("birthdate",userInfo.birthdate,3)];
 	$("#slider").slider({
 		value:userInfo.privacy.age,
 		min: 0,
 		max: 3,
 		step: 1,
 		create:function(){
-			$("#fullAge").html(granularity("birthdate",userInfo.birthdate,3));
-			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + granularity("birthdate",userInfo.birthdate,userInfo.privacy.age) + '</div></div>');
+			$("#fullAge").html(privacy.apply("birthdate",userInfo.birthdate,3));
+			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + privacy.apply("birthdate",userInfo.birthdate,userInfo.privacy.age) + '</div></div>');
 			$(this).find(".slider-tip").hide();
-			$("#list_settings").find(".birthdate span").html(granularity("birthdate",userInfo.birthdate,userInfo.privacy.age));
+			$("#list_settings").find(".birthdate span").html(privacy.apply("birthdate",userInfo.birthdate,userInfo.privacy.age));
 			if(userInfo.privacy.age == 0){
 				$(this).find('.tooltip-inner').css("margin-left","85px");
 				$(this).find('.tooltip-arrow').css("margin-left","-52px");
@@ -315,8 +315,8 @@ function settingsAgeReady(){
 				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
 			}
 			userInfo.privacy.age = ui.value;
-			$("#list_settings").find(".birthdate span").html(granularity("birthdate",userInfo.birthdate,userInfo.privacy.age));
-			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(granularity("birthdate",userInfo.birthdate,userInfo.privacy.age));
+			$("#list_settings").find(".birthdate span").html(privacy.apply("birthdate",userInfo.birthdate,userInfo.privacy.age));
+			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(privacy.apply("birthdate",userInfo.birthdate,userInfo.privacy.age));
 		},
 		stop: function(){
 			$(".slider-tip").hide();
