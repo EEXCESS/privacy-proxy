@@ -223,6 +223,7 @@ function doToggleTopics() {
 			for(var i=0;i<userInfo.topics.length;i++){
 				if(userInfo.topics[i]!=undefined){
 					if($('span[name=\"'+userInfo.topics[i].label+'\"]').size()== 0){
+						alert(JSON.stringify(userInfo.topics[i]));
 						displayTopics(userInfo.topics[i].label,userInfo.topics[i].env,userInfo.topics[i].source);
 					}
 				}

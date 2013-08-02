@@ -60,6 +60,9 @@ public class MendeleyQueriesAggregator implements AggregationStrategy {
 	private TokenBuffer addDocument ( TokenBuffer buffer, Exchange exchange ) throws JsonParseException, IOException{
 		Message in = exchange.getIn();
 		InputStream is = in.getBody(InputStream.class);
+		if ( is == null ){
+			return buffer;
+		}
 		ObjectMapper mapper = new ObjectMapper();
 		JsonFactory factory = new JsonFactory();
 	    JsonParser jp = factory.createJsonParser(is);
