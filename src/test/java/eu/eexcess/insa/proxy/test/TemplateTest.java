@@ -50,7 +50,7 @@ public class TemplateTest extends CamelTestSupport {
 			in.setHeader("profileAddressStreet","profileAddressStreet");
 			in.setHeader("profileAddressCity","profileAddressCity");
 			in.setHeader("profileAddressCountry","profileAddressCountry");
-			in.setHeader("profileTopics",new String[] { "topic1", "topic2" });
+			in.setHeader("profileTopics",new String[] { "{\"label\":\"topic1\",\"env\":\"nothing\"}", "{\"label\":\"topic2\",\"env\":\"home\"}" });
 
 		}
 	};
@@ -83,8 +83,8 @@ public class TemplateTest extends CamelTestSupport {
     "},"+
     "\"topics\": ["+
     	 
-    	  "{ \"label\": \"topic1\" },"+
-    	  "{ \"label\": \"topic2\" }"+
+    	  "{ \"label\": \"topic1\" , \"env\":\"nothing\"},"+
+    	  "{ \"label\": \"topic2\" , \"env\":\"home\"}"+
     	
     "]"+
 "}";

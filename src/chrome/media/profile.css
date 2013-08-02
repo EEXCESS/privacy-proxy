@@ -101,3 +101,12 @@
 .inputCountry{
 	width: 500px;
 }
+
+.imgTag{
+  width: 10px;
+  margin-right: 5px;
+  margin-left: -8px;
+  background-color: #fff;
+  border-radius:3px;
+  padding:2px;
+}

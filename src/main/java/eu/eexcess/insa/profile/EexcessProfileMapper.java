@@ -1,13 +1,15 @@
 package eu.eexcess.insa.profile;
 
-import static eu.eexcess.insa.profile.Mapper.fillHeader;
 import static eu.eexcess.insa.profile.Mapper.*;
+
 import java.util.regex.Matcher;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.codehaus.jackson.JsonNode;
+
+import eu.eexcess.insa.commons.Strings;
 
 public class EexcessProfileMapper implements Processor {
 
@@ -131,8 +133,8 @@ public class EexcessProfileMapper implements Processor {
 				
 				int nbTopics = userGivenProfile.path("topics").size();
 				String[] topics = new String[ nbTopics ];
-				for ( int i = 0 ; i < nbTopics ; i ++ ){
-					topics[i] = userGivenProfile.path("topics").get( i ).path("label").getTextValue();
+				for ( int i = 0 ; i < nbTopics ; i++ ){
+					topics[i] = "{\"label\":\""+userGivenProfile.path("topics").get( i ).path("label").getTextValue() + "\",\"env\":\""+userGivenProfile.path("topics").get( i ).path("env").getTextValue()+"\",\"source\":\"eexcess\"}";
 				}
 				fillHeader(in, "profileTopics" , topics);
 			}
