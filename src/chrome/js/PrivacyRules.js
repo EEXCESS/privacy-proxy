@@ -2,6 +2,13 @@ var privacy = privacy || {
 	version: "1.0"
 };
 
+/*
+ * Example : raw date is 1992-6-3
+ * level 0 : "nothing" 
+ * level 1 : {"decade": "20"}
+ * level 2 : {"age": "21 years"}
+ * level 3 : {"date": "1992-6-3"}
+ */
 privacy.birthdate = {
 	levels: 4,
 	apply: function (raw, level) {
@@ -24,23 +31,152 @@ privacy.birthdate = {
 			return "nothing";
 			break;
 		case 1:
-			return(age - age%10+'\'s');
+			return ('{"decade":"'+(age - age%10)+'"}');
 			break;
 		case 2:
-			return(age + 'years');
+			return ('{"age":"'+ age + ' years"}');
 			break;
 		case 3:
-			return raw;
+			return ('{"date":"'+ raw + '"}');
 			break;
+		default :
+			return ('{"date":"'+ raw + '"}');
+			break;
+			
 		};
 	}
 }
 
+/* Example : raw email is : "toto@domain.com"
+ * level 0 : "nothing"
+ * level 1 : "toto@domain.com"
+ */
+privacy.email = {
+		levels:2,
+		apply: function (raw, level) {
+			if( level == 0){
+				return "nothing";
+			}
+			else if ( level ==1 ){
+				return raw;
+			}
+			else{
+				return raw;
+			}
+		}	
+}
+
+/* Example : raw email is : "Mister"
+ * level 0 : "nothing"
+ * level 1 : "Mister"
+ */
+privacy.title = {
+		levels:2,
+		apply: function (raw, level) {
+			if( level == 0){
+				return "nothing";
+			}
+			else if ( level ==1 ){
+				return raw;
+			}
+			else{
+				return raw;
+			}
+		}	
+}
+
+
+/* Example : raw gender is : "Male"
+ * level 0 : "nothing"
+ * level 1 : "Male"
+ */
+privacy.gender = {
+		levels:2,
+		apply: function (raw, level) {
+			if( level == 0){
+				return "nothing";
+			}
+			else if ( level ==1 ){
+				return raw;
+			}
+			else{
+				return raw;
+			}
+		}	
+}
+
+
+/* Example : raw address is : {
+ * 								"lattitude": "41.785110",
+ * 								"longitude": "23.889504",
+ * 								"street": "4 streetname Street",
+ * 								"postalcode": "48960",
+ * 								"city": "CityTown",
+ * 								"district": "Bigger City's urban region",
+ * 								"region": "RegionName",
+ * 								"country": "United-Kingdom"
+ * 								}
+ * level 0 : "nothing"
+ * level 1 : {
+ * 				"country": "United-Kingdom"
+ * 			}
+ * level 2 : {
+ * 				"region": "RegionName",
+ * 				"country": "United-Kingdom"
+ * 			}
+ * level 3 : {
+ * 				"district": "Bigger City's urban region",
+ * 				"region": "RegionName",
+ * 				"country": "United-Kingdom"
+ * 			}
+ * level 4 : {
+ * 				"postalcode": "48960",
+ * 				"city": "CityTown",
+ * 				"district": "Bigger City's urban region",
+ * 				"region": "RegionName",
+ * 				"country": "United-Kingdom"
+ * 			}
+ * level 5 : {
+ * 				"lattitude": "41.785110",
+ * 				"longitude": "23.889504",
+ * 				"street": "4 streetname Street",
+ * 				"postalcode": "48960",
+ * 				"city": "CityTown",
+ * 				"district": "Bigger City's urban region",
+ * 				"region": "RegionName",
+ * 				"country": "United-Kingdom"
+ * 			}
+ */
+privacy.address = {
+		levels:6,
+		apply: function (raw, level) {
+			jsonRaw = JSON.parse(raw);
+			switch(level){
+			case 0: 
+				return "nothing";
+				break;
+			case 1:
+				return ('{"decade":"'+(age - age%10)+'"}');
+				break;
+			case 2:
+				return ('{"age":"'+ age + ' years"}');
+				break;
+			case 3:
+				return ('{"date":"'+ raw + '"}');
+				break;
+			default :
+				return ('{"date":"'+ raw + '"}');
+				break;
+				
+			};
+		}	
+}
+
 privacy.apply = function(attribute, rawValue, disclosureLevel) {
-	if(privacy[attribute] && privacy[attribute].apply) {
+	if(privacy[attribute] && privacy[attribute].apply && 0<= disclosureLevel && disclosureLevel<privacy[attribute].levels ) {
 		return privacy[attribute].apply(rawValue, disclosureLevel);
 	} else {
-		if(discoluserLevel > 0) {
+		if(disclosureLevel > 0) {
 			return rawValue;
 		} else {
 			return null;

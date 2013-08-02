@@ -13,7 +13,9 @@ import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.script.*;
@@ -59,8 +61,9 @@ public class ApplyPrivacySettingsJS implements Processor{
 	 * @param settings : the privacy settings
 	 * @throws IOException 
 	 * @throws JsonGenerationException 
+	 * @throws ScriptException 
 	 */
-	private void writeNewProfile( JsonNode rootNode, JsonGenerator jg , HashMap<String, Integer> settings) throws JsonGenerationException, IOException{
+	private void writeNewProfile( JsonNode rootNode, JsonGenerator jg , HashMap<String, Integer> settings) throws JsonGenerationException, IOException, ScriptException{
 		jg.writeStartObject();
 		if ( !rootNode.path("hits").isMissingNode()){
 			if(!rootNode.path("hits").path("hits").isMissingNode()){
@@ -85,25 +88,38 @@ public class ApplyPrivacySettingsJS implements Processor{
 						
 						
 						if ( settings.containsKey("email")){
-							if( settings.get("email") == 1 && !userProfile.path("_source").path("email").isMissingNode()){
-								jg.writeStringField("email", userProfile.path("_source").path("email").asText() );
+							if(!userProfile.path("_source").path("email").isMissingNode()){
+								
+								String email = applyPrivacy("email",userProfile.path("_source").path("email").asText(),settings.get("email"));
+								if ( !email.equals("nothing")){
+									jg.writeStringField("email", email );
+								}
+								
 							}
 						}
 						if ( settings.containsKey("gender")){
-							if( settings.get("gender") == 1 && !userProfile.path("_source").path("gender").isMissingNode()){
-								jg.writeStringField("gender", userProfile.path("_source").path("gender").asText() );
+							if(!userProfile.path("_source").path("gender").isMissingNode()){
+								String gender = applyPrivacy("gender",userProfile.path("_source").path("gender").asText(),settings.get("gender"));
+								if ( !gender.equals("nothing")){
+									jg.writeStringField("gender", gender );
+								}
 							}
 						}
 						
 						if ( settings.containsKey("title")){
-							if( settings.get("title") == 1 && !userProfile.path("_source").path("title").isMissingNode()){
-								jg.writeStringField("title", userProfile.path("_source").path("title").asText() );
+							if(!userProfile.path("_source").path("title").isMissingNode()){
+								String title = applyPrivacy("title",userProfile.path("_source").path("title").asText(),settings.get("title"));
+								if ( !title.equals("nothing")){
+									jg.writeStringField("title", title );
+								}
 							}
 						}
 						
-						if ( settings.containsKey("email")){
-							if( settings.get("email") == 1 && !userProfile.path("_source").path("email").isMissingNode()){
-								jg.writeStringField("email", userProfile.path("_source").path("email").asText() );
+						if ( settings.containsKey("geoloc")){
+							if( !userProfile.path("_source").path("geoloc").isMissingNode()){
+								// TODO : see how we store the geolocation ( in the user profile, in the traces ... )
+								//String geoloc = applySettings("geoloc", );
+								
 							}
 						}
 						
@@ -129,6 +145,8 @@ public class ApplyPrivacySettingsJS implements Processor{
 	 * @throws ScriptException
 	 */
 	public String applyPrivacy(String attribute, String rawValue, int disclosureLevel) throws ScriptException {
+		//TODO : check the user given parameters to prevent javascript injection
+		
 		String jsExpr = "privacy.apply('"+attribute+"','"+rawValue+"',"+disclosureLevel+")";
 		Object result = engine.eval(jsExpr);
 		return result.toString();
@@ -170,11 +188,26 @@ public class ApplyPrivacySettingsJS implements Processor{
 		return privacySettings;
 	}
 	
-	public static void main(String[] args) throws ScriptException {
+
+	
+	public static void main(String[] args) throws ScriptException, JsonParseException, JsonMappingException, IOException {
 		ApplyPrivacySettingsJS privacy = new ApplyPrivacySettingsJS();
 		String attribute ="birthdate";
 		String rawValue = "1992-06-03";
-		Integer disclosureLevel = 2;
-		System.out.println(privacy.applyPrivacy(attribute, rawValue, disclosureLevel));
+		Integer disclosureLevel = -1;
+		//InputStream is = exchange.getProperty("user_context-traces", InputStream.class);
+		String is = privacy.applyPrivacy(attribute, rawValue, disclosureLevel);
+		
+		System.out.println(is);
+		if ( !is.equals("nothing")){
+			JsonFactory factory = new JsonFactory();
+			StringWriter sWriter = new StringWriter();
+			JsonGenerator jg = factory.createJsonGenerator(sWriter);
+			//JsonParser jp = factory.createJsonParser(is);
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode jnode = mapper.readTree(is);
+			System.out.println(jnode);
+		}
+		
 	}
 }
