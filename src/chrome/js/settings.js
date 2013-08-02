@@ -1,5 +1,4 @@
 var addressTooltips= {};
-var ageTooltips= {};
 var geolocTooltips= {};
 var tracesTooltips= ["Only the current page will be sent","Your account traces on this computer will be sent","Your account traces on all computers will be sent"];
 
@@ -213,24 +212,6 @@ function doUpdateAge(){
 	}
 	else{
 		var indication = "What will be send: ";
-		var age;
-		var birthY = userInfo.birthdate.split('-')[0];
-		var birthM = userInfo.birthdate.split('-')[1];
-		var birthD = userInfo.birthdate.split('-')[2];
-		
-		var date = new Date();
-		
-		var currentY = date.getFullYear();
-		var currentD = date.getDate();
-		var currentM = date.getMonth()+1;
-		
-		age = currentY-birthY;
-		if((currentM-birthM < 0) || (currentD-birthD < 0)) age - 1;
-		
-		ageTooltips[0] = "nothing";
-		ageTooltips[1] = age - age%10+'\'s';
-		ageTooltips[2] = age + ' years';
-		ageTooltips[3] = userInfo.birthdate;
 		
 		settingsAgeReady();
 	}	
@@ -280,7 +261,7 @@ function addressHoverOut(){
 
 function ageHoverIn(){
 	if ($(this).find(".tooltip-inner").html() == "undefined"){
-		$(this).find(".tooltip-inner").html(ageTooltips[userInfo.privacy.age]);
+		$(this).find(".tooltip-inner").html(granularity("birthdate",userInfo.birthdate,userInfo.privacy.age));
 	}
 	$(this).find(".slider-tip").show();
 }
@@ -300,16 +281,17 @@ function hoverOut(){
 function settingsAgeReady(){
 	
 
+	var ageContent = [granularity("birthdate",userInfo.birthdate,0),granularity("birthdate",userInfo.birthdate,1),granularity("birthdate",userInfo.birthdate,2),granularity("birthdate",userInfo.birthdate,3)];
 	$("#slider").slider({
 		value:userInfo.privacy.age,
 		min: 0,
 		max: 3,
 		step: 1,
 		create:function(){
-			$("#fullAge").html(ageTooltips[3]);
-			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + ageTooltips[userInfo.privacy.age] + '</div></div>');
+			$("#fullAge").html(granularity("birthdate",userInfo.birthdate,3));
+			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + granularity("birthdate",userInfo.birthdate,userInfo.privacy.age) + '</div></div>');
 			$(this).find(".slider-tip").hide();
-			$("#list_settings").find(".birthdate span").html(ageTooltips[userInfo.privacy.age]);
+			$("#list_settings").find(".birthdate span").html(granularity("birthdate",userInfo.birthdate,userInfo.privacy.age));
 			if(userInfo.privacy.age == 0){
 				$(this).find('.tooltip-inner').css("margin-left","85px");
 				$(this).find('.tooltip-arrow').css("margin-left","-52px");
@@ -333,13 +315,13 @@ function settingsAgeReady(){
 				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
 			}
 			userInfo.privacy.age = ui.value;
-			$("#list_settings").find(".birthdate span").html(ageTooltips[userInfo.privacy.age]);
-			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(ageTooltips[userInfo.privacy.age]);
+			$("#list_settings").find(".birthdate span").html(granularity("birthdate",userInfo.birthdate,userInfo.privacy.age));
+			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(granularity("birthdate",userInfo.birthdate,userInfo.privacy.age));
 		},
 		stop: function(){
 			$(".slider-tip").hide();
 		}
-	}).addSliderSegments(4,ageTooltips);
+	}).addSliderSegments(4,ageContent);
 }
 
 function settingsAddressReady(){
