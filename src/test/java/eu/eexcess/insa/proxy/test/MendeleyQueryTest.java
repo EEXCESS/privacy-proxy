@@ -28,7 +28,7 @@ public class MendeleyQueryTest extends CamelTestSupport {
     @Test
     public void testSendMatchingMessage() throws Exception {
     	String expected = "";
-		final InputStream testBody= ClassLoader.getSystemResourceAsStream("data/mendeleyQueryTest_InputBody.json");
+		final InputStream testProfile= ClassLoader.getSystemResourceAsStream("data/userProfile.json");
         
 		Exchange resp = template.send("direct:recommend.mendeley", new Processor() {
 			public void process(Exchange exchange) throws Exception {
