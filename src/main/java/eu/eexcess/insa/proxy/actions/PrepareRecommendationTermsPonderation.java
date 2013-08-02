@@ -45,13 +45,20 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	
 	
 	/**
-	 * Takes a user context
+	 * Takes a user context to produce
 	 * a list of terms with coefficients
 	 * 
 	 * @see org.apache.camel.Processor#process(org.apache.camel.Exchange)
 	 */
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
+		
+		String traces = exchange.getProperty("user_context-traces",String.class);
+		String userProfile = exchange.getProperty("user_context-profile",String.class);
+		
+		System.out.println("traces : \n"+traces);
+		System.out.println("profil : \n"+userProfile);
+		
 		
 		InputStream isTraces = exchange.getProperty("user_context-traces",InputStream.class);
 		//String isTraces = exchange.getProperty("user_context-traces",String.class);
@@ -119,7 +126,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 		if ( !rootNode.path("hits").isMissingNode()){
 			if(!rootNode.path("hits").path("hits").isMissingNode()){
 				if( rootNode.path("hits").path("hits").get(0) != null){
-					if(!rootNode.path("hits").path("hits").get(0).path("_source").isMissingNode())
+					if(!rootNode.path("hits").path("hits").get(0).path("_source").isMissingNode()){
 						if(!rootNode.path("hits").path("hits").get(0).path("_source").path("topics").isMissingNode()){
 							
 							JsonNode topicsNode = rootNode.path("hits").path("hits").get(0).path("_source").path("topics");
@@ -128,6 +135,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 								topics.add(it.next().path("label").asText());
 							}
 						}
+					}
 				}
 			}
 		}

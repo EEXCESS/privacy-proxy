@@ -195,24 +195,31 @@ public class APIService extends RouteBuilder  {
 			 * 
 			 */
 			from("direct:recommend")
-				.process(prepLastTen)  //this sets the user_id exchange property
-				//.log("${in.body}")
+				.process(prepLastTen)  //this sets the user_id and pugin_uuid exchange properties
+				
+				// we need to get the user context
+				  // we get the user's profile
+				.to("direct:get.user.data")
+				.setProperty("user_context-profile",simple("${in.body}", String.class))
+			    // filter the user context following the privacy settings
+				
+				// we get the last traces
 				.setHeader("ElasticType").constant("trace")
 				.setHeader("ElasticIndex").constant("privacy")
 				.to("direct:elastic.userSearch")
-				//.log("${in.body}")
 				.setProperty("user_context-traces",simple("${in.body}", String.class))
-				.to("direct:get.user.data")
-				.setProperty("user_context-profile",simple("${in.body}", String.class))
 				
+				
+				
+				// user's context is used to prepare a query
 				.process(prepPonderation)
-				//.log("${in.body}")
 				.setHeader("origin").simple("exchangeId")
 				.multicast().aggregationStrategy(new RecomendationResultAggregator())
 					.parallelProcessing().timeout(3800L)
 					.to("direct:recommend.econbiz","direct:recommend.mendeley")
 					
 				.end()
+				.to("log:aggregation complete")
 				.unmarshal().string("UTF-8")
 			    .unmarshal(new JsonXMLDataFormat())
 			    //.wireTap("file:///tmp/econbiz/?fileName=example.xml")
@@ -240,11 +247,20 @@ public class APIService extends RouteBuilder  {
 			 * 
 			 */
 			from("direct:recommend.mendeley")
-			    .process(prepMendeleyQuery)
-			    .recipientList().header("QueryEndpoint")
+				.onException(HttpOperationFailedException.class)
+					.handled(true)    /// a changer  (detruit tout l'exchange ?)
+					//.continued(true)
+					//.to("string-template:templates/empty-results.tm")
+					//.to("log:Mendeley.recommendation.httpexception?showAll=true")
+				.end()
+			    
+		    	.process(prepMendeleyQuery)
+				.recipientList().header("QueryEndpoint")
 			    .process(prepDocumentSearch)
 			    .recipientList(header("QueryEndPoint").tokenize(",")).aggregationStrategy(new MendeleyQueriesAggregator())
 			    .process(closeJson)
+			    .to("log:ex1.1?showAll=true")
+
 			    
 			;
 			
