@@ -5,24 +5,20 @@ var privacy = privacy || {
 privacy.birthdate = {
 	levels: 4,
 	apply: function (raw, level) {
-		return "nothing yet";
+		
 	}
 }
 
 privacy.apply = function(attribute, rawValue, disclosureLevel) {
-	var result = "";
-	
 	if(privacy[attribute] && privacy[attribute].apply) {
-		result = privacy[attribute].apply(rawValue, disclosureLevel);
+		return privacy[attribute].apply(rawValue, discoluserLevel);
 	} else {
-		if(disclosureLevel > 0) {
-			result =  rawValue;
+		if(discoluserLevel > 0) {
+			return rawValue;
 		} else {
-			result = null;
+			return null;
 		}
 	}
-	java.lang.System.out.println("Privacy for "+attribute+" ("+rawValue+") = "+result);
-	return result;
 }
 
 
