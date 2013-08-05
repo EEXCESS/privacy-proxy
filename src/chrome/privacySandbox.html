@@ -1,131 +1,193 @@
-<div class="todo mrm span4" >
-	<div class="todo-search headerTraces" id="privacySettingsHeader">
-		<h1>Privacy Settings</h1>
-		<button class="btn btn-primary submitSetting" id="sandboxSubmitButton">Submit this setting</button>
-	</div>
-	<ul id="list_settings">
-		<li id="emailSetting">
-			<div class="emailInfo">
-				<h4 class="email">Email : <span class="effective_data"></span></h4>
-				<p id="fullEmail" class="fullInfo">
-				</p>
-				<div class="switch-animate toggle">
-					<div class="switch has-switch emailSwitch">
-						<div class="switch-animate switch-email switch-off" style="">
-							<input type="checkbox" data-toggle="switch" id="emailPrivacy">
-							<span class="switch-left privacyToggleLeft">Show</span>
-							<label class="privacyToggle" for="emailPrivacy">&nbsp;</label>
-							<span class="switch-right privacyToggleRight">Hide</span>
+<html>
+	<head>
+		<meta charset = "utf-8">
+		<!-- <link rel="stylesheet" type="text/css" href="main.css"> -->
+
+		    <!-- Loading Bootstrap -->
+   		 <link href="flat_ui/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+	 	   <!-- Loading Flat UI -->
+	    <link href="flat_ui/css/flat-ui.css" rel="stylesheet">
+	    <link href="media/traces.css" rel="stylesheet">
+	    <link href="media/profile.css" rel="stylesheet">
+		<link href="media/settings.css" rel="stylesheet">
+		<link href="media/sandbox.css" rel="stylesheet">
+		
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<a href="http://www.eexcess.eu/" target="_blank"><img src="media/logo.jpg" /></a>
+			</div>              
+			<div class="row demo-samples">
+				<ul class="nav nav-tabs" id="myTab">
+	  				<li><a href="#traces" data-toggle="tab" class="tabTraces">Traces</a></li>
+					<li><a data-toggle="tab" class="tabProfile">Profile</a></li>
+					<!--<li><a href="#settings" data-toggle="tab">Settings</a></li> -->
+					<li class="active"><a href="#sandbox" data-toggle="tab">Privacy Sandbox</a></li>
+				</ul>
+				<div class="span12">
+					<div class="tab-content">
+						<div class="tab-pane" id="traces">
+
 						</div>
-					</div>
-				</div>
-				
-			</div>
-		</li>
-		<li id="genderSetting" style="display:none">
-			<div class="genderInfo">
-				<h4 class="gender">Gender: <span class="effective_data"></span></h4>
-				<p id="fullGender" class="fullInfo">
-				</p>
-				<div class="switch-animate toggle">
-					<div class="switch has-switch genderSwitch">
-						<div class="switch-animate switch-gender switch-off" style="">
-							<input type="checkbox" data-toggle="switch" id="genderPrivacy">
-							<span class="switch-left privacyToggleLeft">Show</span>
-							<label class="privacyToggle" for="genderPrivacy">&nbsp;</label>
-							<span class="switch-right privacyToggleRight">Hide</span>
+						<div class="tab-pane" id="profile">
 						</div>
-					</div>
-				</div>
-				
-			</div>
-		</li>
-		<li id="titleSetting" style="display:none">
-			<div class="titleInfo">
-				<h4 class="title">Title : <span class="effective_data"></span></h4>
-				<p id="fullTitle" class="fullInfo">
-				</p>
-				<div class="switch-animate toggle">
-					<div class="switch has-switch titleSwitch">
-						<div class="switch-animate switch-title switch-off" style="">
-							<input type="checkbox" data-toggle="switch" id="titlePrivacy">
-							<span class="switch-left privacyToggleLeft">Show</span>
-							<label class="privacyToggle" for="titlePrivacy">&nbsp;</label>
-							<span class="switch-right privacyToggleRight">Hide</span>
-						</div>
-					</div>
-				</div>
-				
-			</div>
-		</li>
-		<li id="ageSetting">
-			<div class="ageInfo">
-				<h4 class="birthdate">Birthdate : <span class="effective_data"></span></h4>
-				<p id="fullAge" class="fullInfo">
-				</p>
-				<div id="slider"></div>
-				
-			</div>
-		</li>
-		<li id="addressSetting">
-			<div class="addressInfo">
-				<h4 class="street">Address : <span class="effective_data"></span></h4>
-				<p id="fullAddress" class="fullInfo">
-				</p>
-				<!--<h4 class="city">City</h4>
-				<h4 class="country">Country</h4> -->
-				<div id="sliderAddress"></div>	
+						<div class="tab-pane active" id="sandbox">	
+							<div class="todo mrm span4" >
+								<div class="todo-search headerTraces" id="privacySettingsHeader">
+									<h1>Privacy Settings</h1>
+									<button class="btn btn-primary submitSetting" id="sandboxSubmitButton">Submit this setting</button>
+								</div>
+								<ul id="list_settings">
+									<li id="emailSetting">
+										<div class="emailInfo">
+											<h4 class="email">Email : <span class="effective_data"></span></h4>
+											<p id="fullEmail" class="fullInfo">
+											</p>
+											<div class="switch-animate toggle">
+												<div class="switch has-switch emailSwitch">
+													<div class="switch-animate switch-email switch-off" style="">
+														<input type="checkbox" data-toggle="switch" id="emailPrivacy">
+														<span class="switch-left privacyToggleLeft">Show</span>
+														<label class="privacyToggle" for="emailPrivacy">&nbsp;</label>
+														<span class="switch-right privacyToggleRight">Hide</span>
+													</div>
+												</div>
+											</div>
+											
+										</div>
+									</li>
+									<li id="genderSetting" style="display:none">
+										<div class="genderInfo">
+											<h4 class="gender">Gender: <span class="effective_data"></span></h4>
+											<p id="fullGender" class="fullInfo">
+											</p>
+											<div class="switch-animate toggle">
+												<div class="switch has-switch genderSwitch">
+													<div class="switch-animate switch-gender switch-off" style="">
+														<input type="checkbox" data-toggle="switch" id="genderPrivacy">
+														<span class="switch-left privacyToggleLeft">Show</span>
+														<label class="privacyToggle" for="genderPrivacy">&nbsp;</label>
+														<span class="switch-right privacyToggleRight">Hide</span>
+													</div>
+												</div>
+											</div>
+											
+										</div>
+									</li>
+									<li id="titleSetting" style="display:none">
+										<div class="titleInfo">
+											<h4 class="title">Title : <span class="effective_data"></span></h4>
+											<p id="fullTitle" class="fullInfo">
+											</p>
+											<div class="switch-animate toggle">
+												<div class="switch has-switch titleSwitch">
+													<div class="switch-animate switch-title switch-off" style="">
+														<input type="checkbox" data-toggle="switch" id="titlePrivacy">
+														<span class="switch-left privacyToggleLeft">Show</span>
+														<label class="privacyToggle" for="titlePrivacy">&nbsp;</label>
+														<span class="switch-right privacyToggleRight">Hide</span>
+													</div>
+												</div>
+											</div>
+											
+										</div>
+									</li>
+									<li id="ageSetting">
+										<div class="ageInfo">
+											<h4 class="birthdate">Birthdate : <span class="effective_data"></span></h4>
+											<p id="fullAge" class="fullInfo">
+											</p>
+											<div id="slider"></div>
+											
+										</div>
+									</li>
+									<li id="addressSetting">
+										<div class="addressInfo">
+											<h4 class="street">Address : <span class="effective_data"></span></h4>
+											<p id="fullAddress" class="fullInfo">
+											</p>
+											<!--<h4 class="city">City</h4>
+											<h4 class="country">Country</h4> -->
+											<div id="sliderAddress"></div>	
+														
+										</div>
+									</li>
+									<li id="geolocSetting">
+										<div class="geolocInfo">
+											<h4 class="geoloc">Geolocation : <span class="effective_data"></span></h4>
+											<p id="fullGeoloc" class="fullInfo">
+											</p>
+											<div id="sliderGeoloc"></div>	
+													
+										</div>
+									</li>
+									<li id="tracesSetting">
+										<div class="tracesInfo">
+											<h4 class="traces">Traces to send : <span class="effective_data"></span></h4>
+											<p id="fullTraces" class="fullInfo">
+											</p>
+											<div id="sliderTraces"></div>
+										</div>
+										
+									</li>
+								</ul>
+							</div>
 							
-			</div>
-		</li>
-		<li id="geolocSetting">
-			<div class="geolocInfo">
-				<h4 class="geoloc">Geolocation : <span class="effective_data"></span></h4>
-				<p id="fullGeoloc" class="fullInfo">
-				</p>
-				<div id="sliderGeoloc"></div>	
-						
-			</div>
-		</li>
-		<li id="tracesSetting">
-			<div class="tracesInfo">
-				<h4 class="traces">Traces to send : <span class="effective_data"></span></h4>
-				<p id="fullTraces" class="fullInfo">
-				</p>
-				<div id="sliderTraces"></div>
-			</div>
-			
-		</li>
-	</ul>
-</div>
-
-<div class="todo mrm span7">
-	<div class="todo-search headerTraces">
-		<h1 style="display:inline">Recommendations</h1>
-		
-		<ul>
-		
-		
-			<ul class="resultsTitle">
-				<li class="resultsTitle">
-					<h3 class="resultsTitle">Results</h3>
-				</li>
-			</ul>
-			<div id="recommendationDisplay">
-			<li id="recommendationBlock">
-			
-				
-				<div id="results">
+							<div class="todo mrm span7">
+								<div class="todo-search headerTraces">
+									<h1 style="display:inline">Recommendations</h1>
+									
+									<ul>
+									
+									
+										<ul class="resultsTitle">
+											<li class="resultsTitle">
+												<h3 class="resultsTitle">Results</h3>
+											</li>
+										</ul>
+										<div id="recommendationDisplay">
+										<li id="recommendationBlock">
+										
+											
+											<div id="results">
+											</div>
+										</li>
+									</div>
+										
+										<li class="querySandbox">
+											<h3>Query</h3>
+											<p id="recommendation_query">
+											</p>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
-			</li>
+			</div>
 		</div>
-			
-			<li class="querySandbox">
-				<h3>Query</h3>
-				<p id="recommendation_query">
-				</p>
-			</li>
-		</ul>
-		</div>
-</div>
-
+		<script src="lib/md5.js"></script>
+		<script src="flat_ui/js/jquery-1.8.3.min.js"></script>
+		<script src="lib/jquery-ui-1.10.3.custom.min.js"></script>
+		<script src="js/PrivacyRules.js"></script>
+		<script type="text/javascript" src="js/settings.js"></script>
+		<script src="flat_ui/js/jquery.ui.touch-punch.min.js"></script>
+		<script src="flat_ui/js/bootstrap.min.js"></script>
+		<script src="flat_ui/js/bootstrap-select.js"></script>
+		<script src="flat_ui/js/bootstrap-switch.js"></script>
+		<script src="flat_ui/js/flatui-checkbox.js"></script>
+		<script src="flat_ui/js/flatui-radio.js"></script>
+		<script src="flat_ui/js/jquery.tagsinput.js"></script>
+		<script src="flat_ui/js/jquery.placeholder.js"></script>
+		<script src="flat_ui/js/jquery.stacktable.js"></script>
+		<script src="flat_ui/js/application.js"></script>
+		<script src="lib/jquery.jsonview.js"></script>
+		<script src="js/profile.js"></script>
+		<script src="js/PrivacySandbox.js"></script>
+		<script type="text/javascript" src="js/import_traces.js"></script>
+	</body>
+</html>
+							

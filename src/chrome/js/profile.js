@@ -223,7 +223,6 @@ function doToggleTopics() {
 			for(var i=0;i<userInfo.topics.length;i++){
 				if(userInfo.topics[i]!=undefined){
 					if($('span[name=\"'+userInfo.topics[i].label+'\"]').size()== 0){
-						alert(JSON.stringify(userInfo.topics[i]));
 						displayTopics(userInfo.topics[i].label,userInfo.topics[i].env,userInfo.topics[i].source);
 					}
 				}
@@ -361,8 +360,8 @@ function updateAddress(){
 			userInfo.address["postalcode"] = $('.inputPostalcode').val();
 			userInfo.address["city"] = $('.inputCity').val();
 			userInfo.address["country"] = $('.inputCountry').val();
-			userInfo.address["region"] = reponse.postalcodes[0].adminName1;
-			userInfo.address["district"] = reponse.postalcodes[0].adminName3;
+			userInfo.address["region"] = response.postalcodes[0].adminName1;
+			userInfo.address["district"] = response.postalcodes[0].adminName3;
 			userInfo.address["country"] = $('.inputCountry').val();
 			
 			var userDataJSON = JSON.stringify(userInfo);
@@ -433,7 +432,7 @@ function updateTopics(){
 	var tags = document.getElementsByClassName("tag");
 	for(var i=0; i<tags.length;i++){
 		var env = tags[i].parentNode.id;
-		env = env.split("_")[2];
+		env = env.split("_")[0];
 		values[i]={label:tags[i].innerText,env:env};
 	}
 	userInfo.topics=values;
@@ -505,19 +504,55 @@ function doRemoveTag(){
 }
 
 function displayTopics( topic,env,source ){
+	/*alert("."+env+"_tagsinput");
+	$("."+env+"_tagsinput").addTag(topic);*/
+	
 	var newTag = document.createElement('span');
 	newTag.setAttribute('class','tag');
+	newTag.setAttribute('draggable',true);
+	newTag.setAttribute('id',topic);
 	newTag.setAttribute('name',topic);
 	var innerSpan = document.createElement('span');
-	document.getElementById('tagsinput_tag_'+env).value="";
+	$("."+env+"_tagsinput").value="";
 	innerSpan.innerHTML="";
 	if (source == "eexcess") innerSpan.innerHTML='<img class="imgTag" src="media/icon.png">';
 	innerSpan.innerHTML+=topic+'<a class="tagsinput-remove-link"></a>';
 	newTag.appendChild(innerSpan);
-	document.getElementById('tagsinput_tagsinput_'+env).insertBefore(newTag,document.getElementById('tagsinput_addTag_'+env));
+	document.getElementById(env+'_tagsinput').insertBefore(newTag,document.getElementById(env+'_tagsinput').firstChild);
+	
+}
+
+function drag(){
+	event.dataTransfer.setData("Text", this.id);
+}
+
+function drop() {
+	var id = event.dataTransfer.getData("Text");
+	this.insertBefore(document.getElementById(id),this.firstChild);
+	event.preventDefault();
+}
+
+function dragover(){
+	return false;
+}
+
+function newtag(){
+	alert('test');
 }
 
 $(document).ready(function(){
+	
+	var docUrl = $(document)[0].URL;
+	var pluginUrl = docUrl.split('/')[0]+"//"+docUrl.split('/')[2]+'/';
+	
+	$('.tabTraces').live("click",function(){document.location = pluginUrl+"traces.html"});
+	$('.tabSettings').live("click",function(){document.location = pluginUrl+"privacySandbox.html"});
+
+	$('.nothing_tagsinput').live("addTag",newtag);
+	
+	$('.tag').live("dragstart",drag);
+	$('.tagsinput').live("drop",drop).live("dragover",dragover);
+	
 	$('.emailHandle').live("click",doToggleEmail);
 	$('.titleHandle').live("click",doToggleTitle);
 	$('.lastnameHandle').live("click",doToggleLastname);
@@ -542,6 +577,11 @@ $(document).ready(function(){
 	$('.submitAddress').live("click",updateAddress);
 	$('.submitTopics').live("click",updateTopics);
 
+	$('.mytagbuckets').tagsInput({
+		onAddTag: function() {
+			alert("yeah");
+		}
+	});
 
 });
 

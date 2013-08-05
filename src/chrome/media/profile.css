@@ -110,3 +110,41 @@
   border-radius:3px;
   padding:2px;
 }
+.tagsinput-remove-link {
+  width: auto;
+}
+.tagsinput{
+  height: 35% !important;
+}
+#tagsinput_tag_nothing{
+  border-radius: 3px;
+  padding: 5px;
+  border: 2px #d6dbdf solid !important;
+}
+#tagsinput_tag_work{
+  border-radius: 3px;
+  padding: 5px;
+  border: 2px #d6dbdf solid !important;
+}
+#tagsinput_tag_home{
+  border-radius: 3px;
+  padding: 5px;
+  border: 2px #d6dbdf solid !important;
+}
+#tagsinput_tag_all{
+  border-radius: 3px;
+  padding: 5px;
+  border: 2px #d6dbdf solid !important;
+}
+#nothing_tag{
+  width: 80px !important;
+}
+#home_tag{
+  width: 80px !important;
+}
+"work_tag{
+  width: 80px !important;
+}
+#all_tag{
+  width: 80px !important;
+}

@@ -444,6 +444,15 @@ function settingsTracesReady(){
 
 $(document).ready(function(){
 	
+	var docUrl = $(document)[0].URL;
+	var pluginUrl = docUrl.split('/')[0]+"//"+docUrl.split('/')[2]+'/';
+	
+	$('.tabTraces').live("click",function(){document.location = pluginUrl+"traces.html"});
+	$('.tabProfile').live("click",function(){document.location = pluginUrl+"profile.html"});
+	
+	initSandbox();
+	initUserInfo();
+	
 	$('.ui-slider-segment').live("mouseenter",hoverIn).live("mouseleave",hoverOut);
 	
 	$("#slider").find(".ui-slider-handle").live("mouseenter",ageHoverIn).live("mouseleave",ageHoverOut);
