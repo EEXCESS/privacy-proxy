@@ -350,30 +350,41 @@ function updateAddress(){
 	
 	userInfo["address"] = {};
 	
-	userInfo.address["street"] = $('.inputStreet').val();
-	userInfo.address["postalcode"] = $('.inputPostalcode').val();
-	userInfo.address["city"] = $('.inputCity').val();
-	userInfo.address["country"] = $('.inputCountry').val();
-
-	var userDataJSON = JSON.stringify(userInfo);
+	url = "http://api.geonames.org/postalCodeLookupJSON?postalcode="+$('.inputPostalcode').val()+"&country=FR&username=eexcess.insa";
 	
 	$.ajax({
-	   url: "http://localhost:12564/api/v0/users/data",
-	   type: "POST",
-	   contentType: "application/json;charset=UTF-8",
-	   data: userDataJSON,
-	   beforeSend: function (request)
-       {
-           request.setRequestHeader("traceid", idUser);
-       },
-	   complete: function(response) {
-		    $(".streetTitle").html("Address: " + userInfo.address.street);
-			$(".cityTitle").html(userInfo.address.postalcode+" "+userInfo.address.city);
-			$(".countryTitle").html(userInfo.address.country);
-			$('.stateAddress').html("Changes saved");
+	   url: url,
+	   type: "GET",
+	   contentType: "text/json;charset=UTF-8",
+	   success: function(response) {
+			userInfo.address["street"] = $('.inputStreet').val();
+			userInfo.address["postalcode"] = $('.inputPostalcode').val();
+			userInfo.address["city"] = $('.inputCity').val();
+			userInfo.address["country"] = $('.inputCountry').val();
+			userInfo.address["region"] = reponse.postalcodes[0].adminName1;
+			userInfo.address["district"] = reponse.postalcodes[0].adminName3;
+			userInfo.address["country"] = $('.inputCountry').val();
+			
+			var userDataJSON = JSON.stringify(userInfo);
+			
+			$.ajax({
+			   url: "http://localhost:12564/api/v0/users/data",
+			   type: "POST",
+			   contentType: "application/json;charset=UTF-8",
+			   data: userDataJSON,
+			   beforeSend: function (request)
+			   {
+			       request.setRequestHeader("traceid", idUser);
+			   },
+			   complete: function(response) {
+				    $(".streetTitle").html("Address: " + userInfo.address.street);
+					$(".cityTitle").html(userInfo.address.postalcode+" "+userInfo.address.city);
+					$(".countryTitle").html(userInfo.address.country);
+					$('.stateAddress').html("Changes saved");
+			   }
+			});
 	   }
-	});
-	
+	});	
 }
 
 function doUpdate(field){

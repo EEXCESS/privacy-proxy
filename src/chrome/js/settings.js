@@ -115,30 +115,8 @@ function triggerUpdateAddress(){
 		$('#addressSetting').hide();
 	}
 	else{
-	
-		url = "http://api.geonames.org/postalCodeLookupJSON?postalcode="+userInfo.address.postalcode+"&country=FR&username=eexcess.insa";
-			
-		$.ajax({
-		   url: url,
-		   type: "GET",
-		   contentType: "text/json;charset=UTF-8",
-		   success: function(response) {
-			   doUpdateAddress(response);
-		   }
-		});
+		settingsAddressReady()
 	}
-}
-
-function doUpdateAddress(geoname){
-	
-	addressTooltips[0] = "nothing";
-	addressTooltips[1] = userInfo.address.country;
-	addressTooltips[2] = geoname.postalcodes[0].adminName1;
-	addressTooltips[3] = geoname.postalcodes[0].adminName3;
-	addressTooltips[4] = userInfo.address.city;
-	addressTooltips[5] = userInfo.address.street +", "+userInfo.address.postalcode+" "+ userInfo.address.city+", "+userInfo.address.country;
-	
-	settingsAddressReady();
 }
 
 

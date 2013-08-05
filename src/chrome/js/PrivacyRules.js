@@ -27,12 +27,19 @@ privacy.birthdate = {
 			return(age - age%10+'\'s');
 			break;
 		case 2:
-			return(age + 'years');
+			return(age + ' years');
 			break;
 		case 3:
 			return raw;
 			break;
 		};
+	}
+}
+
+privacy.address = {
+	levels: 6,
+	apply: function(raw,level){
+		
 	}
 }
 
