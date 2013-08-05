@@ -1,0 +1,68 @@
+var privacy = privacy || {
+	version: "1.0"
+};
+
+/*
+ * Example : raw date is 1992-6-3
+ * level 0 : "nothing" 
+ * level 1 : {"decade": "20"}
+ * level 2 : {"age": "21 years"}
+ * level 3 : {"date": "1992-6-3"}
+ */
+privacy.birthdate = {
+	levels: 4,
+	apply: function (raw, level) {
+		var age;
+		var birthY = raw.split('-')[0];
+		var birthM = raw.split('-')[1];
+		var birthD = raw.split('-')[2];
+		
+		var date = new Date();
+		
+		var currentY = date.getFullYear();
+		var currentD = date.getDate();
+		var currentM = date.getMonth()+1;
+		
+		age = currentY-birthY;
+		if((currentM-birthM < 0) || (currentD-birthD < 0)) age - 1;
+		
+		switch(level){
+		case 0: 
+			return "nothing";
+			break;
+		case 1:
+			return ('{"decade":"'+(age - age%10)+'"}');
+			break;
+		case 2:
+			return ('{"age":"'+ age + ' years"}');
+			break;
+		case 3:
+			return ('{"date":"'+ raw + '"}');
+			break;
+		default :
+			return ('{"date":"'+ raw + '"}');
+			break;
+			
+		};
+	}
+}
+
+privacy.apply = function(attribute, rawValue, disclosureLevel) {
+	if(privacy[attribute] && privacy[attribute].apply && 0<= disclosureLevel && disclosureLevel<privacy[attribute].levels ) {
+		return privacy[attribute].apply(rawValue, disclosureLevel);
+	} else {
+		if(disclosureLevel > 0) {
+			return rawValue;
+		} else {
+			return null;
+		}
+	}
+}
+
+
+/*
+ * Example:
+ *    privacy.apply("birthdate", "1992-06-03", 1) 
+ *    should output  "20's"
+ *    
+ */
