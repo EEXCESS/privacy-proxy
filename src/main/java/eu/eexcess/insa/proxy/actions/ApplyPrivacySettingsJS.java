@@ -27,7 +27,11 @@ public class ApplyPrivacySettingsJS implements Processor{
 		engine = factory.getEngineByName("JavaScript");
 		engine.eval(new InputStreamReader(privacyJS));
 	}
-
+	
+	/* all of the privacy settings are stored as a hashmap into an exchange property ("privacy_settings")
+	 * (non-Javadoc)
+	 * @see org.apache.camel.Processor#process(org.apache.camel.Exchange)
+	 */
 	public void process(Exchange exchange) throws Exception {
 		// foreach attribute for which we have privacy settings do
 		// applyPrivacy(...) and replace value with output
@@ -41,12 +45,15 @@ public class ApplyPrivacySettingsJS implements Processor{
 	    
 	    
 	    HashMap<String,Integer> privacySettings = getPrivacySettings(rootNode);
+	    // the privacy settings are stored for later use ( filter the traces etc )
+	    exchange.setProperty("privacy_settings", privacySettings);
 	    
 	    StringWriter sWriter = new StringWriter();
 	    JsonGenerator jg = factory.createJsonGenerator(sWriter);
 	    
 	    writeNewProfile( rootNode, jg, privacySettings);
 		
+	    exchange.setProperty("user_context-traces", sWriter.toString());
 		
 		
 		
@@ -87,8 +94,8 @@ public class ApplyPrivacySettingsJS implements Processor{
 					if( !userProfile.path("_source").isMissingNode()){
 						
 						
-						if ( settings.containsKey("email")){
-							if(!userProfile.path("_source").path("email").isMissingNode()){
+						if ( !userProfile.path("_source").path("email").isMissingNode()){
+							if( settings.containsKey("email") ){
 								
 								String email = applyPrivacy("email",userProfile.path("_source").path("email").asText(),settings.get("email"));
 								if ( !email.equals("nothing")){
@@ -96,32 +103,58 @@ public class ApplyPrivacySettingsJS implements Processor{
 								}
 								
 							}
+							else{
+								String email = applyPrivacy("email",userProfile.path("_source").path("email").asText(),(Integer)this.engine.eval("privacy.email.levels")-1);
+								if ( !email.equals("nothing")){
+									jg.writeStringField("email", email );
+								}
+							}
 						}
-						if ( settings.containsKey("gender")){
-							if(!userProfile.path("_source").path("gender").isMissingNode()){
+						if ( !userProfile.path("_source").path("gender").isMissingNode() ){
+							if( settings.containsKey("gender") ){
 								String gender = applyPrivacy("gender",userProfile.path("_source").path("gender").asText(),settings.get("gender"));
+								if ( !gender.equals("nothing")){
+									jg.writeStringField("gender", gender );
+								}
+							}
+							else{
+								String gender = applyPrivacy("gender",userProfile.path("_source").path("gender").asText(),(Integer)this.engine.eval("privacy.gender.levels")-1);
 								if ( !gender.equals("nothing")){
 									jg.writeStringField("gender", gender );
 								}
 							}
 						}
 						
-						if ( settings.containsKey("title")){
-							if(!userProfile.path("_source").path("title").isMissingNode()){
+						if ( !userProfile.path("_source").path("title").isMissingNode() ){
+							if( settings.containsKey("title") ){
 								String title = applyPrivacy("title",userProfile.path("_source").path("title").asText(),settings.get("title"));
 								if ( !title.equals("nothing")){
 									jg.writeStringField("title", title );
 								}
 							}
-						}
-						
-						if ( settings.containsKey("geoloc")){
-							if( !userProfile.path("_source").path("geoloc").isMissingNode()){
-								// TODO : see how we store the geolocation ( in the user profile, in the traces ... )
-								//String geoloc = applySettings("geoloc", );
-								
+							else{
+								String title = applyPrivacy("title",userProfile.path("_source").path("title").asText(),(Integer)this.engine.eval("privacy.title.levels")-1);
+								if ( !title.equals("nothing")){
+									jg.writeStringField("title", title );
+								}
 							}
 						}
+						if ( !userProfile.path("_source").path("address").isMissingNode() ){
+							if( settings.containsKey("title") ){
+								String address = applyPrivacy("address",userProfile.path("_source").path("address").asText(),settings.get("address"));
+								if ( !address.equals("nothing")){
+									jg.writeStringField("address", address );
+								}
+							}
+							else{
+								String address = applyPrivacy("address",userProfile.path("_source").path("address").asText(),(Integer)this.engine.eval("privacy.address.levels")-1);
+								if ( !address.equals("nothing")){
+									jg.writeStringField("address", address );
+								}
+							}
+						}
+						
+						
 						
 					}
 
@@ -192,13 +225,13 @@ public class ApplyPrivacySettingsJS implements Processor{
 	
 	public static void main(String[] args) throws ScriptException, JsonParseException, JsonMappingException, IOException {
 		ApplyPrivacySettingsJS privacy = new ApplyPrivacySettingsJS();
-		String attribute ="birthdate";
+		/*String attribute ="birthdate";
 		String rawValue = "1992-06-03";
 		Integer disclosureLevel = -1;
 		//InputStream is = exchange.getProperty("user_context-traces", InputStream.class);
 		String is = privacy.applyPrivacy(attribute, rawValue, disclosureLevel);
 		
-		System.out.println(is);
+		//System.out.println(is);
 		if ( !is.equals("nothing")){
 			JsonFactory factory = new JsonFactory();
 			StringWriter sWriter = new StringWriter();
@@ -207,7 +240,9 @@ public class ApplyPrivacySettingsJS implements Processor{
 			ObjectMapper mapper = new ObjectMapper();
 			JsonNode jnode = mapper.readTree(is);
 			System.out.println(jnode);
-		}
-		
+		}*/
+		System.out.println(privacy.engine.eval("privacy.gender.levels"));
+		int i = (Integer)privacy.engine.eval("privacy.gender.levels");
+	
 	}
 }

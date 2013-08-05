@@ -47,16 +47,16 @@ public class MendeleyUpdateProfileInfo implements Processor {
 		
 		if(responseNode.path("hits").path("total").asText().equals("1")){ // the profile already exists
 			// in our index, we need to retrieve the id and then to update it
-			System.out.println("the profile already exists");
+			//System.out.println("the profile already exists");
 			String user_id = responseNode.path("hits").path("hits").get(0).path("_id").asText().replace(exchange.getProperty ( "mendeley_id" , String.class ), "");
 			exchange.setProperty("user_id", user_id);
 			profileId = responseNode.path("hits").path("hits").get(0).path("_id").asText();
 			
 		}
 		else{ // the mendeley profile doesn't exist in our index yet
-			String user_id = UUID.randomUUID().toString();
-			exchange.setProperty("user_id", user_id.replace("-", ""));
-			profileId = user_id + exchange.getProperty ( "mendeley_id" , String.class );
+			//String user_id = UUID.randomUUID().toString();
+			//exchange.setProperty("user_id", user_id.replace("-", ""));
+			profileId = exchange.getProperty ( "user_id" , String.class ) + exchange.getProperty ( "mendeley_id" , String.class );
 			
 		}
 		

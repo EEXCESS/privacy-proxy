@@ -151,24 +151,27 @@ privacy.address = {
 		levels:6,
 		apply: function (raw, level) {
 			jsonRaw = JSON.parse(raw);
-			switch(level){
-			case 0: 
-				return "nothing";
-				break;
-			case 1:
-				return ('{"decade":"'+(age - age%10)+'"}');
-				break;
-			case 2:
-				return ('{"age":"'+ age + ' years"}');
-				break;
-			case 3:
-				return ('{"date":"'+ raw + '"}');
-				break;
-			default :
-				return ('{"date":"'+ raw + '"}');
-				break;
-				
-			};
+			res = new Object();
+			
+			if ( level >= 1 ){
+				res.country = jsonRaw.country;
+			}
+			if ( level >= 2 ){
+				res.region = jsonRaw.region;
+			}
+			if ( level >= 3 ){
+				res.district = jsonRaw.district;
+			}
+			if ( level >= 4 ){
+				res.city = jsonRaw.city;
+				res.postalcode = jsonRaw.postalcode;
+			}
+			if ( level == 5 ){
+				res.street = jsonRaw.street;
+				res.longitude = jsonRaw.longitude;
+				res.lattitude = jsonRaw.lattitude;
+			}
+			return JSON.stringify(res);
 		}	
 }
 

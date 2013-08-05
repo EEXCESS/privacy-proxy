@@ -10,7 +10,7 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 
-public class PrepareLastTenTracesQuery implements Processor{
+public class ExtractFrontEndData implements Processor{
 
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
@@ -39,14 +39,10 @@ public class PrepareLastTenTracesQuery implements Processor{
 			
 			
 		
-	
-		
-		String query ="{\"query\": {\"bool\": {\"must\": [{\"bool\": {\"should\": [{\"term\": {\"user.user_id\": \""+user_id+"\"}},{\"term\": {\"plugin.uuid\": \""+uuid+"\"}}]}}]}},\"from\": 0,\"size\": 10,\"sort\": [{\"temporal.begin\": \"desc\"}]}";
-		
 		exchange.setProperty("user_id", user_id);
 		exchange.setProperty("plugin_uuid",uuid);
-		System.out.println("query (last ten traces\n"+query);
-		in.setBody(query);
+		
+		
 		
 		
 		

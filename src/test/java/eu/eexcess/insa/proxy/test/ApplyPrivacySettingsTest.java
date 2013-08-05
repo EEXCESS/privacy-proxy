@@ -2,11 +2,13 @@ package eu.eexcess.insa.proxy.test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -50,6 +52,87 @@ public class ApplyPrivacySettingsTest extends CamelTestSupport {
 
 		}
 	};
+	
+	
+	public ArrayList<HashMap<String,String>> addressTestDataGenerator() throws IOException{
+		
+		ArrayList<HashMap<String,String>> inputData = new ArrayList<HashMap<String,String>>();
+		
+		HashMap<String, String> address1 = new HashMap<String, String> ( );
+		
+		HashMap<String, String> address1Data = new HashMap<String,String>();
+		address1.put("0",formateAddress(address1Data));
+		
+		address1Data.put("country", "France");
+		address1.put("1",formateAddress(address1Data));
+		
+		address1Data.put("region", "Rhône-Alpes");
+		address1.put("2",formateAddress(address1Data));
+		
+		address1Data.put("district", "Région de Lyon");
+		address1.put("3",formateAddress(address1Data));
+		
+		address1Data.put("city", "Villeurbanne");
+		address1Data.put("postalcode", "69100");
+		address1.put("4",formateAddress(address1Data));
+		
+		address1Data.put("street", "42 rue de la Liberté");
+		address1Data.put("lattitude", "41.785110");
+		address1Data.put("longitude", "23.889504");
+		address1.put("5",formateAddress(address1Data));
+		
+		address1.put("raw", formateAddress(address1Data));
+		
+		inputData.add(address1);
+		
+		return inputData;
+		
+		
+		
+	    
+	}
+	
+	String formateAddress ( HashMap<String, String> address) throws IOException{
+		
+		JsonFactory factory = new JsonFactory();
+		StringWriter sWriter = new StringWriter();
+		JsonGenerator jg = factory.createJsonGenerator(sWriter);
+		
+		jg.writeStartObject();
+		if ( !address.isEmpty()){
+			
+			if ( address.containsKey("country")){
+				jg.writeStringField("country", address.get("country"));
+			}
+			if ( address.containsKey("region")){
+				jg.writeStringField("region", address.get("region"));
+			}
+			if ( address.containsKey("district")){
+				jg.writeStringField("district", address.get("district"));
+			}
+			if ( address.containsKey("city")){
+				jg.writeStringField("city", address.get("city"));
+			}
+			if ( address.containsKey("postalcode")){
+				jg.writeStringField("postalcode", address.get("postalcode"));
+			}
+			if ( address.containsKey("street")){
+				jg.writeStringField("street", address.get("street"));
+			}
+			if ( address.containsKey("longitude")){
+				jg.writeStringField("longitude", address.get("longitude"));
+			}
+			if ( address.containsKey("lattitude")){
+				jg.writeStringField("lattitude", address.get("lattitude"));
+			}
+			
+		}
+
+		jg.writeEndObject();
+		jg.close();
+		return sWriter.toString();
+	}
+	
 	
 	public ArrayList<HashMap<String,String>> birthDateTestDataGenerator(){
 		
@@ -206,6 +289,26 @@ public ArrayList<HashMap<String,String>> genderTestDataGenerator(){
 			HashMap<String,String> h = it.next();
 			assertEquals( h.get("0"),privacy.applyPrivacy(field, h.get("raw"), 0) );
 			assertEquals(  h.get("1"),privacy.applyPrivacy(field, h.get("raw"), 1));
+		}
+    }
+    
+    @Test
+    public void test_applyPrivacy_address() throws ScriptException, IOException{
+    	ApplyPrivacySettingsJS privacy = new ApplyPrivacySettingsJS();
+		ArrayList<HashMap<String,String>> inputDatas = addressTestDataGenerator();
+		Iterator<HashMap<String,String>> it =inputDatas.iterator();
+		
+		while ( it.hasNext()){
+			HashMap<String,String> h = it.next();
+			String field="address";
+		
+			assertEquals( h.get("0"),privacy.applyPrivacy(field, h.get("raw"), 0) );
+			assertEquals(  h.get("1"),privacy.applyPrivacy(field, h.get("raw"), 1));
+			assertEquals( h.get("2"), privacy.applyPrivacy(field, h.get("raw"), 2));
+			assertEquals( h.get("3"),privacy.applyPrivacy(field, h.get("raw"), 3));
+			assertEquals( h.get("4"),privacy.applyPrivacy(field, h.get("raw"), 4));
+			assertEquals( h.get("5"),privacy.applyPrivacy(field, h.get("raw"), 5));
+			
 		}
     }
      

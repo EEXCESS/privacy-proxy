@@ -70,9 +70,6 @@ public class ProfileVerifier implements Processor {
 			    "}"+
 			  "}"+
 			"}";
-	    
-	    System.out.println("john query :");
-	    System.out.println(query);
 		in.setBody(query);
 		
 		

@@ -1,11 +1,14 @@
 $('.nav-tabs').button();
 
+
+
 function logout(){
 	localStorage.removeItem("privacy_email");
 	localStorage.removeItem("username");
 	localStorage.removeItem("token_secret");
 	localStorage.removeItem("recommend");
 	localStorage.removeItem("user_id");
+	localStorage.removeItem("recommendation_query");
 	$('#username').html("Good Bye !");
 	$('#logout_btn').hide();
 	$('#sign_in').show();
@@ -16,7 +19,7 @@ function username() {
 	if(localStorage["username"] != undefined){
 		$('#username').html("Welcome "+localStorage["username"]);
 		$('#logout_btn').show();
-		$('#sign_in').hide();
+		//$('#sign_in').hide();
 		
 		if (localStorage["env"] == "home"){
 			$('#home').addClass("active");

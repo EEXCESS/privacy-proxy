@@ -21,9 +21,10 @@ import eu.eexcess.insa.profile.ProfileSplitter;
 import eu.eexcess.insa.proxy.actions.GetUserId;
 import eu.eexcess.insa.proxy.actions.GetUserIdFromBody;
 import eu.eexcess.insa.proxy.actions.GetUserProfiles;
-import eu.eexcess.insa.proxy.actions.PrepareLastTenTracesQuery;
+import eu.eexcess.insa.proxy.actions.ExtractFrontEndData;
 import eu.eexcess.insa.proxy.actions.PrepareRecommendationRequest;
 import eu.eexcess.insa.proxy.actions.PrepareRecommendationTermsPonderation;
+import eu.eexcess.insa.proxy.actions.PrepareRecommendationTracesRequest;
 import eu.eexcess.insa.proxy.actions.PrepareRequest;
 import eu.eexcess.insa.proxy.actions.PrepareResponse;
 import eu.eexcess.insa.proxy.actions.PrepareSearch;
@@ -55,7 +56,7 @@ public class APIService extends RouteBuilder  {
 	final PrepareRecommendationRequest prepRecommendRequ = new PrepareRecommendationRequest();
 	final PrepareRecommendationTermsPonderation prepPonderation = new PrepareRecommendationTermsPonderation();
 	final EconBizQueryMapper prepEconBizQuery = new EconBizQueryMapper ();
-	final PrepareLastTenTracesQuery prepLastTen = new PrepareLastTenTracesQuery();
+	final ExtractFrontEndData getIds = new ExtractFrontEndData();
 	final MendeleyQueryMapper prepMendeleyQuery = new MendeleyQueryMapper();
 	final MendeleyDocumentQueryMapper prepDocumentSearch = new MendeleyDocumentQueryMapper();
 	final CloseJsonObject closeJson = new CloseJsonObject();
@@ -76,6 +77,7 @@ public class APIService extends RouteBuilder  {
 	final MendeleyProfileMapper mendeleyProfileMapper = new MendeleyProfileMapper(); 
 	final ProfileSplitter profileSplitter = new ProfileSplitter();
 	final GetUserIdFromBody getUserIdFromBdy = new GetUserIdFromBody();
+	final PrepareRecommendationTracesRequest prepTraces = new PrepareRecommendationTracesRequest();
 	
 		public void configure() throws Exception {
 			
@@ -195,21 +197,17 @@ public class APIService extends RouteBuilder  {
 			 * 
 			 */
 			from("direct:recommend")
-				.process(prepLastTen)  //this sets the user_id and pugin_uuid exchange properties
+				.process(getIds)  //this sets the user_id and plugin_uuid exchange properties
 				
 				// we need to get the user context
 				  // we get the user's profile
 				.to("direct:get.user.data")
 				.setProperty("user_context-profile",simple("${in.body}", String.class))
-			    // filter the user context following the privacy settings
+			    // filter the user profile following the privacy settings
 				
 				// we get the last traces
-				.setHeader("ElasticType").constant("trace")
-				.setHeader("ElasticIndex").constant("privacy")
-				.to("direct:elastic.userSearch")
-				.setProperty("user_context-traces",simple("${in.body}", String.class))
-				
-				
+				.to("direct:get.recommendation.traces")
+
 				
 				// user's context is used to prepare a query
 				.process(prepPonderation)
@@ -226,7 +224,19 @@ public class APIService extends RouteBuilder  {
 			    .to("xslt:eu/eexcess/insa/xslt/results2html.xsl")
 			    // .wireTap("file:///tmp/econbiz/?fileName=example.html")
 			;
+			
+			/* This route gets the traces needed to prepare a recommendation
+			 * 
+			 */
+			from("direct:get.recommendation.traces")
+				.setHeader("ElasticType").constant("trace")
+				.setHeader("ElasticIndex").constant("privacy")
+				.process(prepTraces)
+				.to("direct:elastic.userSearch")
+				// filter the traces following the privacy settings
 				
+				.setProperty("user_context-traces",simple("${in.body}", String.class))
+			;
 			
 			    
 			 /* route to get recommendation content from EconBiz
@@ -314,6 +324,7 @@ public class APIService extends RouteBuilder  {
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("profiles")
 				.to("direct:elastic.userSearch")
+				
 				.process(mendeleyUpdateProfileInfo)
 				.to("seda:elastic.trace.index")
 				.to("direct:profiles.merge")
@@ -327,12 +338,12 @@ public class APIService extends RouteBuilder  {
 				.process(getProfiles)
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("profiles")
-				.to("log:ex1.1?showAll=true") 
-				
-							
+				.to("log:ex1.1?showAll=true") 	
 				.to("direct:elastic.userSearch")
+				
 				.unmarshal().string("UTF-8")
 				.wireTap("file:///tmp/merge/?fileName=example.json")
+				
 				.process(profileSplitter)
 				.process(eexcessProfileMapper)
 				.process(mendeleyProfileMapper)

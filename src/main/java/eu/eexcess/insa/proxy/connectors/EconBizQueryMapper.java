@@ -46,7 +46,7 @@ public int itemsPerPage = 5; //maximum amount of responses we get ftom mendeley
 	    
 	    //fills the part of the request concer
 	    HashMap<String,Integer>ponderatedTopics = (exchange.getProperty("ponderated_topics",HashMap.class));
-	    System.out.println("topics recuperes : "+ponderatedTopics);
+
 	    prepareTopicBasedQuery( ponderatedTopics, query);
 	    
 	    // fills the part of the request concerning the article's content
@@ -85,7 +85,7 @@ public int itemsPerPage = 5; //maximum amount of responses we get ftom mendeley
 	 
 	 private void prepareTopicBasedQuery ( HashMap<String,Integer> ponderatedTopics, StringBuffer query){
 		
-		 if ( ponderatedTopics != null ){
+		 if ( ponderatedTopics != null && !ponderatedTopics.isEmpty() ){
 			 if(ponderatedTopics.entrySet() != null ){
 				 query.append("subject:(");
 				 Iterator it = ponderatedTopics.entrySet().iterator();

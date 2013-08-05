@@ -32,7 +32,14 @@ function initUserInfo(){
 };
 
 function generateProfilePage() {
-	$(".username").html("Username: " + userInfo.username);
+	if ( !userInfo.username == undefined && !userInfo.username=="" ){
+		$(".username").html("Username: " + userInfo.username);
+		localStorage["username"]= userInfo.username;
+	}
+	else{
+		$(".username").html("Username: user");
+		localStorage["username"] = "user";
+	}
 	
 	var gravatar = "http://www.gravatar.com/avatar/"+MD5(userInfo.email);
 	$('.gravatarProfile').attr('src',gravatar);
