@@ -579,7 +579,12 @@ $(document).ready(function(){
 
 	$('.mytagbuckets').tagsInput({
 		onAddTag: function() {
-			alert("yeah");
+			var name = $(this).attr("id");
+			var lastTag = $('#'+name+'_tagsinput').find('.tag').last();
+			var id = lastTag[0].innerText;
+			lastTag.attr("draggable",true).attr("id",id);
+			var htmlTag = lastTag.html();
+			lastTag.html('<img class="imgTag" src="media/icon.png">'+htmlTag);
 		}
 	});
 
