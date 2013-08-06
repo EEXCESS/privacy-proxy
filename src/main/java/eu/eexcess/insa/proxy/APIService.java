@@ -216,10 +216,13 @@ public class APIService extends RouteBuilder  {
 				.process(prepPonderation)
 				.setHeader("origin").simple("exchangeId")
 				.multicast().aggregationStrategy(new RecomendationResultAggregator())
-					.parallelProcessing().timeout(3800L)
+					.parallelProcessing()
+					.timeout(5000)
 					.to("direct:recommend.econbiz","direct:recommend.mendeley")
+					.log("multicast : end")
 					
 				.end()
+				.process(new JSONList2JSON())
 				.to("log:aggregation complete")
 				.unmarshal().string("UTF-8")
 			    .unmarshal(new JsonXMLDataFormat())
@@ -254,6 +257,7 @@ public class APIService extends RouteBuilder  {
 						.to("string-template:templates/empty-results.tm")
 				.end()
 				.process(econBizResultFormater)
+				.log("EconBiz recommendations retrieved")
 			; 
 			
 			/* Route to get recommendation content from Mendeley
@@ -261,7 +265,9 @@ public class APIService extends RouteBuilder  {
 			 */
 			from("direct:recommend.mendeley")
 				.onException(HttpOperationFailedException.class)
-					.handled(true)    /// a changer  (detruit tout l'exchange ?)
+					
+					.handled(true) .log("exception handled")   /// a changer  (detruit tout l'exchange ?)
+					.log("erreur mandeley")
 					//.continued(true)
 					//.to("string-template:templates/empty-results.tm")
 					//.to("log:Mendeley.recommendation.httpexception?showAll=true")
