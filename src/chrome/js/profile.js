@@ -523,6 +523,7 @@ function displayTopics( topic,env,source ){
 	$("."+env+"_tagsinput").value="";
 	innerSpan.innerHTML="";
 	if (source == "eexcess") innerSpan.innerHTML='<img class="imgTag" src="media/icon.png">';
+	if (source == "mendeley") innerSpan.innerHTML='<img class="imgTag" src="media/mendeley.png">';
 	innerSpan.innerHTML+=topic+'<a class="tagsinput-remove-link"></a>';
 	newTag.appendChild(innerSpan);
 	document.getElementById(env+'_tagsinput').insertBefore(newTag,document.getElementById(env+'_tagsinput').firstChild);
