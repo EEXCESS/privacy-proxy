@@ -110,3 +110,45 @@
   border-radius:3px;
   padding:2px;
 }
+.tagsinput-remove-link {
+  width: auto;
+}
+.tagsinput{
+  height: 35% !important;
+}
+#nothing_tag{
+  margin-left:5px;
+  border-radius: 3px;
+  padding: 5px;
+  border: 2px #d6dbdf solid !important;
+}
+#work_tag{
+  margin-left:5px;
+  border-radius: 3px;
+  padding: 5px;
+  border: 2px #d6dbdf solid !important;
+}
+#home_tag{
+  margin-left:5px;
+  border-radius: 3px;
+  padding: 5px;
+  border: 2px #d6dbdf solid !important;
+}
+#all_tag{
+  margin-left:5px;
+  border-radius: 3px;
+  padding: 5px;
+  border: 2px #d6dbdf solid !important;
+}
+#nothing_tag{
+  width: 80px !important;
+}
+#home_tag{
+  width: 80px !important;
+}
+#work_tag{
+  width: 80px !important;
+}
+#all_tag{
+  width: 80px !important;
+}

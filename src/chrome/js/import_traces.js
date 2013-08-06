@@ -272,30 +272,15 @@ $('#inputUserTraces').live("change",doReloadTraces);
 $('#inputPluginTraces').live("change",doReloadTraces);
 $('.detailHandle').live("click",doToggleDetails);
 
-var URL = $(document)[0].URL;
-var urlSplit = URL.split("/");
-URL = urlSplit[0]+"//"+urlSplit[2]+"/";
-
-$.ajax({
-	   url: URL+"profile.html",
-	   type: "GET",
-	   complete: function(response){
-		   $('#profile').append(response.responseText);
-	   }
-});
-
-$.ajax({
-	   url: URL+"privacySandbox.html",
-	   type: "GET",
-	   complete: function(response){
-		   $('#sandbox').append(response.responseText);
-		   initSandbox();
-		   initUserInfo();
-	   }
-});
-
 
 $(document).ready(function () {
+	
+	var docUrl = $(document)[0].URL;
+	var pluginUrl = docUrl.split('/')[0]+"//"+docUrl.split('/')[2]+'/';
+	
+	$('.tabProfile').live("click",function(){document.location = pluginUrl+"profile.html"});
+	$('.tabSettings').live("click",function(){document.location = pluginUrl+"privacySandbox.html"});
+	
   chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
 	  var uuid = response.data;
 	  chrome.extension.sendRequest({method: "getLocalStorage", key: "user_id"}, function(response) {
