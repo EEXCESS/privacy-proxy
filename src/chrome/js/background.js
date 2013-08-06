@@ -85,7 +85,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     if (request.method == "getLocalStorage") {
       sendResponse({data: localStorage[request.key]});
     }else if (request.method == "documentContext") {
-    	send_context(request.event, sender.tab.id, request);
+    	get_geolocation_context(request.event, sender.tab.id, request);
     }else if (request.method == "newRequest") {
     	if (request.event == "load") {
     		triggerContext(sender.tab.id,"load");
@@ -153,12 +153,51 @@ function triggerContext(tabId,event) {
 	chrome.tabs.sendMessage(tabId, requestContext, function(){});  //asks for a tab to send the page's context
 }
 	
+function get_geolocation_context(event,id,request){
+	var lastUpdate = localStorage["geolocationDate"];
+	var d = new Date();
+	var n = d.getTime();
+	if((lastUpdate == undefined) || (n-lastUpdate > 3600000)){
+		localStorage["geolocationDate"] = n;
+		navigator.geolocation.getCurrentPosition(function(position){
+	        var latitude = position.coords.latitude;
+	        var longitude = position.coords.longitude;
+	        
+	        url = "http://api.geonames.org/findNearbyPostalCodesJSON?lat="+latitude+"&lng=" + longitude +"&username=eexcess.insa";
+
+	    	$.ajax({
+	    	   url: url,
+	    	   type: "GET",
+	    	   contentType: "text/json;charset=UTF-8",
+	    	   success: function(response) {
+	    		   
+	    		   coord = "lat="+latitude+",lng="+longitude;
+	    		   var geolocation = {
+	    				nothing:"nothing",
+	    				country:response.postalCodes[0].countryCode,
+	    				region:response.postalCodes[0].adminName1,
+	    		   		district: response.postalCodes[0].adminName3,
+	    		   		place: response.postalCodes[0].placeName,
+	    		   		coord: coord
+	    		   }
+	    		   
+	    		   localStorage["geolocation"] = JSON.stringify(geolocation);
+	    		   send_context(event,id,request);
+	    	   }
+	    	});
+	    });
+	}
+	else{
+		send_context(event,id,request);
+	}
+}
 
 function send_context(event, tabID, context){
 	
 	console.log("Putting document context");
 	console.log("tabID: " +tabID);
 	var date = date_heure();
+	var geolocation = JSON.parse(localStorage["geolocation"]);
 	var trace = {
 		user: {
 			user_id: localStorage["user_id"],
@@ -178,7 +217,8 @@ function send_context(event, tabID, context){
 		document: {
 			url: context.url,
 			title: context.title
-		}
+		},
+		geolocation: geolocation
 	};
 	
 	var traceJSON = JSON.stringify(trace);

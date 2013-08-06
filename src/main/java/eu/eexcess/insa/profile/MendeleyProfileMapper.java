@@ -1,7 +1,9 @@
 package eu.eexcess.insa.profile;
 
 import java.util.regex.Matcher;
+
 import static eu.eexcess.insa.profile.Mapper.*;
+
 import java.util.regex.Pattern;
 
 import org.apache.camel.Exchange;
@@ -56,6 +58,30 @@ public class MendeleyProfileMapper implements Processor {
 				String mendeleyAddress = mendeleyProfile.path("contact").path("address").getTextValue();
 				fillHeader(in, "ProfileAddressStreet", mendeleyAddress);
 									
+			}
+			
+			// map main.research_interests -> profileTopics
+			{
+				String[] topicsEexcess = (String[]) in.getHeader("profileTopics");
+				
+				String interests = mendeleyProfile.path("main").path("research_interests").getTextValue();
+				String charLimit= ",.:;";
+				char[] limit= charLimit.toCharArray();
+				String tabInterests[] = interests.split("[;,.:]");
+				
+				String[] topics = new String[topicsEexcess.length + tabInterests.length];
+				
+				for(int i=0;i<topicsEexcess.length;i++){
+					topics[i] = topicsEexcess[i];
+				}
+				int nbTopics = topicsEexcess.length;
+				
+				for(int i=0;i<tabInterests.length;i++){
+					System.out.println(i+":"+topics[i+nbTopics-1]);
+					topics[i+nbTopics] = "{\"label\":\""+tabInterests[i]+"\",\"env\":\"work\",\"source\":\"mendeley\"}";
+				}
+				fillHeader(in, "profileTopics" , topics);
+
 			}
 			
 			

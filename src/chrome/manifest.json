@@ -27,6 +27,7 @@
     "http://*/*",
     "https://*/*",
     "notifications",
-    "tabs"
+    "tabs",
+    "geolocation"
   ]
 }
