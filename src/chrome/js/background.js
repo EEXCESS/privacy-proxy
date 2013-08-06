@@ -222,7 +222,6 @@ function send_context(event, tabID, context){
 	};
 	
 	var traceJSON = JSON.stringify(trace);
-	alert(traceJSON);
 	console.log("Context: "+traceJSON);
 	
 	$.ajax({
