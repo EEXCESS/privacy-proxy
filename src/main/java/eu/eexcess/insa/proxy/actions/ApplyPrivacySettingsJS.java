@@ -28,6 +28,8 @@ public class ApplyPrivacySettingsJS implements Processor{
 		engine.eval(new InputStreamReader(privacyJS));
 	}
 	
+	
+	
 	/* all of the privacy settings are stored as a hashmap into an exchange property ("privacy_settings")
 	 * (non-Javadoc)
 	 * @see org.apache.camel.Processor#process(org.apache.camel.Exchange)
@@ -36,7 +38,9 @@ public class ApplyPrivacySettingsJS implements Processor{
 		// foreach attribute for which we have privacy settings do
 		// applyPrivacy(...) and replace value with output
 		
-		InputStream is = exchange.getProperty("user_context-traces", InputStream.class);
+		//InputStream is = exchange.getProperty("user_context-profile", InputStream.class);
+		String is = exchange.getProperty("user_context-profile", String.class); //TODO : remettre en inputstream
+		System.out.println("user profile : input \n"+is);
 		
 		JsonFactory factory = new JsonFactory();
 		JsonParser jp = factory.createJsonParser(is);
@@ -52,8 +56,11 @@ public class ApplyPrivacySettingsJS implements Processor{
 	    JsonGenerator jg = factory.createJsonGenerator(sWriter);
 	    
 	    writeNewProfile( rootNode, jg, privacySettings);
+	    
+		String s = sWriter.toString();
+		System.out.println("user profile : output\n"+s);
 		
-	    exchange.setProperty("user_context-traces", sWriter.toString());
+	    exchange.setProperty("user_context-profile", s);
 		
 		
 		
@@ -140,16 +147,26 @@ public class ApplyPrivacySettingsJS implements Processor{
 							}
 						}
 						if ( !userProfile.path("_source").path("address").isMissingNode() ){
+							JsonFactory factory = new JsonFactory();
+							ObjectMapper mapper = new ObjectMapper();
+							factory.createJsonParser(new String());
 							if( settings.containsKey("title") ){
-								String address = applyPrivacy("address",userProfile.path("_source").path("address").asText(),settings.get("address"));
+								String address = applyPrivacy("address",userProfile.path("_source").path("address").toString(),settings.get("address"));
 								if ( !address.equals("nothing")){
-									jg.writeStringField("address", address );
+									JsonParser jp = factory.createJsonParser(address);
+									JsonNode addressNode = mapper.readValue(jp, JsonNode.class);
+									//jg.writeStringField("address", address );
+									jg.writeFieldName("address");
+									mapper.writeTree(jg, addressNode);
 								}
 							}
 							else{
-								String address = applyPrivacy("address",userProfile.path("_source").path("address").asText(),(Integer)this.engine.eval("privacy.address.levels")-1);
+								String address = applyPrivacy("address",userProfile.path("_source").path("address").toString(),(Integer)this.engine.eval("privacy.address.levels")-1);
 								if ( !address.equals("nothing")){
-									jg.writeStringField("address", address );
+									JsonParser jp = factory.createJsonParser(address);
+									JsonNode addressNode = mapper.readValue(jp, JsonNode.class);
+									jg.writeFieldName("address");
+									mapper.writeTree(jg, addressNode);
 								}
 							}
 						}

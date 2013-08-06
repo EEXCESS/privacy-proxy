@@ -151,25 +151,42 @@ privacy.address = {
 		levels:6,
 		apply: function (raw, level) {
 			jsonRaw = JSON.parse(raw);
+			
 			res = new Object();
 			
 			if ( level >= 1 ){
-				res.country = jsonRaw.country;
+				if ( jsonRaw.country != null){
+					res.country = jsonRaw.country;
+				}
 			}
 			if ( level >= 2 ){
-				res.region = jsonRaw.region;
+				if ( jsonRaw.region != null ){
+					res.region = jsonRaw.region;
+				}
 			}
 			if ( level >= 3 ){
-				res.district = jsonRaw.district;
+				if ( jsonRaw.district != null ){
+					res.district = jsonRaw.district;
+				}
 			}
 			if ( level >= 4 ){
-				res.city = jsonRaw.city;
-				res.postalcode = jsonRaw.postalcode;
+				if ( jsonRaw.city != null ){
+					res.city = jsonRaw.city;
+				}
+				if ( jsonRaw.postalcode != null ){ 
+					res.postalcode = jsonRaw.postalcode;
+				}
 			}
 			if ( level == 5 ){
-				res.street = jsonRaw.street;
-				res.longitude = jsonRaw.longitude;
-				res.lattitude = jsonRaw.lattitude;
+				if ( jsonRaw.street != null ){ 
+					res.street = jsonRaw.street;
+				}
+				if ( jsonRaw.longitude != null ){ 
+					res.longitude = jsonRaw.longitude;
+				}
+				if ( jsonRaw.lattitude != null ){ 
+					res.lattitude = jsonRaw.lattitude;
+				}
 			}
 			return JSON.stringify(res);
 		}	

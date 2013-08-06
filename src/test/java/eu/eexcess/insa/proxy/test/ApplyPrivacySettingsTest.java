@@ -311,6 +311,9 @@ public ArrayList<HashMap<String,String>> genderTestDataGenerator(){
 			
 		}
     }
+    
+    @Test
+    public void test_applyPrivacysetings
      
     @Override
     protected RouteBuilder createRouteBuilder() {

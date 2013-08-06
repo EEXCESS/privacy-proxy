@@ -18,6 +18,8 @@ import eu.eexcess.insa.oauth.OAuthSigningProcessor;
 import eu.eexcess.insa.profile.EexcessProfileMapper;
 import eu.eexcess.insa.profile.MendeleyProfileMapper;
 import eu.eexcess.insa.profile.ProfileSplitter;
+import eu.eexcess.insa.proxy.actions.ApplyPrivacySettings;
+import eu.eexcess.insa.proxy.actions.ApplyPrivacySettingsJS;
 import eu.eexcess.insa.proxy.actions.GetUserId;
 import eu.eexcess.insa.proxy.actions.GetUserIdFromBody;
 import eu.eexcess.insa.proxy.actions.GetUserProfiles;
@@ -78,9 +80,10 @@ public class APIService extends RouteBuilder  {
 	final ProfileSplitter profileSplitter = new ProfileSplitter();
 	final GetUserIdFromBody getUserIdFromBdy = new GetUserIdFromBody();
 	final PrepareRecommendationTracesRequest prepTraces = new PrepareRecommendationTracesRequest();
+	//final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
 	
 		public void configure() throws Exception {
-			
+			final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
 			/* Route used to register traces
 			 * 
 			 */
@@ -204,7 +207,7 @@ public class APIService extends RouteBuilder  {
 				.to("direct:get.user.data")
 				.setProperty("user_context-profile",simple("${in.body}", String.class))
 			    // filter the user profile following the privacy settings
-				
+				.process(applyPrivacySettings)
 				// we get the last traces
 				.to("direct:get.recommendation.traces")
 
