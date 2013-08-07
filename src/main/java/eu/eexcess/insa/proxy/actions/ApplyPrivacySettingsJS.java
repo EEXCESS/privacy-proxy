@@ -146,11 +146,36 @@ public class ApplyPrivacySettingsJS implements Processor{
 								}
 							}
 						}
+						
+						JsonFactory factory = new JsonFactory();
+						ObjectMapper mapper = new ObjectMapper();
+						if ( !userProfile.path("_source").path("birthdate").isMissingNode() ){
+							
+							//factory.createJsonParser(new String());
+							if( settings.containsKey("age") ){
+								String birthdate = applyPrivacy("birthdate",userProfile.path("_source").path("birthdate").asText(),settings.get("age"));
+								if ( !birthdate.equals("nothing")){
+									JsonParser jp = factory.createJsonParser(birthdate);
+									JsonNode birthdateNode = mapper.readValue(jp, JsonNode.class);
+									//jg.writeStringField("address", address );
+									jg.writeFieldName("birthdate");
+									mapper.writeTree(jg, birthdateNode);
+								}
+							}
+							else{
+								String birthdate = applyPrivacy("birthdate",userProfile.path("_source").path("birthdate").asText(),(Integer)this.engine.eval("privacy.birthdate.levels")-1);
+								if ( !birthdate.equals("nothing")){
+									System.out.println("birthdate :"+birthdate);
+									JsonParser jp = factory.createJsonParser(birthdate);
+									JsonNode birthdateNode = mapper.readValue(jp, JsonNode.class);
+									jg.writeFieldName("birthdate");
+									mapper.writeTree(jg, birthdateNode);
+								}
+							}
+						}
 						if ( !userProfile.path("_source").path("address").isMissingNode() ){
-							JsonFactory factory = new JsonFactory();
-							ObjectMapper mapper = new ObjectMapper();
-							factory.createJsonParser(new String());
-							if( settings.containsKey("title") ){
+							//factory.createJsonParser(new String());
+							if( settings.containsKey("address") ){
 								String address = applyPrivacy("address",userProfile.path("_source").path("address").toString(),settings.get("address"));
 								if ( !address.equals("nothing")){
 									JsonParser jp = factory.createJsonParser(address);
@@ -170,6 +195,12 @@ public class ApplyPrivacySettingsJS implements Processor{
 								}
 							}
 						}
+						if ( !userProfile.path("_source").path("topics").isMissingNode()){
+							jg.writeFieldName("topics");
+							mapper.writeTree(jg, userProfile.path("_source").path("topics"));
+						}
+						
+						
 						
 						
 						
@@ -221,10 +252,11 @@ public class ApplyPrivacySettingsJS implements Processor{
 							Iterator<String> it = rootNode.path("hits").path("hits").get(0).path("_source").path("privacy").getFieldNames();
 							while(it.hasNext()){
 								String fieldName = it.next();
-								
+							
 								if ( rootNode.path("hits").path("hits").get(0).path("_source").path("privacy").path(fieldName).isIntegralNumber() ){
 									int value = rootNode.path("hits").path("hits").get(0).path("_source").path("privacy").path(fieldName).asInt();
 									privacySettings.put(fieldName, value);
+									
 								}
 								
 								

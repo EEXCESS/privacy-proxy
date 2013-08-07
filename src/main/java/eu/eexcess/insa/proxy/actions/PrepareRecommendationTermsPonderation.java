@@ -119,7 +119,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 		
 	}
 	
-	
+	// warning : the path to the topics needs to be changed since the profile is now filtered before this processor
 	private List<String> extractTopicsFromProfile ( JsonNode rootNode ){
 		ArrayList<String> topics = new ArrayList<String>();
 		System.out.println("rootnode = "+rootNode);
