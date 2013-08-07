@@ -115,8 +115,22 @@ function triggerUpdateAddress(){
 		$('#addressSetting').hide();
 	}
 	else{
-		settingsAddressReady()
+		doUpdateAddress();
 	}
+}
+
+function doUpdateAddress(){
+	
+	addressTooltips[0] = "nothing";
+	addressTooltips[1] = JSON.parse(privacy.apply("address",JSON.stringify(userInfo.address),1)).country;
+	addressTooltips[2] = JSON.parse(privacy.apply("address",JSON.stringify(userInfo.address),2)).region;
+	addressTooltips[3] = JSON.parse(privacy.apply("address",JSON.stringify(userInfo.address),3)).district;
+	addressTooltips[4] = JSON.parse(privacy.apply("address",JSON.stringify(userInfo.address),4)).city;
+	
+	var address = JSON.parse(privacy.apply("address",JSON.stringify(userInfo.address),5));
+	addressTooltips[5] = userInfo.address.street+", "+userInfo.address.postalcode+" "+userInfo.address.city+", "+userInfo.address.country;
+	
+	settingsAddressReady();
 }
 
 

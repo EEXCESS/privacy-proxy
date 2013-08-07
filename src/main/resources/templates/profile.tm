@@ -20,7 +20,9 @@
         "street": "<headers.profileAddressStreet>",
         "postalcode": "<headers.profileAddressPostalCode>",
         "city": "<headers.profileAddressCity>",
-        "country": "<headers.profileAddressCountry>"
+        "country": "<headers.profileAddressCountry>",
+        "region": "<headers.profileAddressRegion>",
+        "district": "<headers.profileAddressDistrict>"
     },
     "topics": <if(headers.profileTopics)>[
 	    <first(headers.profileTopics):{v | <v>}>
