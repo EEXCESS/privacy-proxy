@@ -369,7 +369,6 @@ function updateAddress(){
 			userInfo.address["country"] = $('.inputCountry').val();
 			userInfo.address["region"] = response.postalcodes[0].adminName1;
 			userInfo.address["district"] = response.postalcodes[0].adminName3;
-			userInfo.address["country"] = $('.inputCountry').val();
 			
 			var userDataJSON = JSON.stringify(userInfo);
 			

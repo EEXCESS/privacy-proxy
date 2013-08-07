@@ -40,6 +40,16 @@ public class EexcessProfileMapper implements Processor {
 					String userCountry = userGivenProfile.path("address").path("country").getTextValue();
 					fillHeader(in, "ProfileAddressCountry", userCountry);
 				}
+				
+				if(!userGivenProfile.path("address").path("region").isMissingNode()){
+					String userRegion = userGivenProfile.path("address").path("region").getTextValue();
+					fillHeader(in, "ProfileAddressRegion", userRegion);
+				}
+				
+				if(!userGivenProfile.path("address").path("district").isMissingNode()){
+					String userDistrict = userGivenProfile.path("address").path("district").getTextValue();
+					fillHeader(in, "ProfileAddressDistrict", userDistrict);
+				}
 			}
 			
 			// Map: username
