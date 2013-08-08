@@ -1,14 +1,15 @@
+var ageTooltips= {};
 var addressTooltips= {};
 var geolocTooltips= {};
 var tracesTooltips= ["Only the current page will be sent","Your account traces on this computer will be sent","Your account traces on all computers will be sent"];
 
 function updateUserInfo(){
-	userDataJSON = 
+	userDataJSON = JSON.stringify(userInfo);
 	$.ajax({
 		   url: "http://localhost:12564/api/v0/users/privacy_settings",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
-		   data: JSON.stringify(userInfo),
+		   data: userDataJSON,
 		   beforeSend: function (request)
 	       {
 	           request.setRequestHeader("traceid", idUser);
@@ -23,13 +24,13 @@ function doSwitchEmail() {
 	if($(".switch-email").attr("class") == "switch-animate switch-email switch-off"){
 		$(".switch-email").removeClass("switch-off");
 		$(".switch-email").addClass("switch-on");
-		userInfo["privacy"]["email"] = 1;
+		userInfo.privacy.email = "1";
 		$("#list_settings").find(".email").html("Email: " + userInfo.email);
 	}
 	else{
 		$(".switch-email").removeClass("switch-on");
 		$(".switch-email").addClass("switch-off");
-		userInfo["privacy"]["email"]= 0;
+		userInfo.privacy.email= "0";
 		$("#list_settings").find(".email").html("Email: nothing");
 	}
 }
@@ -138,51 +139,54 @@ function initializeSettingsDisplay(){
 	if(userInfo.privacy == undefined ){
 		userInfo.privacy={};
 	}
-	if ( userInfo.privacy.email == undefined ||  userInfo.privacy.email == 1 ){
-		userInfo.privacy.email = 1 ;
+	if ( userInfo.privacy.email == undefined || userInfo.privacy.email == "" ||  userInfo.privacy.email == "1" ){
+		userInfo.privacy.email = "1" ;
 		$(".switch-email").removeClass("switch-off");
 		$(".switch-email").addClass("switch-on");
 		$("#list_settings").find(".email span").html(userInfo.email);
 	}
-	else if(  userInfo.privacy.email == 0 ){
+	else if(  userInfo.privacy.email == "0" ){
 		$(".switch-email").removeClass("switch-on");
 		$(".switch-email").addClass("switch-off");
 		$("#list_settings").find(".email span").html("nothing");
 	}
-	if ( userInfo.privacy.gender == undefined ||  userInfo.privacy.gender == 1 ){
-		userInfo.privacy.gender = 1 ;
+	if ( userInfo.privacy.gender == undefined || userInfo.privacy.gender == "" || userInfo.privacy.gender == "1" ){
+		userInfo.privacy.gender = "1" ;
 		 $(".switch-gender").removeClass("switch-off");
 		$(".switch-gender").addClass("switch-on");
 		$("#list_settings").find(".gender span").html(userInfo.gender);
 		$("#titleSetting").show();
 	}
-	else if(  userInfo.privacy.gender == 0 ){
+	else if(  userInfo.privacy.gender == "0" ){
 		$(".switch-gender").removeClass("switch-on");
 		$(".switch-gender").addClass("switch-off");
 		$("#titleSetting").hide();
 		$("#list_settings").find(".gender span").html("nothing");
 		$("#titlePrivacy").attr("checked","false");
 	}
-	if ( userInfo.privacy.title == undefined ||  userInfo.privacy.title == 1 ){
-		userInfo.privacy.title = 1 ;
+	if ( userInfo.privacy.title == undefined || userInfo.privacy.title == "" ||  userInfo.privacy.title == "1" ){
+		userInfo.privacy.title = "1" ;
 		 $(".switch-title").removeClass("switch-off");
 			$(".switch-title").addClass("switch-on");
 			$("#list_settings").find(".title span").html(userInfo.title);
 	}
-	else if(  userInfo.privacy.title == 0 ){
+	else if(  userInfo.privacy.title == "0" ){
 		$(".switch-title").removeClass("switch-on");
 		$(".switch-title").addClass("switch-off");
 		$("#list_settings").find(".title span").html("nothing");
 	}
-	if ( userInfo.privacy.age == undefined ||  userInfo.privacy.age == 3 ){
-		userInfo.privacy.title = 1 ;
-		// $(".switch-title").removeClass("switch-off");
-			//$(".switch-title").addClass("switch-on");
+	if ( userInfo.privacy.age == undefined || userInfo.privacy.age == ""){
+		userInfo.privacy.age = "0" ;
 	}
-	else if(  userInfo.privacy.title == 0 ){
-	//	$(".switch-title").removeClass("switch-on");
-	//	$(".switch-title").addClass("switch-off");
-	}
+	if ( userInfo.privacy.address == undefined || userInfo.privacy.address == ""){
+		userInfo.privacy.address = "0" ;
+	}	
+	if ( userInfo.privacy.geoloc == undefined || userInfo.privacy.geoloc == ""){
+		userInfo.privacy.geoloc = "0" ;
+	}	
+	if ( userInfo.privacy.traces == undefined || userInfo.privacy.traces == ""){
+		userInfo.privacy.traces = "0" ;
+	}	
 	
 	if(userInfo.title == undefined || userInfo.title == "") $("#titleSetting").hide();
 	
@@ -205,6 +209,12 @@ function doUpdateAge(){
 	else{
 		var indication = "What will be send: ";
 		
+		ageTooltips[0] = "nothing";
+		ageTooltips[1] = JSON.parse(privacy.apply("birthdate",userInfo.birthdate,1)).decade;
+		ageTooltips[2] = JSON.parse(privacy.apply("birthdate",userInfo.birthdate,2)).age;
+		ageTooltips[3] = JSON.parse(privacy.apply("birthdate",userInfo.birthdate,3)).date;
+
+		
 		settingsAgeReady();
 	}	
 }
@@ -219,7 +229,7 @@ function initSettings(){
 
 function tracesHoverIn(){
 	if ($(this).find(".tooltip-inner").html() == "undefined"){
-		$(this).find(".tooltip-inner").html(tracesTooltips[userInfo.privacy.traces]);
+		$(this).find(".tooltip-inner").html(tracesTooltips[parseInt(userInfo.privacy.traces)]);
 	}
 	$(this).find(".slider-tip").show();
 }
@@ -230,7 +240,7 @@ function tracesHoverOut(){
 
 function geolocHoverIn(){
 	if ($(this).find(".tooltip-inner").html() == "undefined"){
-		$(this).find(".tooltip-inner").html(geolocTooltips[userInfo.privacy.geoloc]);
+		$(this).find(".tooltip-inner").html(geolocTooltips[parseInt(userInfo.privacy.geoloc)]);
 	}
 	$(this).find(".slider-tip").show();
 }
@@ -242,7 +252,7 @@ function geolocHoverOut(){
 
 function addressHoverIn(){
 	if ($(this).find(".tooltip-inner").html() == "undefined"){
-		$(this).find(".tooltip-inner").html(addressTooltips[userInfo.privacy.address]);
+		$(this).find(".tooltip-inner").html(addressTooltips[parseInt(userInfo.privacy.address)]);
 	}
 	$(this).find(".slider-tip").show();
 }
@@ -253,7 +263,7 @@ function addressHoverOut(){
 
 function ageHoverIn(){
 	if ($(this).find(".tooltip-inner").html() == "undefined"){
-		$(this).find(".tooltip-inner").html(privacy.apply("birthdate",userInfo.birthdate,userInfo.privacy.age));
+		$(this).find(".tooltip-inner").html(privacy.apply("birthdate",userInfo.birthdate,parseInt(userInfo.privacy.age)));
 	}
 	$(this).find(".slider-tip").show();
 }
@@ -273,22 +283,21 @@ function hoverOut(){
 function settingsAgeReady(){
 	
 
-	var ageContent = [privacy.apply("birthdate",userInfo.birthdate,0),privacy.apply("birthdate",userInfo.birthdate,1),privacy.apply("birthdate",userInfo.birthdate,2),privacy.apply("birthdate",userInfo.birthdate,3)];
 	$("#slider").slider({
-		value:userInfo.privacy.age,
+		value:parseInt(userInfo.privacy.age),
 		min: 0,
 		max: 3,
 		step: 1,
 		create:function(){
-			$("#fullAge").html(privacy.apply("birthdate",userInfo.birthdate,3));
-			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + privacy.apply("birthdate",userInfo.birthdate,userInfo.privacy.age) + '</div></div>');
+			$("#fullAge").html(ageTooltips[3]);
+			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + ageTooltips[parseInt(userInfo.privacy.age)] + '</div></div>');
 			$(this).find(".slider-tip").hide();
-			$("#list_settings").find(".birthdate span").html(privacy.apply("birthdate",userInfo.birthdate,userInfo.privacy.age));
-			if(userInfo.privacy.age == 0){
+			$("#list_settings").find(".birthdate span").html(ageTooltips[parseInt(userInfo.privacy.age)]);
+			if(userInfo.privacy.age == "0"){
 				$(this).find('.tooltip-inner').css("margin-left","85px");
 				$(this).find('.tooltip-arrow').css("margin-left","-52px");
 			}
-			if(userInfo.privacy.age == 3){
+			if(userInfo.privacy.age == "3"){
 				$(this).find('.tooltip-inner').css("margin-left","-60px");
 				$(this).find('.tooltip-arrow').css("margin-left","20px");
 			}
@@ -306,33 +315,36 @@ function settingsAgeReady(){
 				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","0");
 				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
 			}
-			userInfo.privacy.age = ui.value;
-			$("#list_settings").find(".birthdate span").html(privacy.apply("birthdate",userInfo.birthdate,userInfo.privacy.age));
-			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(privacy.apply("birthdate",userInfo.birthdate,userInfo.privacy.age));
+			userInfo.privacy.age = "" + ui.value;
+			$("#list_settings").find(".birthdate span").html(ageTooltips[parseInt(userInfo.privacy.age)]);
+			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(ageTooltips[parseInt(userInfo.privacy.age)]);
 		},
 		stop: function(){
 			$(".slider-tip").hide();
 		}
-	}).addSliderSegments(4,ageContent);
+	}).addSliderSegments(4,ageTooltips);
 }
 
 function settingsAddressReady(){
 	
+	$("#sliderAddress").find(".slider-tip").html(addressTooltips[parseInt(userInfo.privacy.address)]);
+	
 	$("#sliderAddress").slider({
-		value:userInfo.privacy.address,
+		value:parseInt(userInfo.privacy.address),
 		min: 0,
 		max: 5,
 		step: 1,
+		rang: "min",
 		create:function(){
 			$("#fullAddress").html(addressTooltips[5]);
-			$("#list_settings").find(".street span").html(addressTooltips[userInfo.privacy.address]);
-			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + addressTooltips[userInfo.privacy.address] + '</div></div>');
+			$("#list_settings").find(".street span").html(addressTooltips[parseInt(userInfo.privacy.address)]);
+			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + addressTooltips[parseInt(userInfo.privacy.address)] + '</div></div>');
 			$(this).find(".slider-tip").hide();
-			if(userInfo.privacy.address == 0){
+			if(userInfo.privacy.address == "0"){
 				$(this).find('.tooltip-inner').css("margin-left","85px");
 				$(this).find('.tooltip-arrow').css("margin-left","-52px");
 			}
-			if(userInfo.privacy.address == 5){
+			if(userInfo.privacy.address == "5"){
 				$(this).find('.tooltip-inner').css("margin-left","-60px");
 				$(this).find('.tooltip-arrow').css("margin-left","20px");
 			}
@@ -350,10 +362,10 @@ function settingsAddressReady(){
 				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","0");
 				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
 			}
-			userInfo.privacy.address = ui.value;
-			$("#list_settings").find(".street span").html(addressTooltips[userInfo.privacy.address]);
+			userInfo.privacy.address = "" + ui.value;
+			$("#list_settings").find(".street span").html(addressTooltips[parseInt(userInfo.privacy.address)]);
 
-			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(addressTooltips[userInfo.privacy.address]);
+			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(addressTooltips[parseInt(userInfo.privacy.address)]);
 		},
 		stop: function(){
 			$(".slider-tip").hide();
@@ -363,23 +375,23 @@ function settingsAddressReady(){
 
 function settingsGeolocReady(){
 	
-	if (userInfo.privacy.geoloc == undefined) userInfo.privacy.geoloc = 0;
+	if (userInfo.privacy.geoloc == undefined) userInfo.privacy.geoloc = "0";
 	
 	$("#sliderGeoloc").slider({
-		value:userInfo.privacy.geoloc,
+		value:parseInt(userInfo.privacy.geoloc),
 		min: 0,
 		max: 5,
 		step: 1,
 		create:function(){
 			$("#fullGeoloc").html(geolocTooltips[5]);	
-			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + geolocTooltips[userInfo.privacy.geoloc] + '</div></div>');
-			$("#list_settings").find(".geoloc span").html(geolocTooltips[userInfo.privacy.geoloc]);
+			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + geolocTooltips[parseInt(userInfo.privacy.geoloc)] + '</div></div>');
+			$("#list_settings").find(".geoloc span").html(geolocTooltips[parseInt(userInfo.privacy.geoloc)]);
 			$(this).find(".slider-tip").hide();
-			if(userInfo.privacy.geoloc == 0){
+			if(userInfo.privacy.geoloc == "0"){
 				$(this).find('.tooltip-inner').css("margin-left","85px");
 				$(this).find('.tooltip-arrow').css("margin-left","-52px");
 			}
-			if(userInfo.privacy.geoloc == 5){
+			if(userInfo.privacy.geoloc == "5"){
 				$(this).find('.tooltip-inner').css("margin-left","-60px");
 				$(this).find('.tooltip-arrow').css("margin-left","20px");
 			}
@@ -397,9 +409,9 @@ function settingsGeolocReady(){
 				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","0");
 				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
 			}
-			userInfo.privacy.geoloc = ui.value;
-			$("#list_settings").find(".geoloc span").html(geolocTooltips[userInfo.privacy.geoloc]);
-			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(geolocTooltips[userInfo.privacy.geoloc]);
+			userInfo.privacy.geoloc = "" + ui.value;
+			$("#list_settings").find(".geoloc span").html(geolocTooltips[parseInt(userInfo.privacy.geoloc)]);
+			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(geolocTooltips[parseInt(userInfo.privacy.geoloc)]);
 		},
 		stop: function(){
 			$(".slider-tip").hide();
@@ -409,23 +421,23 @@ function settingsGeolocReady(){
 
 function settingsTracesReady(){
 	
-	if (userInfo.privacy.traces == undefined) userInfo.privacy.traces = 0;
+	if (userInfo.privacy.traces == undefined) userInfo.privacy.traces = "0";
 	
 	$("#sliderTraces").slider({
-		value:userInfo.privacy.traces,
+		value:parseInt(userInfo.privacy.traces),
 		min: 0,
 		max: 2,
 		step: 1,
 		create:function(){
 			$("#fullTraces").html(tracesTooltips[2]);
-			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + tracesTooltips[userInfo.privacy.traces] + '</div></div>');
+			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + tracesTooltips[parseInt(userInfo.privacy.traces)] + '</div></div>');
 			$(this).find(".slider-tip").hide();
-			$("#list_settings").find(".traces span").html(tracesTooltips[userInfo.privacy.traces]);
-			if(userInfo.privacy.traces == 0){
+			$("#list_settings").find(".traces span").html(tracesTooltips[parseInt(userInfo.privacy.traces)]);
+			if(userInfo.privacy.traces == "0"){
 				$(this).find('.tooltip-inner').css("margin-left","85px");
 				$(this).find('.tooltip-arrow').css("margin-left","-52px");
 			}
-			if(userInfo.privacy.traces == 2){
+			if(userInfo.privacy.traces == "2"){
 				$(this).find('.tooltip-inner').css("margin-left","-60px");
 				$(this).find('.tooltip-arrow').css("margin-left","20px");
 			}
@@ -443,9 +455,9 @@ function settingsTracesReady(){
 				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","0");
 				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
 			}
-			userInfo.privacy.traces = ui.value;
-			$("#list_settings").find(".traces span").html(tracesTooltips[userInfo.privacy.traces]);
-			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(tracesTooltips[userInfo.privacy.traces]);
+			userInfo.privacy.traces = "" + ui.value;
+			$("#list_settings").find(".traces span").html(tracesTooltips[parseInt(userInfo.privacy.traces)]);
+			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(tracesTooltips[parseInt(userInfo.privacy.traces)]);
 		},
 		stop: function(){
 			$(".slider-tip").hide();

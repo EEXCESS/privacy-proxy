@@ -357,10 +357,9 @@ public class APIService extends RouteBuilder  {
 				
 				.process(profileSplitter)
 				.process(eexcessProfileMapper)
-				.to("log:coucou?showAll=true")
 				.process(mendeleyProfileMapper)
-				.to("log:coucou2?showAll=true")
 				.to("string-template:templates/profile.tm")
+				.to("log:coucou2?showAll=true")
 
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")

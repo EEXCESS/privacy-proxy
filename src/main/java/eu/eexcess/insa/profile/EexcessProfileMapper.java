@@ -104,6 +104,7 @@ public class EexcessProfileMapper implements Processor {
 			if(!userGivenProfile.path("privacy").isMissingNode()){
 				if(!userGivenProfile.path("privacy").path("email").isMissingNode()){
 					String userPrivacyEmail = userGivenProfile.path("privacy").path("email").getTextValue();
+
 					fillHeader(in, "ProfilePrivacyEmail", userPrivacyEmail);
 				}
 				

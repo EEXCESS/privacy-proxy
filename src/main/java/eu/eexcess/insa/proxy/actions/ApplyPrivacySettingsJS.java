@@ -162,6 +162,8 @@ public class ApplyPrivacySettingsJS implements Processor{
 								}
 							}
 							else{
+								System.out.println(userProfile.path("_source").path("birthdate").asText()+"::"+this.engine.eval("privacy.birthdate.levels"));
+								int level = (Integer)this.engine.eval("privacy.birthdate.levels");
 								String birthdate = applyPrivacy("birthdate",userProfile.path("_source").path("birthdate").asText(),(Integer)this.engine.eval("privacy.birthdate.levels")-1);
 								if ( !birthdate.equals("nothing")){
 									System.out.println("birthdate :"+birthdate);
