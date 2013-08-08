@@ -150,9 +150,9 @@ privacy.gender = {
 privacy.address = {
 		levels:6,
 		apply: function (raw, level) {
-			jsonRaw = JSON.parse(raw);
+			var jsonRaw = JSON.parse(raw);
 			
-			res = new Object();
+			var res = new Object();
 			
 			if ( level >= 1 ){
 				if ( jsonRaw.country != null){

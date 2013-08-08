@@ -117,7 +117,7 @@ public class APIService extends RouteBuilder  {
 			from("jetty:http://localhost:12564/api/v0/recommend")	
 				.removeHeaders("CamelHttp*")
 				.removeHeader("Host")	
-				.to("direct:recommend")
+				.to("direct:prepare.user.profile")
 				.setHeader("Content-Type").constant("text/html")
 				.setHeader("recommendation_query", property("recommendation_query"));
 			;
@@ -199,19 +199,21 @@ public class APIService extends RouteBuilder  {
 			/*route to get recommendation content
 			 * 
 			 */
-			from("direct:recommend")
+			from("direct:prepare.user.profile")
+				//infos from the front end are retrieved
 				.process(getIds)  //this sets the user_id and plugin_uuid exchange properties
-				
 				// we need to get the user context
 				  // we get the user's profile
 				.to("direct:get.user.data")
 				.setProperty("user_context-profile",simple("${in.body}", String.class))
+				  // we get the last traces
+				.to("direct:get.recommendation.traces")
 			    // filter the user profile following the privacy settings
 				.process(applyPrivacySettings)
-				// we get the last traces
-				.to("direct:get.recommendation.traces")
-
-				
+				.to("direct:recommend")
+			;
+			
+			from("direct:recommend")
 				// user's context is used to prepare a query
 				.process(prepPonderation)
 				.setHeader("origin").simple("exchangeId")
@@ -363,6 +365,7 @@ public class APIService extends RouteBuilder  {
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.setHeader("traceId").property("user_id")
+				.to("log:just_befire_indexing?showAll=true")
 				.to("seda:elastic.trace.index")
 			;
 		}

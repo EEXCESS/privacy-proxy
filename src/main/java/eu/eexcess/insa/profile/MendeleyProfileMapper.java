@@ -62,22 +62,32 @@ public class MendeleyProfileMapper implements Processor {
 			
 			// map main.research_interests -> profileTopics
 			{
+				
 				String[] topicsEexcess = (String[]) in.getHeader("profileTopics");
 				
 				String interests = mendeleyProfile.path("main").path("research_interests").getTextValue();
+				interests = interests.replace("\n"," ");
 				String charLimit= ",.:;";
 				char[] limit= charLimit.toCharArray();
 				String tabInterests[] = interests.split("[;,.:]");
+				int nbTopics =0;
+				int topicsEexcessLength;
+				if ( topicsEexcess != null ){
 				
-				String[] topics = new String[topicsEexcess.length + tabInterests.length];
-				
-				for(int i=0;i<topicsEexcess.length;i++){
-					topics[i] = topicsEexcess[i];
+					topicsEexcessLength = topicsEexcess.length;
 				}
-				int nbTopics = topicsEexcess.length;
+				else{
+					topicsEexcessLength = 0;
+				}
+					String[] topics = new String[topicsEexcessLength + tabInterests.length];
+					
+					for(int i=0;i<topicsEexcessLength;i++){
+						topics[i] = topicsEexcess[i];
+					}
+					nbTopics = topicsEexcessLength;
 				
 				for(int i=0;i<tabInterests.length;i++){
-					System.out.println(i+":"+topics[i+nbTopics-1]);
+					//System.out.println(i+":"+topics[i+nbTopics-1]);
 					topics[i+nbTopics] = "{\"label\":\""+tabInterests[i]+"\",\"env\":\"work\",\"source\":\"mendeley\"}";
 				}
 				fillHeader(in, "profileTopics" , topics);

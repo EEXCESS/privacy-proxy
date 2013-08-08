@@ -25,7 +25,6 @@ public class ExtractFrontEndData implements Processor{
 	    JsonParser jp = factory.createJsonParser(is);
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
-		
 	    String user_id = "";
 	    String uuid = "";
 		if ( !rootNode.path("user").path("user_id").isMissingNode()){
@@ -41,6 +40,7 @@ public class ExtractFrontEndData implements Processor{
 		
 		exchange.setProperty("user_id", user_id);
 		exchange.setProperty("plugin_uuid",uuid);
+		exchange.setProperty("trace_recommendation", rootNode);
 		
 		
 		

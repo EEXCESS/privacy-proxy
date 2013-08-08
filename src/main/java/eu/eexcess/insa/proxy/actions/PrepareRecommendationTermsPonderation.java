@@ -122,23 +122,18 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	// warning : the path to the topics needs to be changed since the profile is now filtered before this processor
 	private List<String> extractTopicsFromProfile ( JsonNode rootNode ){
 		ArrayList<String> topics = new ArrayList<String>();
-		System.out.println("rootnode = "+rootNode);
-		if ( !rootNode.path("hits").isMissingNode()){
-			if(!rootNode.path("hits").path("hits").isMissingNode()){
-				if( rootNode.path("hits").path("hits").get(0) != null){
-					if(!rootNode.path("hits").path("hits").get(0).path("_source").isMissingNode()){
-						if(!rootNode.path("hits").path("hits").get(0).path("_source").path("topics").isMissingNode()){
-							
-							JsonNode topicsNode = rootNode.path("hits").path("hits").get(0).path("_source").path("topics");
-							Iterator<JsonNode> it = topicsNode.getElements();
-							while ( it.hasNext()){
-								topics.add(it.next().path("label").asText());
-							}
-						}
-					}
+	
+		if(!rootNode.path("_source").isMissingNode()){
+			if(!rootNode.path("_source").path("topics").isMissingNode()){
+				
+				JsonNode topicsNode = rootNode.path("_source").path("topics");
+				Iterator<JsonNode> it = topicsNode.getElements();
+				while ( it.hasNext()){
+					topics.add(it.next().path("label").asText());
 				}
 			}
 		}
+		
 		return topics;
 	}
 	

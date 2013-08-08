@@ -40,7 +40,7 @@ public class ApplyPrivacySettingsJS implements Processor{
 		
 		//InputStream is = exchange.getProperty("user_context-profile", InputStream.class);
 		String is = exchange.getProperty("user_context-profile", String.class); //TODO : remettre en inputstream
-		System.out.println("user profile : input \n"+is);
+		//System.out.println("user profile : input \n"+is);
 		
 		JsonFactory factory = new JsonFactory();
 		JsonParser jp = factory.createJsonParser(is);
@@ -58,7 +58,7 @@ public class ApplyPrivacySettingsJS implements Processor{
 	    writeNewProfile( rootNode, jg, privacySettings);
 	    
 		String s = sWriter.toString();
-		System.out.println("user profile : output\n"+s);
+		//System.out.println("user profile : output\n"+s);
 		
 	    exchange.setProperty("user_context-profile", s);
 		
@@ -146,7 +146,6 @@ public class ApplyPrivacySettingsJS implements Processor{
 								}
 							}
 						}
-						
 						JsonFactory factory = new JsonFactory();
 						ObjectMapper mapper = new ObjectMapper();
 						if ( !userProfile.path("_source").path("birthdate").isMissingNode() ){
