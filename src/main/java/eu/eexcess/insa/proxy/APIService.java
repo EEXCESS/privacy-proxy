@@ -36,6 +36,7 @@ import eu.eexcess.insa.proxy.actions.PrepareRespLogin;
 import eu.eexcess.insa.proxy.actions.ProfileVerifier;
 import eu.eexcess.insa.proxy.actions.PrepareUserProfile;
 import eu.eexcess.insa.proxy.actions.UpdateEEXCESSProfile;
+import eu.eexcess.insa.proxy.actions.UserProfileEnricherAggregator;
 import eu.eexcess.insa.proxy.connectors.CloseJsonObject;
 import eu.eexcess.insa.proxy.connectors.EconBizQueryMapper;
 import eu.eexcess.insa.proxy.connectors.EconBizResultFormater;
@@ -80,6 +81,7 @@ public class APIService extends RouteBuilder  {
 	final ProfileSplitter profileSplitter = new ProfileSplitter();
 	final GetUserIdFromBody getUserIdFromBdy = new GetUserIdFromBody();
 	final PrepareRecommendationTracesRequest prepTraces = new PrepareRecommendationTracesRequest();
+	final UserProfileEnricherAggregator userContextAggregator = new UserProfileEnricherAggregator();
 	//final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
 	
 		public void configure() throws Exception {
@@ -203,13 +205,12 @@ public class APIService extends RouteBuilder  {
 				//infos from the front end are retrieved
 				.process(getIds)  //this sets the user_id and plugin_uuid exchange properties
 				// we need to get the user context
-				  // we get the user's profile
-				.to("direct:get.user.data")
-				.setProperty("user_context-profile",simple("${in.body}", String.class))
-				  // we get the last traces
+				 .enrich("direct:get.user.data", userContextAggregator)
+				
+				// we get the last traces
 				.to("direct:get.recommendation.traces")
-			    // filter the user profile following the privacy settings
-				.process(applyPrivacySettings)
+				 // filter the user profile following the privacy settings
+			    .process(applyPrivacySettings)
 				.to("direct:recommend")
 			;
 			
@@ -242,7 +243,9 @@ public class APIService extends RouteBuilder  {
 				.process(prepTraces)
 				.to("direct:elastic.userSearch")
 				// filter the traces following the privacy settings
-				
+				//.log("${in.body}")
+				//.convertBodyTo(String.class)
+				.to("log:recommendations.traces?showAll=true") 
 				.setProperty("user_context-traces",simple("${in.body}", String.class))
 			;
 			

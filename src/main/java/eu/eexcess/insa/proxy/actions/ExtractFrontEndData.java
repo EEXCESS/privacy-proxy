@@ -14,13 +14,10 @@ public class ExtractFrontEndData implements Processor{
 
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
-		in.setHeader(Exchange.HTTP_METHOD,"POST");
 		
 		InputStream is = in.getBody(InputStream.class);
 
-		
-		//coefficients are calculated for each term from the obsel's title 
-		// ************************************************************
+	
 		JsonFactory factory = new JsonFactory();
 	    JsonParser jp = factory.createJsonParser(is);
 	    ObjectMapper mapper = new ObjectMapper();
@@ -35,17 +32,11 @@ public class ExtractFrontEndData implements Processor{
 			uuid = rootNode.path("plugin").path("uuid").asText();
 			
 		}
-			
-			
 		
 		exchange.setProperty("user_id", user_id);
 		exchange.setProperty("plugin_uuid",uuid);
-		exchange.setProperty("trace_recommendation", rootNode);
-		
-		
-		
-		
-		
+		//exchange.setProperty("trace_recommendation", rootNode);
+		in.setBody(rootNode);
 	}
 
 }
