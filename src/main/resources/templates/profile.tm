@@ -3,13 +3,13 @@
     "email": "<headers.profileEmail>",
     "password": "<headers.profilePassword>",
     "privacy": {
-        "email": "<headers.profilePrivacyEmail>",
-        "gender": "<headers.profilePrivacyGender>",
-        "title": "<headers.profilePrivacyTitle>",
-        "traces": "<headers.profilePrivacyTraces>",
-        "geoloc": "<headers.profilePrivacyGeoloc>",
-        "age": "<headers.profilePrivacyAge>",
-        "address": "<headers.profilePrivacyAddress>"
+        "email": "<headers.ProfilePrivacyEmail>",
+        "gender": "<headers.ProfilePrivacyGender>",
+        "title": "<headers.ProfilePrivacyTitle>",
+        "traces": "<headers.ProfilePrivacyTraces>",
+        "geoloc": "<headers.ProfilePrivacyGeoloc>",
+        "age": "<headers.ProfilePrivacyAge>",
+        "address": "<headers.ProfilePrivacyAddress>"
     },
     "title": "<headers.profileTitle>",
     "lastname": "<headers.profileLastName>",

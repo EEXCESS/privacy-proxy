@@ -63,6 +63,9 @@ public class MendeleyProfileMapper implements Processor {
 			// map main.research_interests -> profileTopics
 			{
 				String[] topicsEexcess = (String[]) in.getHeader("profileTopics");
+				if(topicsEexcess == null) {
+					topicsEexcess = new String[]{};
+				}
 				
 				String interests = mendeleyProfile.path("main").path("research_interests").getTextValue();
 				String charLimit= ",.:;";
@@ -77,7 +80,6 @@ public class MendeleyProfileMapper implements Processor {
 				int nbTopics = topicsEexcess.length;
 				
 				for(int i=0;i<tabInterests.length;i++){
-					System.out.println(i+":"+topics[i+nbTopics-1]);
 					topics[i+nbTopics] = "{\"label\":\""+tabInterests[i]+"\",\"env\":\"work\",\"source\":\"mendeley\"}";
 				}
 				fillHeader(in, "profileTopics" , topics);
