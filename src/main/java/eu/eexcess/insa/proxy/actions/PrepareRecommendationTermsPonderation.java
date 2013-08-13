@@ -77,7 +77,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    in.setBody(q);
 	    logger.info("recommendation query : "+q);
 	    exchange.setProperty("recommendation_query", q);
-	    in.setHeader("recommendation_query",q);	    //in.setHeader("origin",exchange.getExchangeId());
+	    //in.setHeader("recommendation_query",q);	    //in.setHeader("origin",exchange.getExchangeId());
 	}
 		
 		
@@ -272,6 +272,8 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 				/ (Math.log((k * T + b) / b) * (1 / k) + B * T);
 		//double truncatedCoefficient = coefficient - coefficient % 0.001;
 		double truncatedCoefficient = Math.round(coefficient*10);
+		System.out.print(coefficient);
+		System.out.println("   ->   "+truncatedCoefficient);
 		return (int)(truncatedCoefficient);
 	}
 

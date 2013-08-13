@@ -256,6 +256,8 @@ function recommend(traces){
 				chrome.browserAction.setBadgeText({text: hitCount});
 			}
 			localStorage["recommendation_query"] = response.getResponseHeader('recommendation_query');
+			alert(response.getResponseHeader("recommendation_query"));
+			
 	   }
 	});
 	
