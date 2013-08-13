@@ -124,3 +124,13 @@
 .effective_data{
 	font-size:0.85em;
 }
+
+.switch-left{
+  background-color: #fff !important;
+}
+.has-switch label{
+  border-color: #fff !important;
+}
+.has-switch > div.switch-off label { 
+  border-color: #bdc3c7 !important;
+}
