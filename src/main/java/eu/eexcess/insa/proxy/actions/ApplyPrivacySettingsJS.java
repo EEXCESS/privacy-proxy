@@ -39,18 +39,20 @@ public class ApplyPrivacySettingsJS implements Processor{
 		// applyPrivacy(...) and replace value with output
 		
 		//InputStream is = exchange.getProperty("user_context-profile", InputStream.class);
-		String is = exchange.getProperty("user_context-profile", String.class); //TODO : remettre en inputstream
-		System.out.println("user profile : input \n"+is);
+		//String is = exchange.getProperty("user_context-profile", String.class); //TODO : remettre en inputstream
+		//System.out.println("user profile : input \n"+is);
 		
 		JsonFactory factory = new JsonFactory();
-		JsonParser jp = factory.createJsonParser(is);
+		//JsonParser jp = factory.createJsonParser(is);
 	    ObjectMapper mapper = new ObjectMapper();
-	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
+	    //JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
 	    
+		JsonNode rootNode = exchange.getProperty("user_context-profile", JsonNode.class);
 	    
-	    HashMap<String,Integer> privacySettings = getPrivacySettings(rootNode);
+	    //HashMap<String,Integer> privacySettings = getPrivacySettings(rootNode);
 	    // the privacy settings are stored for later use ( filter the traces etc )
-	    exchange.setProperty("privacy_settings", privacySettings);
+	    //exchange.setProperty("privacy_settings", privacySettings);
+	    HashMap<String, Integer> privacySettings = exchange.getProperty("privacy_settings", HashMap.class);
 	    
 	    StringWriter sWriter = new StringWriter();
 	    JsonGenerator jg = factory.createJsonGenerator(sWriter);
@@ -58,7 +60,7 @@ public class ApplyPrivacySettingsJS implements Processor{
 	    writeNewProfile( rootNode, jg, privacySettings);
 	    
 		String s = sWriter.toString();
-		System.out.println("user profile : output\n"+s);
+		//System.out.println("user profile : output\n"+s);
 		
 	    exchange.setProperty("user_context-profile", s);
 		
@@ -146,7 +148,6 @@ public class ApplyPrivacySettingsJS implements Processor{
 								}
 							}
 						}
-						
 						JsonFactory factory = new JsonFactory();
 						ObjectMapper mapper = new ObjectMapper();
 						if ( !userProfile.path("_source").path("birthdate").isMissingNode() ){
@@ -244,6 +245,7 @@ public class ApplyPrivacySettingsJS implements Processor{
 	 * @param rootNode the raw elasticsearch response as a JsonNode, contains the user's profile
 	 * @return a hashmap mapping each privacy setting with its numerical value
 	 */
+	/* fonction déplacée dans l'aggregateur // a retirer ensuite si tout se passe bien
 	private HashMap<String, Integer> getPrivacySettings ( JsonNode rootNode){
 		HashMap<String, Integer> privacySettings = new HashMap<String, Integer>();
 		if ( !rootNode.path("hits").isMissingNode()){
@@ -271,7 +273,7 @@ public class ApplyPrivacySettingsJS implements Processor{
 		}	
 		return privacySettings;
 	}
-	
+	*/
 
 	
 	public static void main(String[] args) throws ScriptException, JsonParseException, JsonMappingException, IOException {

@@ -36,6 +36,7 @@ import eu.eexcess.insa.proxy.actions.PrepareRespLogin;
 import eu.eexcess.insa.proxy.actions.ProfileVerifier;
 import eu.eexcess.insa.proxy.actions.PrepareUserProfile;
 import eu.eexcess.insa.proxy.actions.UpdateEEXCESSProfile;
+import eu.eexcess.insa.proxy.actions.UserProfileEnricherAggregator;
 import eu.eexcess.insa.proxy.connectors.CloseJsonObject;
 import eu.eexcess.insa.proxy.connectors.EconBizQueryMapper;
 import eu.eexcess.insa.proxy.connectors.EconBizResultFormater;
@@ -80,6 +81,7 @@ public class APIService extends RouteBuilder  {
 	final ProfileSplitter profileSplitter = new ProfileSplitter();
 	final GetUserIdFromBody getUserIdFromBdy = new GetUserIdFromBody();
 	final PrepareRecommendationTracesRequest prepTraces = new PrepareRecommendationTracesRequest();
+	final UserProfileEnricherAggregator userContextAggregator = new UserProfileEnricherAggregator();
 	//final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
 	
 		public void configure() throws Exception {
@@ -117,7 +119,7 @@ public class APIService extends RouteBuilder  {
 			from("jetty:http://localhost:12564/api/v0/recommend")	
 				.removeHeaders("CamelHttp*")
 				.removeHeader("Host")	
-				.to("direct:recommend")
+				.to("direct:prepare.user.profile")
 				.setHeader("Content-Type").constant("text/html")
 				.setHeader("recommendation_query", property("recommendation_query"));
 			;
@@ -199,19 +201,20 @@ public class APIService extends RouteBuilder  {
 			/*route to get recommendation content
 			 * 
 			 */
-			from("direct:recommend")
+			from("direct:prepare.user.profile")
+				//infos from the front end are retrieved
 				.process(getIds)  //this sets the user_id and plugin_uuid exchange properties
-				
 				// we need to get the user context
-				  // we get the user's profile
-				.to("direct:get.user.data")
-				.setProperty("user_context-profile",simple("${in.body}", String.class))
-			    // filter the user profile following the privacy settings
-				.process(applyPrivacySettings)
+				 .enrich("direct:get.user.data", userContextAggregator)
+				
 				// we get the last traces
 				.to("direct:get.recommendation.traces")
-
-				
+				 // filter the user profile following the privacy settings
+			    .process(applyPrivacySettings)
+				.to("direct:recommend")
+			;
+			
+			from("direct:recommend")
 				// user's context is used to prepare a query
 				.process(prepPonderation)
 				.setHeader("origin").simple("exchangeId")
@@ -240,7 +243,9 @@ public class APIService extends RouteBuilder  {
 				.process(prepTraces)
 				.to("direct:elastic.userSearch")
 				// filter the traces following the privacy settings
-				
+				//.log("${in.body}")
+				//.convertBodyTo(String.class)
+				.to("log:recommendations.traces?showAll=true") 
 				.setProperty("user_context-traces",simple("${in.body}", String.class))
 			;
 			
@@ -362,6 +367,7 @@ public class APIService extends RouteBuilder  {
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.setHeader("traceId").property("user_id")
+				.to("log:just_befire_indexing?showAll=true")
 				.to("seda:elastic.trace.index")
 			;
 		}
