@@ -84,11 +84,10 @@
   margin-left: 25;
   font-size:75%;
 }
-
-
 .resultsTitle{
 	background-color:ffffff !important;
-	
+	display: inline;
+	margin-right: 25px;
 }
 
 #sandboxSubmitButton{

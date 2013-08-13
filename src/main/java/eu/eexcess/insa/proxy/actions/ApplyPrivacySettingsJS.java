@@ -114,7 +114,16 @@ public class ApplyPrivacySettingsJS implements Processor{
 								
 							}
 							else{
-								String email = applyPrivacy("email",userProfile.path("_source").path("email").asText(),(Integer)this.engine.eval("privacy.email.levels")-1);
+								Object o = this.engine.eval("privacy.email.levels");
+								int level;
+								if ( o instanceof Double){
+									Double d = (Double) o;
+									level = d.intValue();
+								}
+								else{
+									level = (Integer)o;
+								}
+								String email = applyPrivacy("email",userProfile.path("_source").path("email").asText(),level-1);
 								if ( !email.equals("nothing")){
 									jg.writeStringField("email", email );
 								}
@@ -128,7 +137,16 @@ public class ApplyPrivacySettingsJS implements Processor{
 								}
 							}
 							else{
-								String gender = applyPrivacy("gender",userProfile.path("_source").path("gender").asText(),(Integer)this.engine.eval("privacy.gender.levels")-1);
+								Object o = this.engine.eval("privacy.gender.levels");
+								int level;
+								if ( o instanceof Double){
+									Double d = (Double) o;
+									level = d.intValue();
+								}
+								else{
+									level = (Integer)o;
+								}
+								String gender = applyPrivacy("gender",userProfile.path("_source").path("gender").asText(),level-1);
 								if ( !gender.equals("nothing")){
 									jg.writeStringField("gender", gender );
 								}
@@ -143,7 +161,16 @@ public class ApplyPrivacySettingsJS implements Processor{
 								}
 							}
 							else{
-								String title = applyPrivacy("title",userProfile.path("_source").path("title").asText(),(Integer)this.engine.eval("privacy.title.levels")-1);
+								Object o = this.engine.eval("privacy.title.levels");
+								int level;
+								if ( o instanceof Double){
+									Double d = (Double) o;
+									level = d.intValue();
+								}
+								else{
+									level = (Integer)o;
+								}
+								String title = applyPrivacy("title",userProfile.path("_source").path("title").asText(),level-1);
 								if ( !title.equals("nothing")){
 									jg.writeStringField("title", title );
 								}
@@ -165,9 +192,17 @@ public class ApplyPrivacySettingsJS implements Processor{
 								}
 							}
 							else{
-								System.out.println(userProfile.path("_source").path("birthdate").asText()+"::"+this.engine.eval("privacy.birthdate.levels"));
-								int level = (Integer)this.engine.eval("privacy.birthdate.levels");
-								String birthdate = applyPrivacy("birthdate",userProfile.path("_source").path("birthdate").asText(),(Integer)this.engine.eval("privacy.birthdate.levels")-1);
+								//System.out.println(userProfile.path("_source").path("birthdate").asText()+"::"+this.engine.eval("privacy.birthdate.levels"));
+								Object o = this.engine.eval("privacy.birthdate.levels");
+								int level;
+								if ( o instanceof Double){
+									Double d = (Double) o;
+									level = d.intValue();
+								}
+								else{
+									level = (Integer)o;
+								}
+								String birthdate = applyPrivacy("birthdate",userProfile.path("_source").path("birthdate").asText(),level-1);
 								if ( !birthdate.equals("nothing")){
 									System.out.println("birthdate :"+birthdate);
 									JsonParser jp = factory.createJsonParser(birthdate);
@@ -190,7 +225,16 @@ public class ApplyPrivacySettingsJS implements Processor{
 								}
 							}
 							else{
-								String address = applyPrivacy("address",userProfile.path("_source").path("address").toString(),(Integer)this.engine.eval("privacy.address.levels")-1);
+								Object o = this.engine.eval("privacy.address.levels");
+								int level;
+								if ( o instanceof Double){
+									Double d = (Double) o;
+									level = d.intValue();
+								}
+								else{
+									level = (Integer)o;
+								}
+								String address = applyPrivacy("address",userProfile.path("_source").path("address").toString(),level-1);
 								if ( !address.equals("nothing")){
 									JsonParser jp = factory.createJsonParser(address);
 									JsonNode addressNode = mapper.readValue(jp, JsonNode.class);
@@ -315,7 +359,16 @@ public class ApplyPrivacySettingsJS implements Processor{
 			System.out.println(jnode);
 		}*/
 		System.out.println(privacy.engine.eval("privacy.gender.levels"));
-		int i = (Integer)privacy.engine.eval("privacy.gender.levels");
+		//int i = (Integer)privacy.engine.eval("privacy.gender.levels");
+		Object o = privacy.engine.eval("privacy.birthdate.levels");
+		int level;
+		if ( o instanceof Double){
+			Double d = (Double) o;
+			level = d.intValue();
+		}
+		else{
+			level = (Integer)privacy.engine.eval("privacy.birthdate.levels");
+		}
 	
 	}
 }

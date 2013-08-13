@@ -2,6 +2,7 @@ var birthdateTooltips= {};
 var addressTooltips= {};
 var geolocTooltips= {};
 var tracesTooltips= ["Only the current page will be sent","Your account traces on this computer will be sent","Your account traces on all computers will be sent"];
+var lastTrace = {};
 
 function updateUserInfo(){
 	userDataJSON = JSON.stringify(userInfo);
@@ -29,6 +30,7 @@ function doSwitchEmail() {
 		userInfo.privacy.email= "0";
 		$("#list_settings").find(".email").html("Email: nothing");
 	}
+	updateRecommendation();
 }
 
 function doSwitchGender() {
@@ -47,6 +49,7 @@ function doSwitchGender() {
 		userInfo["privacy"]["title"] = "0";
 		$("#list_settings").find(".title").html("Title: nothing");
 	}
+	updateRecommendation();
 }
 
 function doSwitchTitle() {
@@ -59,6 +62,7 @@ function doSwitchTitle() {
 		$("#list_settings").find(".title").html("Title: nothing");
 		
 	}
+	updateRecommendation();
 }
 
 function triggerUpdateGeoloc() {
@@ -211,7 +215,8 @@ function initSettings(){
 	doUpdateAge();
 	triggerUpdateGeoloc();
 	initializeSettingsDisplay();
-	settingSlider("Traces", 2, tracesTooltips,userInfo.privacy.traces);;
+	settingSlider("Traces", 2, tracesTooltips,userInfo.privacy.traces);
+	lastTrace = JSON.parse(localStorage["traces"]).hits.hits[0]["_source"];
 }
 
 function tracesHoverIn(){
@@ -267,6 +272,25 @@ function hoverOut(){
 	$(this).find(".slider-tip").hide();
 }
 
+function updateRecommendation(){
+	
+	var traces = JSON.stringify(lastTrace);
+	$('.loader').attr("src","media/ajax-loader.gif")
+	
+	$.ajax({
+		   url: "http://localhost:12564/api/v0/recommend",
+		   type: "POST",
+		   contentType: "application/json;charset=UTF-8",
+		   data: traces,
+		   complete: function(response, status){
+		   
+				var xml = response.responseText;
+				$("#results").html(xml);
+				$('.loader').attr("src","flat_ui/images/todo/done.png")
+		   }
+		});
+}
+
 function settingSlider(field, max, tooltips, privacy){
 	
 	$("#slider"+field).find(".slider-tip").html(tooltips[parseInt(privacy)]);
@@ -306,6 +330,7 @@ function settingSlider(field, max, tooltips, privacy){
 			userInfo.privacy[field.toLowerCase()] = "" + ui.value;
 			privacy = userInfo.privacy[field.toLowerCase()];
 			$("#list_settings").find("."+field.toLowerCase()+" span").html(tooltips[parseInt(privacy)]);
+			updateRecommendation();
 
 			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(tooltips[parseInt(privacy)]);
 		},
