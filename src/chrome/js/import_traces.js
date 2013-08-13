@@ -130,6 +130,7 @@ function traces(user_id,email) {
 	
 	// useful data are collected from the response
 	var traces = request.responseText;
+	localStorage["traces"] = traces;
 	var tracesJson = JSON.parse(traces);
 	var sources = tracesJson["hits"].hits;
 	var nbTraces = tracesJson["hits"].total;
