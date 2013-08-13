@@ -16,40 +16,60 @@ import org.codehaus.jackson.map.ObjectMapper;
 public class PrepareRecommendationTracesRequest implements Processor {
 
 	
-	//TODO
-	//prendre en compte les privacy settings ( en exchange property ) pour savoir le nombre de traces à récupérer
-	//  0 --> only current page
-	// 1 -> traces on this computer only
-	//2 --> all computers
-	// regarder la trace envoyée du front end
-	// récupérer environnement -- > le stocker en propriété
-	// faire une meilleure requete elasticsearch ( avec jsongenerator etc )
-	// pas oublier de faire un nouveau processor pour filtrer les topics
+	
+	
 	public void process(Exchange exchange) throws Exception {
 		String user_id = exchange.getProperty("user_id", String.class);
 		String plugin_id = exchange.getProperty("plugin_uuid", String.class);
+		String environnement = exchange.getProperty("environnement", String.class);
 		HashMap< String, Integer> privacySettings = exchange.getProperty("privacy_settings", HashMap.class);
 		int privacyTrace = 2; // privacy level is set to the minimum by default
 		if ( privacySettings.containsKey("traces")){
 			privacyTrace = privacySettings.get("traces");
+			
 		}
 		if ( privacyTrace != 0){
-		
+			// the number of traces we want to consider 
+			int nbTraces = 10;
+			boolean onlyUseTracesFromSameEnvironnement = true ;
+			
+			// the message body contains the traces that has been sent from the front end ( the current trace)
 			JsonFactory factory = new JsonFactory();
 			StringWriter sWriter = new StringWriter();
 			JsonGenerator jg = factory.createJsonGenerator(sWriter);
-			InputStream inputTrace = exchange.getIn().getBody(InputStream.class);
-			JsonParser jp = factory.createJsonParser(inputTrace);
-			ObjectMapper mapper = new ObjectMapper();
-			JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
 			
+			//InputStream inputTrace = exchange.getIn().getBody(InputStream.class);
+			//JsonParser jp = factory.createJsonParser(inputTrace);
+			//ObjectMapper mapper = new ObjectMapper();
+			//JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
 			
-			String upperDate;
-			int nbTraces;
-		
-			String environnement;
+			JsonNode rootNode = exchange.getIn().getBody(JsonNode.class);
 			
+			// we use this trace to retrieve the relevant datas : 
+				//- date
+				// environnement ( work / home )
+				// ( the user_id and plugin_id already have been retrieved)
 			
+			String upperDate="";
+			if ( rootNode != null){
+				/*
+				 * if ( !rootNode.path("user").isMissingNode()){
+					if ( !rootNode.path("user").path("environnement").isMissingNode()){
+						
+						environnement = rootNode.path("user").path("environnement").asText();
+						
+					}
+				}
+				*/
+				if ( !rootNode.path("temporal").isMissingNode()){
+					if ( !rootNode.path("temporal").path("begin").isMissingNode()){
+						upperDate = rootNode.path("temporal").path("begin").asText();
+					}
+				}
+			}
+			
+			//System.out.println("user_id = "+user_id);
+
 			jg.writeStartObject();
 				jg.writeFieldName("query");
 				jg.writeStartObject();
@@ -57,33 +77,45 @@ public class PrepareRecommendationTracesRequest implements Processor {
 					jg.writeStartObject();
 							jg.writeFieldName("must");
 							jg.writeStartArray();
-								jg.writeStartObject();
+								
 								// 
-									jg.writeFieldName("term");
+								if ( onlyUseTracesFromSameEnvironnement){
 									jg.writeStartObject();
-										jg.writeStringField("trace.user.environnement", );
-									jg.writeEndObject();
-									
-									jg.writeFieldName("term");
-									jg.writeStartObject();
-										jg.writeStringField("trace.plugin.uuid", );
-									jg.writeEndObject();
-									
-									jg.writeFieldName("term");
-									jg.writeStartObject();
-										jg.writeStringField("trace.user.user_id", );
-									jg.writeEndObject();
-									
-									jg.writeFieldName("range");
-									jg.writeStartObject();
-										jg.writeFieldName("temporal.begin");
+										jg.writeFieldName("term");
 										jg.writeStartObject();
-											jg.writeStringField("to", upperDate);
-											jg.writeBooleanField("include_upper", true);
+											jg.writeStringField("trace.user.environnement", environnement );
+										jg.writeEndObject();
+									jg.writeEndObject();
+								}
+								if ( privacyTrace == 1 || user_id== null || user_id.equals("")){ // only the traces from this plugin are used
+									jg.writeStartObject();
+										jg.writeFieldName("term");
+										jg.writeStartObject();
+											jg.writeStringField("trace.plugin.uuid", plugin_id );
+										jg.writeEndObject();
+									jg.writeEndObject();
+								}
+								if ( !user_id.equals("")&& user_id!=null){
+									jg.writeStartObject();
+										jg.writeFieldName("term");
+										jg.writeStartObject();
+											jg.writeStringField("trace.user.user_id", user_id );
+										jg.writeEndObject();
+									jg.writeEndObject();
+								}
+									
+									jg.writeStartObject();
+										jg.writeFieldName("range");
+										jg.writeStartObject();
+											jg.writeFieldName("temporal.begin");
+											jg.writeStartObject();
+												jg.writeStringField("to", upperDate);
+												jg.writeBooleanField("include_upper", true);
+											jg.writeEndObject();
 										jg.writeEndObject();
 									jg.writeEndObject();
 									
-								jg.writeEndObject();
+								
 							jg.writeEndArray();
 					
 					jg.writeEndObject();
@@ -94,13 +126,46 @@ public class PrepareRecommendationTracesRequest implements Processor {
 				
 			jg.writeEndObject();
 			
+			jg.close();
 			
-			String query ="{\"query\": {\"bool\": {\"must\": [{\"bool\": {\"should\": [{\"term\": {\"user.user_id\": \""+user_id+"\"}},{\"term\": {\"plugin.uuid\": \""+plugin_id+"\"}}]}}]}},\"from\": 0,\"size\": 10,\"sort\": [{\"temporal.begin\": \"desc\"}]}";
+			String query = sWriter.toString();
+			//String query ="{\"query\": {\"bool\": {\"must\": [{\"bool\": {\"should\": [{\"term\": {\"user.user_id\": \""+user_id+"\"}},{\"term\": {\"plugin.uuid\": \""+plugin_id+"\"}}]}}]}},\"from\": 0,\"size\": 10,\"sort\": [{\"temporal.begin\": \"desc\"}]}";
 			
 			Message in = exchange.getIn();
 			
-			
+			//System.out.println("traces query : "+query);
 			in.setBody(query);
+			exchange.setProperty("needMoreTraces", "yes");
+		}
+		else{ // privacy.traces = 0 : only the current trace is used
+			// we need a query to retrieve the exact same trace that we received OR to bypass the query and to keep the original one
+			JsonFactory factory = new JsonFactory();
+			StringWriter sWriter = new StringWriter();
+			JsonGenerator jg = factory.createJsonGenerator(sWriter);
+			JsonNode rootNode = exchange.getIn().getBody(JsonNode.class);
+			ObjectMapper mapper = new ObjectMapper();
+			jg.writeStartObject();
+				jg.writeFieldName("hits");
+				jg.writeStartObject();
+					jg.writeNumberField("total", 1);
+					jg.writeFieldName("hits");
+					jg.writeStartArray();
+						jg.writeStartObject();
+						jg.writeFieldName("_source");
+							mapper.writeTree(jg, rootNode);
+						jg.writeEndObject();
+					jg.writeEndArray();
+				jg.writeEndObject();
+
+				
+			jg.writeEndObject();
+			jg.close();
+			
+			String query = sWriter.toString();
+			Message in = exchange.getIn();
+			in.setBody(query);
+			
+			exchange.setProperty("needMoreTraces", "no");
 		}
 
 	}

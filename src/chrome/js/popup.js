@@ -36,6 +36,7 @@ function recommend() {
 	chrome.browserAction.setBadgeText({text:""});
 	var recommendation = localStorage["recommend"];
 	document.getElementById('recommend').innerHTML = recommendation;
+	var recommendation_terms = localStorage[""]
 }
 
 document.addEventListener('DOMContentLoaded', function () {

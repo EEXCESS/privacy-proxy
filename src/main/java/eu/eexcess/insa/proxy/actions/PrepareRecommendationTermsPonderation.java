@@ -77,7 +77,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    in.setBody(q);
 	    logger.info("recommendation query : "+q);
 	    exchange.setProperty("recommendation_query", q);
-	    //in.setHeader("origin",exchange.getExchangeId());
+	    in.setHeader("recommendation_query",q);	    //in.setHeader("origin",exchange.getExchangeId());
 	}
 		
 		
@@ -100,7 +100,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    // the topics are saved into an exchange property to be used later by the specific query mappers
 
 	    exchange.setProperty("ponderated_topics", ponderatedTopics);
-
+	    
 		// the query terms aren't modified for now 
 		return tracesQuery;
 	}
@@ -119,7 +119,6 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 		
 	}
 	
-	// warning : the path to the topics needs to be changed since the profile is now filtered before this processor
 	private List<String> extractTopicsFromProfile ( JsonNode rootNode ){
 		ArrayList<String> topics = new ArrayList<String>();
 	

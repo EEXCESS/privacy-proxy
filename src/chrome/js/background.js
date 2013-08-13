@@ -11,7 +11,7 @@ console.log("EEXCESS privacy plugin version "+version);
 var activeTabId = 0;
 
 //Envirronnement init
-localStorage["env"] == "home";
+localStorage["env"] = "home";
 
 // plugin's unique id
 var uuidUser = localStorage["uuid"];
@@ -246,7 +246,7 @@ function recommend(traces){
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: traces,
-	   complete: function(response, status, xhr){
+	   complete: function(response, status){
 	   
 			var xml = $(response.responseText);
 			var hitCount = $(xml).attr("data-hits");
@@ -255,7 +255,7 @@ function recommend(traces){
 			if (hitCount != 0) {
 				chrome.browserAction.setBadgeText({text: hitCount});
 			}
-			localStorage["recommendation_query"] = response.getResponseHeader("recommendation_query");
+			localStorage["recommendation_query"] = response.getResponseHeader('recommendation_query');
 	   }
 	});
 	

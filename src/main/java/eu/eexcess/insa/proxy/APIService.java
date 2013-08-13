@@ -231,6 +231,10 @@ public class APIService extends RouteBuilder  {
 			    .unmarshal(new JsonXMLDataFormat())
 			    //.wireTap("file:///tmp/econbiz/?fileName=example.xml")
 			    .to("xslt:eu/eexcess/insa/xslt/results2html.xsl")
+			    
+			    .to("log:headerestilla?showAll=true")
+			    //.log("${property.recommendation_query}")
+			    //.setHeader("recommendation_query",simple("${property.recommendation_query}"))
 			    // .wireTap("file:///tmp/econbiz/?fileName=example.html")
 			;
 			
@@ -241,7 +245,14 @@ public class APIService extends RouteBuilder  {
 				.setHeader("ElasticType").constant("trace")
 				.setHeader("ElasticIndex").constant("privacy")
 				.process(prepTraces)
-				.to("direct:elastic.userSearch")
+				.choice()
+					.when().simple("${property.needMoreTraces} == 'yes'")
+						.to("direct:elastic.userSearch")
+					.otherwise()
+						.to("log:no need for a traces query")
+					
+				.end()
+				
 				// filter the traces following the privacy settings
 				//.log("${in.body}")
 				//.convertBodyTo(String.class)

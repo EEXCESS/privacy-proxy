@@ -19,7 +19,7 @@ public class MendeleyProfileMapper implements Processor {
 		Message in = exchange.getIn();
 		//JsonNode existingProfile = in.getBody(JsonNode.class);
 		JsonNode mendeleyProfile = exchange.getProperty("profile.mendeley",JsonNode.class);
-		//System.out.println(mendeleyProfile);
+		System.out.println(mendeleyProfile);
 		
 		if ( mendeleyProfile != null){
 			// Map main.location -> addressCity + addressCountry
@@ -34,7 +34,7 @@ public class MendeleyProfileMapper implements Processor {
 				}
 			}
 			
-			// Map main.name -> profileLastName + profileFirstName
+			// Map main.name -> profileLastName + profileFirstName + profileUsername
 			{
 				String mendeleyUserName = mendeleyProfile.path("main").path("name").getTextValue();
 				String[]splittedName = mendeleyUserName.split(" ");
@@ -43,7 +43,8 @@ public class MendeleyProfileMapper implements Processor {
 				}
 				if(splittedName[1] != null ){
 					fillHeader(in, "ProfileLastName", splittedName[1]);
-				}		
+				}
+				fillHeader(in, "ProfileUsername", mendeleyUserName);
 			}
 			
 			// Map contact.zipcode -> profileAddressPostalCode
@@ -53,11 +54,19 @@ public class MendeleyProfileMapper implements Processor {
 									
 			}
 			
-			// Map contact.zipcode -> profileAddressStreet
+			// Map contact.address -> profileAddressStreet
 			{
 				String mendeleyAddress = mendeleyProfile.path("contact").path("address").getTextValue();
 				fillHeader(in, "ProfileAddressStreet", mendeleyAddress);
 									
+			}
+			
+			// Map contact.email -> ProfileEmail
+			{
+				if ( !mendeleyProfile.path("contact").path("email").isMissingNode()){
+					String mendeleyEmail = mendeleyProfile.path("contact").path("email").asText();
+					fillHeader(in, "ProfileEmail", mendeleyEmail);
+				}
 			}
 			
 			// map main.research_interests -> profileTopics

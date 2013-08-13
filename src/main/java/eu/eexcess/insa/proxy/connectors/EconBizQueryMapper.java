@@ -54,13 +54,13 @@ public int itemsPerPage = 5; //maximum amount of responses we get ftom mendeley
 	    
 	   String encodedQuery = URLEncoder.encode(query.toString(), "UTF8"); 
 	    in.setHeader(Exchange.HTTP_QUERY,"q="+encodedQuery+"&size="+itemsPerPage);
-	    System.out.println("q="+URLDecoder.decode(encodedQuery)+"&size="+itemsPerPage);
+	   // System.out.println("q="+URLDecoder.decode(encodedQuery)+"&size="+itemsPerPage);
 	    
 	    in.setHeader(Exchange.HTTP_METHOD, "GET");
 	}
 	
 	 private  void prepareContentBasedQuery(JsonNode rootNode, StringBuffer query ){
-	    	
+	    	//System.out.println("econbizquerymapper : "+rootNode);
 	    	JsonNode nodeBuffer;
 		    
 		    Iterator<JsonNode> itNodes = rootNode.path("query").getElements();

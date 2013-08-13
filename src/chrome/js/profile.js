@@ -32,7 +32,7 @@ function initUserInfo(){
 };
 
 function generateProfilePage() {
-	if ( !userInfo.username == undefined && !userInfo.username=="" ){
+	if ( userInfo.username != undefined && userInfo.username !="" ){
 		$(".username").html("Username: " + userInfo.username);
 		localStorage["username"]= userInfo.username;
 	}

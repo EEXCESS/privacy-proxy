@@ -24,10 +24,16 @@ public class ExtractFrontEndData implements Processor{
 	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
 	    String user_id = "";
 	    String uuid = "";
+	    String environnement = "";
 		if ( !rootNode.path("user").path("user_id").isMissingNode()){
 			user_id = rootNode.path("user").path("user_id").asText();
 			
 		}
+		if ( !rootNode.path("user").path("environnement").isMissingNode()){
+			environnement  = rootNode.path("user").path("environnement").asText();
+			
+		}
+		
 		if ( !rootNode.path("plugin").path("uuid").isMissingNode()){
 			uuid = rootNode.path("plugin").path("uuid").asText();
 			
@@ -35,6 +41,7 @@ public class ExtractFrontEndData implements Processor{
 		
 		exchange.setProperty("user_id", user_id);
 		exchange.setProperty("plugin_uuid",uuid);
+		exchange.setProperty("environnement", environnement);
 		//exchange.setProperty("trace_recommendation", rootNode);
 		in.setBody(rootNode);
 	}

@@ -111,6 +111,7 @@ function traces(user_id,email) {
 	var async = false;
 	var request = new XMLHttpRequest();
 	
+		// we should perhaps build the request in the proxy
 	var body = '';
 	if(user_id != '') {
 		body = body + "{\"term\":{\"plugin.uuid\": \""+user_id+"\"}}";

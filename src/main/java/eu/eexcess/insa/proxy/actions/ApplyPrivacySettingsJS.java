@@ -57,7 +57,8 @@ public class ApplyPrivacySettingsJS implements Processor{
 	    StringWriter sWriter = new StringWriter();
 	    JsonGenerator jg = factory.createJsonGenerator(sWriter);
 	    
-	    writeNewProfile( rootNode, jg, privacySettings);
+	    String environnement = exchange.getProperty("environnement", String.class);
+	    writeNewProfile( rootNode, jg, privacySettings, environnement);
 	    
 		String s = sWriter.toString();
 		//System.out.println("user profile : output\n"+s);
@@ -79,7 +80,7 @@ public class ApplyPrivacySettingsJS implements Processor{
 	 * @throws JsonGenerationException 
 	 * @throws ScriptException 
 	 */
-	private void writeNewProfile( JsonNode rootNode, JsonGenerator jg , HashMap<String, Integer> settings) throws JsonGenerationException, IOException, ScriptException{
+	private void writeNewProfile( JsonNode rootNode, JsonGenerator jg , HashMap<String, Integer> settings, String environnement) throws JsonGenerationException, IOException, ScriptException{
 		jg.writeStartObject();
 		if ( !rootNode.path("hits").isMissingNode()){
 			if(!rootNode.path("hits").path("hits").isMissingNode()){
@@ -198,9 +199,28 @@ public class ApplyPrivacySettingsJS implements Processor{
 								}
 							}
 						}
+						//  / \
+						// /_!_\
 						if ( !userProfile.path("_source").path("topics").isMissingNode()){
+							
 							jg.writeFieldName("topics");
-							mapper.writeTree(jg, userProfile.path("_source").path("topics"));
+							jg.writeStartArray();
+							
+							Iterator<JsonNode> it = userProfile.path("_source").path("topics").getElements();
+							while ( it.hasNext()){
+								JsonNode topic = it.next();
+								if ( !topic.path("env").isMissingNode()){
+									if ( topic.path("env").asText().equals( environnement )){
+										mapper.writeTree(jg, topic);
+									}
+								}
+							}
+							
+							jg.writeEndArray();
+							
+							
+							
+							//mapper.writeTree(jg, userProfile.path("_source").path("topics"));
 						}
 						
 						

@@ -71,11 +71,12 @@ public class UserProfileEnricherAggregator implements AggregationStrategy {
 							while(it.hasNext()){
 								String fieldName = it.next();
 							
-								if ( rootNode.path("hits").path("hits").get(0).path("_source").path("privacy").path(fieldName).isIntegralNumber() ){
+								//if ( rootNode.path("hits").path("hits").get(0).path("_source").path("privacy").path(fieldName).isIntegralNumber() ){
 									int value = rootNode.path("hits").path("hits").get(0).path("_source").path("privacy").path(fieldName).asInt();
+									
 									privacySettings.put(fieldName, value);
 									
-								}
+								//}
 								
 								
 							}
