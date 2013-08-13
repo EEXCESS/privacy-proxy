@@ -128,9 +128,9 @@ public class EexcessProfileMapper implements Processor {
 					fillHeader(in, "ProfilePrivacyGeoloc", userPrivacyGeoloc);
 				}
 				
-				if(!userGivenProfile.path("privacy").path("age").isMissingNode()){
-					String userPrivacyAge = userGivenProfile.path("privacy").path("age").getTextValue();
-					fillHeader(in, "ProfilePrivacyAge", userPrivacyAge);
+				if(!userGivenProfile.path("privacy").path("birthdate").isMissingNode()){
+					String userPrivacyAge = userGivenProfile.path("privacy").path("birthdate").getTextValue();
+					fillHeader(in, "ProfilePrivacyBirthdate", userPrivacyAge);
 				}
 				
 				if(!userGivenProfile.path("privacy").path("address").isMissingNode()){

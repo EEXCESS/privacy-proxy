@@ -1,4 +1,4 @@
-var ageTooltips= {};
+var birthdateTooltips= {};
 var addressTooltips= {};
 var geolocTooltips= {};
 var tracesTooltips= ["Only the current page will be sent","Your account traces on this computer will be sent","Your account traces on all computers will be sent"];
@@ -93,7 +93,7 @@ function doUpdateGeoloc(geoname,coord){
 	geolocTooltips[4] = geoname.postalCodes[0].placeName;
 	geolocTooltips[5] = coord;
 	
-	settingsGeolocReady();
+	settingSlider("Geoloc", 5, geolocTooltips,userInfo.privacy.geoloc);
 }
 
 function triggerUpdateAddress(){
@@ -118,7 +118,7 @@ function doUpdateAddress(){
 	var address = JSON.parse(privacy.apply("address",JSON.stringify(userInfo.address),5));
 	addressTooltips[5] = userInfo.address.street+", "+userInfo.address.postalcode+" "+userInfo.address.city+", "+userInfo.address.country;
 	
-	settingsAddressReady();
+	settingSlider("Address", 5, addressTooltips,userInfo.privacy.address);
 }
 
 
@@ -162,8 +162,8 @@ function initializeSettingsDisplay(){
 		$("#titleSetting").find(".switch-animate").addClass("switch-off");
 		$("#list_settings").find(".title span").html("nothing");
 	}
-	if ( userInfo.privacy.age == undefined || userInfo.privacy.age == ""){
-		userInfo.privacy.age = "0" ;
+	if ( userInfo.privacy.birthdate == undefined || userInfo.privacy.birthdate == ""){
+		userInfo.privacy.birthdate = "0" ;
 	}
 	if ( userInfo.privacy.address == undefined || userInfo.privacy.address == ""){
 		userInfo.privacy.address = "0" ;
@@ -196,13 +196,13 @@ function doUpdateAge(){
 	else{
 		var indication = "What will be send: ";
 		
-		ageTooltips[0] = "nothing";
-		ageTooltips[1] = JSON.parse(privacy.apply("birthdate",userInfo.birthdate,1)).decade;
-		ageTooltips[2] = JSON.parse(privacy.apply("birthdate",userInfo.birthdate,2)).age;
-		ageTooltips[3] = JSON.parse(privacy.apply("birthdate",userInfo.birthdate,3)).date;
+		birthdateTooltips[0] = "nothing";
+		birthdateTooltips[1] = JSON.parse(privacy.apply("birthdate",userInfo.birthdate,1)).decade;
+		birthdateTooltips[2] = JSON.parse(privacy.apply("birthdate",userInfo.birthdate,2)).age;
+		birthdateTooltips[3] = JSON.parse(privacy.apply("birthdate",userInfo.birthdate,3)).date;
 
 		
-		settingsAgeReady();
+		settingSlider("Birthdate", 3, birthdateTooltips,userInfo.privacy.birthdate);
 	}	
 }
 
@@ -211,7 +211,7 @@ function initSettings(){
 	doUpdateAge();
 	triggerUpdateGeoloc();
 	initializeSettingsDisplay();
-	settingsTracesReady();
+	settingSlider("Traces", 2, tracesTooltips,userInfo.privacy.traces);;
 }
 
 function tracesHoverIn(){
@@ -250,7 +250,7 @@ function addressHoverOut(){
 
 function ageHoverIn(){
 	if ($(this).find(".tooltip-inner").html() == "undefined"){
-		$(this).find(".tooltip-inner").html(privacy.apply("birthdate",userInfo.birthdate,parseInt(userInfo.privacy.age)));
+		$(this).find(".tooltip-inner").html(privacy.apply("birthdate",userInfo.birthdate,parseInt(userInfo.privacy.birthdate)));
 	}
 	$(this).find(".slider-tip").show();
 }
@@ -267,24 +267,25 @@ function hoverOut(){
 	$(this).find(".slider-tip").hide();
 }
 
-function settingsAgeReady(){
+function settingSlider(field, max, tooltips, privacy){
 	
-
-	$("#sliderBirthdate").slider({
-		value:parseInt(userInfo.privacy.age),
+	$("#slider"+field).find(".slider-tip").html(tooltips[parseInt(privacy)]);
+	
+	$("#slider"+field).slider({
+		value:parseInt(privacy),
 		min: 0,
-		max: 3,
+		max: max,
 		step: 1,
 		create:function(){
-			$("#fullAge").html(ageTooltips[3]);
-			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + ageTooltips[parseInt(userInfo.privacy.age)] + '</div></div>');
+			$("#full"+field).html(tooltips[max]);
+			$("#list_settings").find("."+field.toLowerCase()+" span").html(tooltips[parseInt(privacy)]);
+			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + tooltips[parseInt(privacy)] + '</div></div>');
 			$(this).find(".slider-tip").hide();
-			$(".birthdate span").html(ageTooltips[parseInt(userInfo.privacy.age)]);
-			if(userInfo.privacy.age == "0"){
+			if(privacy == "0"){
 				$(this).find('.tooltip-inner').css("margin-left","85px");
 				$(this).find('.tooltip-arrow').css("margin-left","-52px");
 			}
-			if(userInfo.privacy.age == "3"){
+			if(privacy == (""+max)){
 				$(this).find('.tooltip-inner').css("margin-left","-60px");
 				$(this).find('.tooltip-arrow').css("margin-left","20px");
 			}
@@ -294,7 +295,7 @@ function settingsAgeReady(){
 				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","85px");
 				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-52px");
 			}
-			else if(ui.value == 3){
+			else if(ui.value == max){
 				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","-60px");
 				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","20px");
 			}
@@ -302,158 +303,17 @@ function settingsAgeReady(){
 				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","0");
 				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
 			}
-			userInfo.privacy.age = "" + ui.value;
-			$("#list_settings").find(".birthdate span").html(ageTooltips[parseInt(userInfo.privacy.age)]);
-			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(ageTooltips[parseInt(userInfo.privacy.age)]);
+			userInfo.privacy[field.toLowerCase()] = "" + ui.value;
+			privacy = userInfo.privacy[field.toLowerCase()];
+			$("#list_settings").find("."+field.toLowerCase()+" span").html(tooltips[parseInt(privacy)]);
+
+			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(tooltips[parseInt(privacy)]);
 		},
 		stop: function(){
 			$(".slider-tip").hide();
 		}
-	}).addSliderSegments(4,ageTooltips);
+	}).addSliderSegments(max+1,tooltips);
 }
-
-function settingsAddressReady(){
-	
-	$("#sliderAddress").find(".slider-tip").html(addressTooltips[parseInt(userInfo.privacy.address)]);
-	
-	$("#sliderAddress").slider({
-		value:parseInt(userInfo.privacy.address),
-		min: 0,
-		max: 5,
-		step: 1,
-		rang: "min",
-		create:function(){
-			$("#fullAddress").html(addressTooltips[5]);
-			$("#list_settings").find(".street span").html(addressTooltips[parseInt(userInfo.privacy.address)]);
-			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + addressTooltips[parseInt(userInfo.privacy.address)] + '</div></div>');
-			$(this).find(".slider-tip").hide();
-			if(userInfo.privacy.address == "0"){
-				$(this).find('.tooltip-inner').css("margin-left","85px");
-				$(this).find('.tooltip-arrow').css("margin-left","-52px");
-			}
-			if(userInfo.privacy.address == "5"){
-				$(this).find('.tooltip-inner').css("margin-left","-60px");
-				$(this).find('.tooltip-arrow').css("margin-left","20px");
-			}
-		},
-		slide: function( event, ui ) {
-			if(ui.value == 0){
-				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","85px");
-				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-52px");
-			}
-			else if(ui.value == 5){
-				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","-60px");
-				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","20px");
-			}
-			else {
-				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","0");
-				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
-			}
-			userInfo.privacy.address = "" + ui.value;
-			$("#list_settings").find(".street span").html(addressTooltips[parseInt(userInfo.privacy.address)]);
-
-			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(addressTooltips[parseInt(userInfo.privacy.address)]);
-		},
-		stop: function(){
-			$(".slider-tip").hide();
-		}
-	}).addSliderSegments(6,addressTooltips);
-};
-
-function settingsGeolocReady(){
-	
-	if (userInfo.privacy.geoloc == undefined) userInfo.privacy.geoloc = "0";
-	
-	$("#sliderGeoloc").slider({
-		value:parseInt(userInfo.privacy.geoloc),
-		min: 0,
-		max: 5,
-		step: 1,
-		create:function(){
-			$("#fullGeoloc").html(geolocTooltips[5]);	
-			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + geolocTooltips[parseInt(userInfo.privacy.geoloc)] + '</div></div>');
-			$("#list_settings").find(".geoloc span").html(geolocTooltips[parseInt(userInfo.privacy.geoloc)]);
-			$(this).find(".slider-tip").hide();
-			if(userInfo.privacy.geoloc == "0"){
-				$(this).find('.tooltip-inner').css("margin-left","85px");
-				$(this).find('.tooltip-arrow').css("margin-left","-52px");
-			}
-			if(userInfo.privacy.geoloc == "5"){
-				$(this).find('.tooltip-inner').css("margin-left","-60px");
-				$(this).find('.tooltip-arrow').css("margin-left","20px");
-			}
-		},
-		slide: function( event, ui ) {
-			if(ui.value == 0){
-				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","85px");
-				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-52px");
-			}
-			else if(ui.value == 5){
-				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","-60px");
-				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","20px");
-			}
-			else {
-				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","0");
-				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
-			}
-			userInfo.privacy.geoloc = "" + ui.value;
-			$("#list_settings").find(".geoloc span").html(geolocTooltips[parseInt(userInfo.privacy.geoloc)]);
-			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(geolocTooltips[parseInt(userInfo.privacy.geoloc)]);
-		},
-		stop: function(){
-			$(".slider-tip").hide();
-		}
-	}).addSliderSegments(6,geolocTooltips);
-}
-
-function settingsTracesReady(){
-	
-	if (userInfo.privacy.traces == undefined) userInfo.privacy.traces = "0";
-	
-	$("#sliderTraces").slider({
-		value:parseInt(userInfo.privacy.traces),
-		min: 0,
-		max: 2,
-		step: 1,
-		create:function(){
-			$("#fullTraces").html(tracesTooltips[2]);
-			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + tracesTooltips[parseInt(userInfo.privacy.traces)] + '</div></div>');
-			$(this).find(".slider-tip").hide();
-			$("#list_settings").find(".traces span").html(tracesTooltips[parseInt(userInfo.privacy.traces)]);
-			if(userInfo.privacy.traces == "0"){
-				$(this).find('.tooltip-inner').css("margin-left","85px");
-				$(this).find('.tooltip-arrow').css("margin-left","-52px");
-			}
-			if(userInfo.privacy.traces == "2"){
-				$(this).find('.tooltip-inner').css("margin-left","-60px");
-				$(this).find('.tooltip-arrow').css("margin-left","20px");
-			}
-		},
-		slide: function( event, ui ) {
-			if(ui.value == 0){
-				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","85px");
-				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-52px");
-			}
-			else if(ui.value == 2){
-				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","-60px");
-				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","20px");
-			}
-			else {
-				$(this).find('.ui-slider-handle').find('.tooltip-inner').css("margin-left","0");
-				$(this).find('.ui-slider-handle').find('.tooltip-arrow').css("margin-left","-10px");
-			}
-			userInfo.privacy.traces = "" + ui.value;
-			$("#list_settings").find(".traces span").html(tracesTooltips[parseInt(userInfo.privacy.traces)]);
-			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(tracesTooltips[parseInt(userInfo.privacy.traces)]);
-		},
-		stop: function(){
-			$(".slider-tip").hide();
-		}
-	}).addSliderSegments(3,tracesTooltips);
-}
-
-
-
 
 $(document).ready(function(){
 	
@@ -468,7 +328,7 @@ $(document).ready(function(){
 	
 	$('.ui-slider-segment').live("mouseenter",hoverIn).live("mouseleave",hoverOut);
 	
-	$("#slider").find(".ui-slider-handle").live("mouseenter",ageHoverIn).live("mouseleave",ageHoverOut);
+	$("#sliderBirthdate").find(".ui-slider-handle").live("mouseenter",ageHoverIn).live("mouseleave",ageHoverOut);
 	$("#sliderAddress").find(".ui-slider-handle").live("mouseenter",addressHoverIn).live("mouseleave",addressHoverOut);
 	$("#sliderGeoloc").find(".ui-slider-handle").live("mouseenter",geolocHoverIn).live("mouseleave",geolocHoverOut);
 	$("#sliderTraces").find(".ui-slider-handle").live("mouseenter",tracesHoverIn).live("mouseleave",tracesHoverOut);
@@ -479,6 +339,3 @@ $(document).ready(function(){
 	$('.submitSetting').live("click",updateUserInfo);
 
 });
-
-
-

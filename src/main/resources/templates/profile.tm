@@ -8,7 +8,7 @@
         "title": "<headers.ProfilePrivacyTitle>",
         "traces": "<headers.ProfilePrivacyTraces>",
         "geoloc": "<headers.ProfilePrivacyGeoloc>",
-        "age": "<headers.ProfilePrivacyAge>",
+        "birthdate": "<headers.ProfilePrivacyBirthdate>",
         "address": "<headers.ProfilePrivacyAddress>"
     },
     "title": "<headers.profileTitle>",
