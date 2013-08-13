@@ -21,15 +21,11 @@ function updateUserInfo(){
 }
 
 function doSwitchEmail() {
-	if($(".switch-email").attr("class") == "switch-animate switch-email switch-off"){
-		$(".switch-email").removeClass("switch-off");
-		$(".switch-email").addClass("switch-on");
+	if($("#emailSetting").attr("class") == "todo-done"){
 		userInfo.privacy.email = "1";
 		$("#list_settings").find(".email").html("Email: " + userInfo.email);
 	}
 	else{
-		$(".switch-email").removeClass("switch-on");
-		$(".switch-email").addClass("switch-off");
 		userInfo.privacy.email= "0";
 		$("#list_settings").find(".email").html("Email: nothing");
 	}
@@ -37,40 +33,31 @@ function doSwitchEmail() {
 
 function doSwitchGender() {
 	
-	if($(".switch-gender").attr("class") == "switch-animate switch-gender switch-off"){
-		$(".switch-gender").removeClass("switch-off");
-		$(".switch-gender").addClass("switch-on");
+	if($("#genderSetting").attr("class") == "todo-done"){
 		$("#titleSetting").show();
-		userInfo["privacy"]["gender"] = 1;
+		$("#titleSetting").addClass("todo-done");
+		userInfo["privacy"]["gender"] = "1";
 		$("#list_settings").find(".gender").html("Gender: " + userInfo.gender);
 	}
 	else{
-		$(".switch-gender").removeClass("switch-on");
-		$(".switch-gender").addClass("switch-off");
 		$("#titleSetting").hide();
-		userInfo["privacy"]["gender"] = 0;
+		userInfo["privacy"]["gender"] = "0";
 		$("#list_settings").find(".gender").html("Gender: nothing");
-		$(".switch-title").removeClass("switch-on");
-		$(".switch-title").addClass("switch-off");
-		userInfo["privacy"]["title"] = 0;
+		$("#titleSetting").removeClass("todo-done");
+		userInfo["privacy"]["title"] = "0";
 		$("#list_settings").find(".title").html("Title: nothing");
 	}
 }
 
 function doSwitchTitle() {
-	
-	if($(".switch-title").attr("class") == "switch-animate switch-title switch-off"){
-		$(".switch-title").removeClass("switch-off");
-		$(".switch-title").addClass("switch-on");
-		userInfo["privacy"]["title"] = 1;
+	if($("#titleSetting").attr("class") == "todo-done"){
+		userInfo["privacy"]["title"] = "1";
 		$("#list_settings").find(".title").html("Title: "+userInfo.title);
-
 	}
 	else{
-		$(".switch-title").removeClass("switch-on");
-		$(".switch-title").addClass("switch-off");
-		userInfo["privacy"]["title"] = 0;
+		userInfo["privacy"]["title"] = "0";
 		$("#list_settings").find(".title").html("Title: nothing");
+		
 	}
 }
 
@@ -141,38 +128,38 @@ function initializeSettingsDisplay(){
 	}
 	if ( userInfo.privacy.email == undefined || userInfo.privacy.email == "" ||  userInfo.privacy.email == "1" ){
 		userInfo.privacy.email = "1" ;
-		$(".switch-email").removeClass("switch-off");
-		$(".switch-email").addClass("switch-on");
+		$("#emailSetting").find(".switch-animate").removeClass("switch-off");
+		$("#emailSetting").find(".switch-animate").addClass("switch-on");
 		$("#list_settings").find(".email span").html(userInfo.email);
 	}
 	else if(  userInfo.privacy.email == "0" ){
-		$(".switch-email").removeClass("switch-on");
-		$(".switch-email").addClass("switch-off");
+		$("#emailSetting").find(".switch-animate").removeClass("switch-on");
+		$("#emailSetting").find(".switch-animate").addClass("switch-off");
 		$("#list_settings").find(".email span").html("nothing");
 	}
 	if ( userInfo.privacy.gender == undefined || userInfo.privacy.gender == "" || userInfo.privacy.gender == "1" ){
 		userInfo.privacy.gender = "1" ;
-		 $(".switch-gender").removeClass("switch-off");
-		$(".switch-gender").addClass("switch-on");
+		$("#genderSetting").find(".switch-animate").removeClass("switch-off");
+		$("#genderSetting").find(".switch-animate").addClass("switch-on");
 		$("#list_settings").find(".gender span").html(userInfo.gender);
 		$("#titleSetting").show();
 	}
 	else if(  userInfo.privacy.gender == "0" ){
-		$(".switch-gender").removeClass("switch-on");
-		$(".switch-gender").addClass("switch-off");
+		$("#genderSetting").find(".switch-animate").removeClass("switch-on");
+		$("#genderSetting").find(".switch-animate").addClass("switch-off");
 		$("#titleSetting").hide();
 		$("#list_settings").find(".gender span").html("nothing");
 		$("#titlePrivacy").attr("checked","false");
 	}
 	if ( userInfo.privacy.title == undefined || userInfo.privacy.title == "" ||  userInfo.privacy.title == "1" ){
 		userInfo.privacy.title = "1" ;
-		 $(".switch-title").removeClass("switch-off");
-			$(".switch-title").addClass("switch-on");
-			$("#list_settings").find(".title span").html(userInfo.title);
+		$("#titleSetting").find(".switch-animate").removeClass("switch-off");
+		$("#titleSetting").find(".switch-animate").addClass("switch-on");
+		$("#list_settings").find(".title span").html(userInfo.title);
 	}
 	else if(  userInfo.privacy.title == "0" ){
-		$(".switch-title").removeClass("switch-on");
-		$(".switch-title").addClass("switch-off");
+		$("#titleSetting").find(".switch-animate").removeClass("switch-on");
+		$("#titleSetting").find(".switch-animate").addClass("switch-off");
 		$("#list_settings").find(".title span").html("nothing");
 	}
 	if ( userInfo.privacy.age == undefined || userInfo.privacy.age == ""){
@@ -283,7 +270,7 @@ function hoverOut(){
 function settingsAgeReady(){
 	
 
-	$("#slider").slider({
+	$("#sliderBirthdate").slider({
 		value:parseInt(userInfo.privacy.age),
 		min: 0,
 		max: 3,
@@ -292,7 +279,7 @@ function settingsAgeReady(){
 			$("#fullAge").html(ageTooltips[3]);
 			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner">' + ageTooltips[parseInt(userInfo.privacy.age)] + '</div></div>');
 			$(this).find(".slider-tip").hide();
-			$("#list_settings").find(".birthdate span").html(ageTooltips[parseInt(userInfo.privacy.age)]);
+			$(".birthdate span").html(ageTooltips[parseInt(userInfo.privacy.age)]);
 			if(userInfo.privacy.age == "0"){
 				$(this).find('.tooltip-inner').css("margin-left","85px");
 				$(this).find('.tooltip-arrow').css("margin-left","-52px");
@@ -486,9 +473,9 @@ $(document).ready(function(){
 	$("#sliderGeoloc").find(".ui-slider-handle").live("mouseenter",geolocHoverIn).live("mouseleave",geolocHoverOut);
 	$("#sliderTraces").find(".ui-slider-handle").live("mouseenter",tracesHoverIn).live("mouseleave",tracesHoverOut);
 
-	$('.emailSwitch').live("click",doSwitchEmail);
-	$('.genderSwitch').live("click",doSwitchGender);
-	$('.titleSwitch').live("click",doSwitchTitle);  
+	$('#emailSetting').find(".switch").live("click",doSwitchEmail);
+	$('#genderSetting').find(".switch").live("click",doSwitchGender);
+	$('#titleSetting').find(".switch").live("click",doSwitchTitle);  
 	$('.submitSetting').live("click",updateUserInfo);
 
 });
