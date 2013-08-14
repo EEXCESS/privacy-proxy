@@ -255,11 +255,24 @@ function recommend(traces){
 			if (hitCount != 0) {
 				chrome.browserAction.setBadgeText({text: hitCount});
 			}
-			localStorage["recommendation_query"] = response.getResponseHeader('recommendation_query');
-			alert(response.getResponseHeader("recommendation_query"));
+			//localStorage["recommendation_query"] = response.getResponseHeader('recommendation_query');
+			
 			
 	   }
 	});
+	
+	$.ajax({
+		   url: "http://localhost:11564/api/v0/query/enrich",
+		   type: "POST",
+		   contentType: "application/json;charset=UTF-8",
+		   data: traces,
+		   complete: function(response, status){
+
+				localStorage["recommendation_query"] = response.responseText;
+				
+				
+		   }
+		});
 	
 }
 

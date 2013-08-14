@@ -20,6 +20,7 @@ import eu.eexcess.insa.profile.MendeleyProfileMapper;
 import eu.eexcess.insa.profile.ProfileSplitter;
 import eu.eexcess.insa.proxy.actions.ApplyPrivacySettings;
 import eu.eexcess.insa.proxy.actions.ApplyPrivacySettingsJS;
+import eu.eexcess.insa.proxy.actions.EnrichedRecommendationQueryAggregator;
 import eu.eexcess.insa.proxy.actions.GetUserId;
 import eu.eexcess.insa.proxy.actions.GetUserIdFromBody;
 import eu.eexcess.insa.proxy.actions.GetUserProfiles;
@@ -82,6 +83,7 @@ public class APIService extends RouteBuilder  {
 	final GetUserIdFromBody getUserIdFromBdy = new GetUserIdFromBody();
 	final PrepareRecommendationTracesRequest prepTraces = new PrepareRecommendationTracesRequest();
 	final UserProfileEnricherAggregator userContextAggregator = new UserProfileEnricherAggregator();
+	final EnrichedRecommendationQueryAggregator recommendationQueryAggregator = new EnrichedRecommendationQueryAggregator();
 	//final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
 	
 		public void configure() throws Exception {
@@ -201,6 +203,17 @@ public class APIService extends RouteBuilder  {
 			/*=========================================================================
 			 *  Recommendation routes
 			 *=========================================================================*/
+			
+			
+			from("jetty:http://localhost:11564/api/v0/query/enrich")
+				.process(getIds)
+				.enrich("direct:get.user.data", userContextAggregator)
+				.to("direct:get.recommendation.traces")
+				.process(applyPrivacySettings)
+				.process(prepPonderation)
+				.process(recommendationQueryAggregator)
+			;
+			
 			
 			/*route to get recommendation content
 			 * 

@@ -249,7 +249,6 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 			endDate = hitJson.path("_source").path("temporal").path("end")
 					.asText();
 		}
-
 		begin = dateFormat.parse(beginDate);
 		if (!endDate.equals("")) {
 			end = dateFormat.parse(endDate);
