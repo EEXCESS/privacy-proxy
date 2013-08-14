@@ -41,6 +41,15 @@
 									<button class="btn btn-primary submitSetting" id="sandboxSubmitButton">Submit this setting</button>
 								</div>
 								<ul id="list_settings">
+									<li id="tracesSetting">
+										<div class="tracesInfo">
+											<h4 class="traces">Traces to send : <span class="effective_data"></span></h4>
+											<p id="fullTraces" class="fullInfo">
+											</p>
+											<div id="sliderTraces"></div>
+										</div>
+										
+									</li>
 									<li id="emailSetting">
 										<div class="emailInfo">
 											<h4 class="email">Email : <span class="effective_data"></span></h4>
@@ -102,25 +111,14 @@
 													
 										</div>
 									</li>
-									<li id="tracesSetting">
-										<div class="tracesInfo">
-											<h4 class="traces">Traces to send : <span class="effective_data"></span></h4>
-											<p id="fullTraces" class="fullInfo">
-											</p>
-											<div id="sliderTraces"></div>
-										</div>
-										
-									</li>
 								</ul>
 							</div>
 							
 							<div class="todo mrm span7">
 								<div class="todo-search headerTraces">
 									<h1 style="display:inline">Recommendations</h1>
-									
-									<ul>
-									
-									
+									<div id="sliderUserTrace"></div>								
+									<ul>	
 										<ul class="resultsTitle">
 											<li class="resultsTitle">
 												<h3 class="resultsTitle">Results</h3>
@@ -153,6 +151,8 @@
 		<script src="flat_ui/js/jquery-1.8.3.min.js"></script>
 		<script src="lib/jquery-ui-1.10.3.custom.min.js"></script>
 		<script src="js/PrivacyRules.js"></script>
+				<script src="js/PrivacySandbox.js"></script>
+		
 		<script type="text/javascript" src="js/settings.js"></script>
 		<script src="flat_ui/js/jquery.ui.touch-punch.min.js"></script>
 		<script src="flat_ui/js/bootstrap.min.js"></script>
@@ -164,9 +164,9 @@
 		<script src="flat_ui/js/jquery.placeholder.js"></script>
 		<script src="flat_ui/js/jquery.stacktable.js"></script>
 		<script src="flat_ui/js/application.js"></script>
+		<script src="js/flat_ui_ext.js"></script>
 		<script src="lib/jquery.jsonview.js"></script>
 		<script src="js/profile.js"></script>
-		<script src="js/PrivacySandbox.js"></script>
 		<script type="text/javascript" src="js/import_traces.js"></script>
 	</body>
 </html>

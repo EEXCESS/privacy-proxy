@@ -217,6 +217,7 @@ function initSettings(){
 	initializeSettingsDisplay();
 	settingSlider("Traces", 2, tracesTooltips,userInfo.privacy.traces);
 	lastTrace = JSON.parse(localStorage["traces"]).hits.hits[0]["_source"];
+	initSliderUser();
 }
 
 function tracesHoverIn(){
@@ -277,18 +278,32 @@ function updateRecommendation(){
 	var traces = JSON.stringify(lastTrace);
 	$('.loader').attr("src","media/ajax-loader.gif")
 	
+	userDataJSON = JSON.stringify(userInfo);
 	$.ajax({
-		   url: "http://localhost:12564/api/v0/recommend",
+		   url: "http://localhost:12564/api/v0/users/privacy_settings",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
-		   data: traces,
-		   complete: function(response, status){
-		   
-				var xml = response.responseText;
-				$("#results").html(xml);
-				$('.loader').attr("src","flat_ui/images/todo/done.png")
+		   data: userDataJSON,
+		   beforeSend: function (request)
+	       {
+	           request.setRequestHeader("traceid", idUser);
+	       },
+		   complete: function(response) {
+			   
+			   $.ajax({
+				   url: "http://localhost:12564/api/v0/recommend",
+				   type: "POST",
+				   contentType: "application/json;charset=UTF-8",
+				   data: traces,
+				   complete: function(response, status){
+				   
+						var xml = response.responseText;
+						$("#results").html(xml);
+						$('.loader').attr("src","flat_ui/images/todo/done.png")
+				   }
+				});
 		   }
-		});
+	});
 }
 
 function settingSlider(field, max, tooltips, privacy){
