@@ -20,6 +20,7 @@ import eu.eexcess.insa.profile.MendeleyProfileMapper;
 import eu.eexcess.insa.profile.ProfileSplitter;
 import eu.eexcess.insa.proxy.actions.ApplyPrivacySettings;
 import eu.eexcess.insa.proxy.actions.ApplyPrivacySettingsJS;
+import eu.eexcess.insa.proxy.actions.EnrichedRecommendationQueryAggregator;
 import eu.eexcess.insa.proxy.actions.GetUserId;
 import eu.eexcess.insa.proxy.actions.GetUserIdFromBody;
 import eu.eexcess.insa.proxy.actions.GetUserProfiles;
@@ -82,6 +83,7 @@ public class APIService extends RouteBuilder  {
 	final GetUserIdFromBody getUserIdFromBdy = new GetUserIdFromBody();
 	final PrepareRecommendationTracesRequest prepTraces = new PrepareRecommendationTracesRequest();
 	final UserProfileEnricherAggregator userContextAggregator = new UserProfileEnricherAggregator();
+	final EnrichedRecommendationQueryAggregator recommendationQueryAggregator = new EnrichedRecommendationQueryAggregator();
 	//final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
 	
 		public void configure() throws Exception {
@@ -121,7 +123,11 @@ public class APIService extends RouteBuilder  {
 				.removeHeader("Host")	
 				.to("direct:prepare.user.profile")
 				.setHeader("Content-Type").constant("text/html")
-				.setHeader("recommendation_query", property("recommendation_query"));
+				//.setHeader("recommendation_query", property("recommendation_query"));
+				//.setHeader("recommendation_query",simple("${property[recommendation_query]}"))
+				.setHeader("recommendation_query",property("recommendation_query"))
+				
+			    .to("log:headerestilla?showHeaders=true")
 			;
 			
 			
@@ -198,6 +204,17 @@ public class APIService extends RouteBuilder  {
 			 *  Recommendation routes
 			 *=========================================================================*/
 			
+			
+			from("jetty:http://localhost:11564/api/v0/query/enrich")
+				.process(getIds)
+				.enrich("direct:get.user.data", userContextAggregator)
+				.to("direct:get.recommendation.traces")
+				.process(applyPrivacySettings)
+				.process(prepPonderation)
+				.process(recommendationQueryAggregator)
+			;
+			
+			
 			/*route to get recommendation content
 			 * 
 			 */
@@ -232,7 +249,7 @@ public class APIService extends RouteBuilder  {
 			    //.wireTap("file:///tmp/econbiz/?fileName=example.xml")
 			    .to("xslt:eu/eexcess/insa/xslt/results2html.xsl")
 			    
-			    .to("log:headerestilla?showAll=true")
+			    
 			    //.log("${property.recommendation_query}")
 			    //.setHeader("recommendation_query",simple("${property.recommendation_query}"))
 			    // .wireTap("file:///tmp/econbiz/?fileName=example.html")
