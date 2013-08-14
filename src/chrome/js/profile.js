@@ -258,16 +258,17 @@ function checkUpdate(){
 		$('.stateEmail').html('This is not a valid email');
 	}else{
 		
-		var body = "{\"term\":{\"data.email\":\""+email+"\"}}";
-		
+		var query = JSON.stringify({
+			user_email: email
+		});
 		$.ajax({
 		   url: "http://localhost:11564/user/verify",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
-		   data: body,
+		   data: query,
 		   complete: function(response) {	
 			    var responseObject = JSON.parse(response.responseText);
-				var taken = responseObject["takenID"];
+				var taken = responseObject["hits"];
 				if(taken==0) {
 					doUpdate("Email");
 				}

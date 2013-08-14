@@ -56,8 +56,8 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 		String traces = exchange.getProperty("user_context-traces",String.class);
 		String userProfile = exchange.getProperty("user_context-profile",String.class);
 		
-		System.out.println("traces : \n"+traces);
-		System.out.println("profil : \n"+userProfile);
+		//System.out.println("traces : \n"+traces);
+		//System.out.println("profil : \n"+userProfile);
 		
 		
 		InputStream isTraces = exchange.getProperty("user_context-traces",InputStream.class);
@@ -156,6 +156,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    while(itJson.hasNext()){ //goes over all the obsels in order to extract their title's terms and 
 	    	// to give them a coefficient
 	    	JsonNode obsel = itJson.next();
+	    	// the date value needs to be dependant on the trace sent from the front end !
 	    	coefficient = calcOneObselWeight(obsel, new Date()); 
 	    	titleBuffer = obsel.path("_source").path("document").path("title").asText();
 	    	
@@ -163,21 +164,24 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    	List<String> terms = tokenize(titleBuffer);
 	    	
 	    	Iterator<String> itTerms = terms.iterator();
-	    	while ( itTerms.hasNext() ){
-	    		term = itTerms.next();
-	    		if ( ponderatedTerms.containsKey(term)){
-	    			int newCoef = ponderatedTerms.get(term)+ coefficient;
-	    			
-	    			ponderatedTerms.remove(term);
-	    			ponderatedTerms.put( term, newCoef);
-	    		}
-	    		else{
-	    			ponderatedTerms.put( term, coefficient);
-	    		}
+	    	if ( coefficient > 0 ){
+		    	while ( itTerms.hasNext() ){
+		    		term = itTerms.next();
+		    		if ( ponderatedTerms.containsKey(term)){
+		    			int newCoef = ponderatedTerms.get(term)+ coefficient;
+		    			
+		    			ponderatedTerms.remove(term);
+		    			ponderatedTerms.put( term, newCoef);
+		    		}
+		    		else{
+		    			ponderatedTerms.put( term, coefficient);
+		    		}
+		    	}
 	    	}
 	    	
 	    	
 	    }
+	   
 	    return ponderatedTerms;
 
 	}
@@ -271,8 +275,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 				/ (Math.log((k * T + b) / b) * (1 / k) + B * T);
 		//double truncatedCoefficient = coefficient - coefficient % 0.001;
 		double truncatedCoefficient = Math.round(coefficient*10);
-		System.out.print(coefficient);
-		System.out.println("   ->   "+truncatedCoefficient);
+		
 		return (int)(truncatedCoefficient);
 	}
 

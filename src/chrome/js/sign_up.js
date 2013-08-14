@@ -9,16 +9,19 @@ function valideIDs(){
 	var username = document.forms["register"].elements[0].value;
 	var email = document.forms["register"].elements[1].value;
 	
-	var body = "{\"term\":{\"data.username\":\""+username+"\"}},{\"term\":{\"data.email\":\""+email+"\"}}";
-
+	var query = JSON.stringify({
+		user_email: email,
+		user_username: username
+	});
+	
 	if(validEmail(email)){
 		$.ajax({
 		   url: "http://localhost:11564/user/verify",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
-		   data: body,
+		   data: query,
 		   success: function(response) {	
-				var taken = response["takenID"];
+				var taken = response["hits"];
 				if(taken==0) {
 					register();
 				}

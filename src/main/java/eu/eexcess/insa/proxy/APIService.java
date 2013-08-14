@@ -5,8 +5,6 @@ import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.http4.HttpOperationFailedException;
 
-import com.semsaas.jsonxml.JsonXMLReader;
-
 import eu.eexcess.insa.camel.JsonXMLDataFormat;
 import eu.eexcess.insa.oauth.MendeleyAuthorizationHeaderGenerator;
 import eu.eexcess.insa.oauth.MendeleyAuthorizationQueryGenerator;
@@ -18,20 +16,19 @@ import eu.eexcess.insa.oauth.OAuthSigningProcessor;
 import eu.eexcess.insa.profile.EexcessProfileMapper;
 import eu.eexcess.insa.profile.MendeleyProfileMapper;
 import eu.eexcess.insa.profile.ProfileSplitter;
-import eu.eexcess.insa.proxy.actions.ApplyPrivacySettings;
 import eu.eexcess.insa.proxy.actions.ApplyPrivacySettingsJS;
 import eu.eexcess.insa.proxy.actions.EnrichedRecommendationQueryAggregator;
 import eu.eexcess.insa.proxy.actions.GetUserId;
 import eu.eexcess.insa.proxy.actions.GetUserIdFromBody;
 import eu.eexcess.insa.proxy.actions.GetUserProfiles;
-import eu.eexcess.insa.proxy.actions.ExtractFrontEndData;
+import eu.eexcess.insa.proxy.actions.ExtractUserEnvironment;
 import eu.eexcess.insa.proxy.actions.PrepareRecommendationRequest;
 import eu.eexcess.insa.proxy.actions.PrepareRecommendationTermsPonderation;
 import eu.eexcess.insa.proxy.actions.PrepareRecommendationTracesRequest;
 import eu.eexcess.insa.proxy.actions.PrepareRequest;
-import eu.eexcess.insa.proxy.actions.PrepareResponse;
+import eu.eexcess.insa.proxy.actions.ElasticExtractHitCount;
 import eu.eexcess.insa.proxy.actions.PrepareSearch;
-import eu.eexcess.insa.proxy.actions.PrepareUserSearch;
+import eu.eexcess.insa.proxy.actions.JSONBody2Properties;
 import eu.eexcess.insa.proxy.actions.PrepareUserLogin;
 import eu.eexcess.insa.proxy.actions.PrepareRespLogin;
 import eu.eexcess.insa.proxy.actions.ProfileVerifier;
@@ -47,20 +44,20 @@ import eu.eexcess.insa.proxy.connectors.MendeleyQueriesAggregator;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
 import eu.eexcess.insa.proxy.connectors.RecomendationResultAggregator;
 
-
 public class APIService extends RouteBuilder  {
-
+	final ElasticExtractHitCount elasticExtractHitCount = new ElasticExtractHitCount();
+	
+	
 	final PrepareRequest prepReq = new PrepareRequest();
-	final PrepareResponse prepRes = new PrepareResponse();
 	final PrepareSearch prepSearch = new PrepareSearch();
-	final PrepareUserSearch prepUserSearch = new PrepareUserSearch();
+	final JSONBody2Properties jsonBody2Properties = new JSONBody2Properties();
 	final PrepareUserLogin prepUserLogin = new PrepareUserLogin();
 	final PrepareRespLogin prepRespUser = new PrepareRespLogin();
 	final PrepareUserProfile prepUserProfile = new PrepareUserProfile();
 	final PrepareRecommendationRequest prepRecommendRequ = new PrepareRecommendationRequest();
 	final PrepareRecommendationTermsPonderation prepPonderation = new PrepareRecommendationTermsPonderation();
 	final EconBizQueryMapper prepEconBizQuery = new EconBizQueryMapper ();
-	final ExtractFrontEndData getIds = new ExtractFrontEndData();
+	final ExtractUserEnvironment extractUserEnv = new ExtractUserEnvironment();
 	final MendeleyQueryMapper prepMendeleyQuery = new MendeleyQueryMapper();
 	final MendeleyDocumentQueryMapper prepDocumentSearch = new MendeleyDocumentQueryMapper();
 	final CloseJsonObject closeJson = new CloseJsonObject();
@@ -110,7 +107,7 @@ public class APIService extends RouteBuilder  {
 			from("direct:get.user.data")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
-				.process(prepUserSearch)
+				.to("string-template:templates/elastic/user.account.search.tm")
 				.to("direct:elastic.userSearch")
 			;
 				
@@ -121,7 +118,8 @@ public class APIService extends RouteBuilder  {
 			from("jetty:http://localhost:12564/api/v0/recommend")	
 				.removeHeaders("CamelHttp*")
 				.removeHeader("Host")	
-				.to("direct:prepare.user.profile")
+				.to("direct:context.safe.load")
+				.to("direct:recommend")
 				.setHeader("Content-Type").constant("text/html")
 				//.setHeader("recommendation_query", property("recommendation_query"));
 				//.setHeader("recommendation_query",simple("${property[recommendation_query]}"))
@@ -177,18 +175,31 @@ public class APIService extends RouteBuilder  {
 			;
 			
 
-			/* Route to check if given username and email currently exit
+			/*
+			 * Route to check if given username or email currently exit
+			 * INPUT BODY: JSON with the following structure
+			 *   {
+			 *      "user_email": <USER_EMAIL>,
+			 *      "user_id": <USER_ID>
+			 *   }
+			 *   
+			 * NOTE: Only one of the keys is necessary
 			 * 
+			 * OUTPUT BODY:
+			 *   ElasticSearch results
 			 */
 			from("jetty:http://localhost:11564/user/verify")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
-				.process(prepUserSearch)
+				.process(jsonBody2Properties)
+				.to("string-template:templates/elastic/user.account.search.tm")
 				.to("direct:elastic.userSearch")
-				.process(prepRes)
+				.process(elasticExtractHitCount)
+				.to("string-template:templates/results/hits.tm")
 			;
 			
-			/*Route to log a user in
+			/*
+			 * Route to log a user in
 			 * 
 			 */
 			from("jetty:http://localhost:11564/user/login")
@@ -206,21 +217,32 @@ public class APIService extends RouteBuilder  {
 			
 			
 			from("jetty:http://localhost:11564/api/v0/query/enrich")
-				.process(getIds)
-				.enrich("direct:get.user.data", userContextAggregator)
-				.to("direct:get.recommendation.traces")
-				.process(applyPrivacySettings)
+				.to("direct:context.safe.load")
 				.process(prepPonderation)
 				.process(recommendationQueryAggregator)
 			;
 			
-			
-			/*route to get recommendation content
+
+			/*
+			 *  Loads a user context and ensures it is privacy safe by applying the user privacy settings
+			 *   User context is composed of:
+			 *     - a user profile (demographic information)
+			 *     - a list of user traces relative to a current time
+			 *     
+			 *  INPUT HEADERS:
+			 *  
+			 *  INPUT BODY: A JSON of a trace
+			 *  
+			 *  INPUT PROPERTIES:
+			 *    
+			 *  OUTPUT HEADERS:
 			 * 
+			 *  OUTPUT HEADERS:
+			 * 
+			 *  
 			 */
-			from("direct:prepare.user.profile")
-				//infos from the front end are retrieved
-				.process(getIds)  //this sets the user_id and plugin_uuid exchange properties
+			from("direct:context.safe.load")
+				.process(extractUserEnv)  //this sets the user_id and plugin_uuid exchange properties
 				// we need to get the user context
 				 .enrich("direct:get.user.data", userContextAggregator)
 				
@@ -228,7 +250,6 @@ public class APIService extends RouteBuilder  {
 				.to("direct:get.recommendation.traces")
 				 // filter the user profile following the privacy settings
 			    .process(applyPrivacySettings)
-				.to("direct:recommend")
 			;
 			
 			from("direct:recommend")

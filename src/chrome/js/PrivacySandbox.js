@@ -1,5 +1,3 @@
-var values = [0];
-
 function initSandbox(){
 	var maxScore = 10;
 	var recommendation = localStorage["recommend"];
@@ -21,7 +19,7 @@ function initSandbox(){
 	$('#recommendation_query').html(svgQuery);
 };
 
-function findNearest(includeLeft, includeRight, value) {
+function findNearest(values, includeLeft, includeRight, value) {
     var nearest = null;
     var diff = null;
     for (var i = 0; i < values.length; i++) {
@@ -36,20 +34,38 @@ function findNearest(includeLeft, includeRight, value) {
     return nearest;
 }
 
-$.fn.addSliderSegmentsUser = function (amount) {	
+$.fn.addSliderSegmentsUser = function (amount, values) {	
 	var range = values[values.length-1]-values[0];
 	var gapSum = 0;
+	var tracesJson = JSON.parse(localStorage["traces"]);
+	var traces = tracesJson["hits"].hits;
+	//var arrowHeight = $(".tooltip-arrow").height();
+	
+	
+	var sliderLength = $("#sliderUserTrace").width(); // length in px of the full slider
+	var arrowHeight = 5;
+	var sliderPosition = $("#sliderUserTrace").position();
 	for(var i=amount-1;i>=0;i--){
 		var segmentMargin = i==0 ? 0 : (100*(values[i]-values[i-1])/range);
-		var tooltipMargin = -52;
-		var adviceMargin = 85;
+		
+		var arrowPositionTop = sliderPosition.top-10;//+(values[i]*sliderLength)/values[amount-1];
+		var arrowPositionLeft = sliderPosition.left+(values[i]*sliderLength)/values[amount-1];
+		var tooltipPosition = 35 + (values[i]*sliderLength)/values[amount-1];
+		var arrowPosition = 0;
+		//var tooltipPosition = 0 ;
 		gapSum += segmentMargin;
+		//var displayedTrace = "toto";
+		var displayedTrace = JSON.stringify(traces[amount-1-i]["_source"]["document"].title);
+		displayedTrace += "\n";
+		displayedTrace += JSON.stringify(traces[amount-1-i]["_source"]["temporal"].begin);
 		var segment = "<div class='ui-slider-segment' id='segment-"+i+"' data-sum='"+gapSum+"' style='margin-left: "+segmentMargin+"%;'>"+
 		                 "<div class='tooltip top slider-tip' style='display: none'>"+
-		                   "<div class='tooltip-arrow advice' style='margin-left: "+tooltipMargin+"px'></div>"+
-		                   "<div class='tooltip-inner advice' style='margin-left: "+adviceMargin+"px'>test</div>"+
+		                   //"<div class='tooltip-arrow advice' style='margin-left: "+arrowPosition+"px'></div>"+
+		                   "<div class='tooltip-arrow advice' style='position:fixed; top:"+arrowPositionTop+";left:"+arrowPositionLeft+";'></div>"+
+		                   "<div class='tooltip-inner advice' style='margin-left: "+tooltipPosition+"px; margin-bottom:"+arrowHeight+"px;'>"+displayedTrace+"</div>"+
 		                 "</div>"+
 		               "</div>";
+		//alert(JSON.stringify(traces[i]));
 		$(this).prepend(segment);
 	}
 };
@@ -77,6 +93,7 @@ function initSliderUser(){
 	 *     
 	 *     We have to check it 2 times because the second loop put them really close together
 	 */
+    var values = [0];
 	for(i=8;i>=0;i--){
 		var current = new Date(trace[i].temporal.begin);
 		var currentMilli = current.getTime();
@@ -119,14 +136,17 @@ function initSliderUser(){
 		slide: function(event, ui) {
 		    var includeLeft = event.keyCode != $.ui.keyCode.RIGHT;
 		    var includeRight = event.keyCode != $.ui.keyCode.LEFT;
-		    var value = findNearest(includeLeft, includeRight, ui.value);
+		    var value = findNearest(values, includeLeft, includeRight, ui.value);
 		    slider.slider('values', 0, value);
+		    updateRecommendation();
+		    //$(this).find('.ui-slider-handle').find(".tooltip-inner").html(ui.value);
 		    return false;
+		    
 		},
 		change: function(event, ui) { 
 		}
 	});
-	$("#sliderUserTrace").addSliderSegmentsUser(10,range);
+	$("#sliderUserTrace").addSliderSegmentsUser(10, values);
 	
 	
 }

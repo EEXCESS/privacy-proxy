@@ -10,13 +10,12 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 
-public class ExtractFrontEndData implements Processor{
+public class ExtractUserEnvironment implements Processor{
 
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
 		
 		InputStream is = in.getBody(InputStream.class);
-
 	
 		JsonFactory factory = new JsonFactory();
 	    JsonParser jp = factory.createJsonParser(is);
@@ -33,7 +32,6 @@ public class ExtractFrontEndData implements Processor{
 			environnement  = rootNode.path("user").path("environnement").asText();
 			
 		}
-		
 		if ( !rootNode.path("plugin").path("uuid").isMissingNode()){
 			uuid = rootNode.path("plugin").path("uuid").asText();
 			

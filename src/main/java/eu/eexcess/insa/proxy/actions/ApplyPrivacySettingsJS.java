@@ -254,7 +254,7 @@ public class ApplyPrivacySettingsJS implements Processor{
 							while ( it.hasNext()){
 								JsonNode topic = it.next();
 								if ( !topic.path("env").isMissingNode()){
-									if ( topic.path("env").asText().equals( environnement )){
+									if ( topic.path("env").asText().equals( environnement ) || topic.path("env").asText().equals( "all" )){
 										mapper.writeTree(jg, topic);
 									}
 								}
