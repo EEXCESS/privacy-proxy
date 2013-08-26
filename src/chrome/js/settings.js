@@ -30,7 +30,7 @@ function doSwitchEmail() {
 		userInfo.privacy.email= "0";
 		$("#list_settings").find(".email").html("Email: nothing");
 	}
-	updateRecommendation();
+	updateRecommendation(initSandBox);
 }
 
 function doSwitchGender() {
@@ -49,7 +49,7 @@ function doSwitchGender() {
 		userInfo["privacy"]["title"] = "0";
 		$("#list_settings").find(".title").html("Title: nothing");
 	}
-	updateRecommendation();
+	updateRecommendation(initSandBox);
 }
 
 function doSwitchTitle() {
@@ -62,7 +62,7 @@ function doSwitchTitle() {
 		$("#list_settings").find(".title").html("Title: nothing");
 		
 	}
-	updateRecommendation();
+	updateRecommendation(initSandBox);
 }
 
 function triggerUpdateGeoloc() {
@@ -217,6 +217,7 @@ function initSettings(){
 	initializeSettingsDisplay();
 	settingSlider("Traces", 2, tracesTooltips,userInfo.privacy.traces);
 	lastTrace = JSON.parse(localStorage["traces"]).hits.hits[0]["_source"];
+	
 	initSliderUser();
 }
 
@@ -273,9 +274,14 @@ function hoverOut(){
 	$(this).find(".slider-tip").hide();
 }
 
-function updateRecommendation(){
-	
-	var traces = JSON.stringify(lastTrace);
+
+	//updateRecommendation (JSON.parse(localStorage["traces"]).hits.hits[0]["_source"]);
+
+function updateRecommendation(callback, trace){
+	if ( trace == undefined ){
+		trace = lastTrace;
+	}
+	var traces = JSON.stringify(trace);
 	$('.loader').attr("src","media/ajax-loader.gif")
 	
 	userDataJSON = JSON.stringify(userInfo);
@@ -299,7 +305,23 @@ function updateRecommendation(){
 				   
 						var xml = response.responseText;
 						$("#results").html(xml);
-						$('.loader').attr("src","flat_ui/images/todo/done.png")
+						
+						$('.loader').attr("src","flat_ui/images/todo/done.png");
+						
+						$.ajax({
+							   url: "http://localhost:11564/api/v0/query/enrich",
+							   type: "POST",
+							   contentType: "application/json;charset=UTF-8",
+							   data: JSON.stringify(trace),
+							   complete: function(response, status){
+
+									localStorage["recommendation_query"] = response.responseText;
+									callback();
+									
+									
+							   }
+							});
+						
 				   }
 				});
 		   }
@@ -345,7 +367,7 @@ function settingSlider(field, max, tooltips, privacy){
 			userInfo.privacy[field.toLowerCase()] = "" + ui.value;
 			privacy = userInfo.privacy[field.toLowerCase()];
 			$("#list_settings").find("."+field.toLowerCase()+" span").html(tooltips[parseInt(privacy)]);
-			updateRecommendation();
+			updateRecommendation(initSandbox);
 
 			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(tooltips[parseInt(privacy)]);
 		},

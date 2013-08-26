@@ -21,6 +21,9 @@ public class EnrichedRecommendationQueryAggregator implements Processor {
 	public void process(Exchange exchange) throws Exception {
 		HashMap<String, Integer> ponderatedTopics = (HashMap<String, Integer>)exchange.getProperty("ponderated_topics", HashMap.class);
 		Message in = exchange.getIn();
+		
+		
+		
 		InputStream contentQuery = in.getBody(InputStream.class);
 		
 		JsonFactory factory = new JsonFactory();

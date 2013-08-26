@@ -77,7 +77,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    in.setBody(q);
 	    logger.info("recommendation query : "+q);
 	    exchange.setProperty("recommendation_query", q);
-	    //in.setHeader("recommendation_query",q);	    //in.setHeader("origin",exchange.getExchangeId());
+	    in.setHeader("recommendation_query",q);	    //in.setHeader("origin",exchange.getExchangeId());
 	}
 		
 		
@@ -221,7 +221,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 
 				coefficients.add(obs);
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 				//coefficients.add(0.0);
 				coefficients.add(0);
@@ -253,11 +253,21 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 			endDate = hitJson.path("_source").path("temporal").path("end")
 					.asText();
 		}
-		begin = dateFormat.parse(beginDate);
-		if (!endDate.equals("")) {
-			end = dateFormat.parse(endDate);
-		} else {
-			end = cDate;
+		try{
+			begin = dateFormat.parse(beginDate);
+			if (!endDate.equals("") && endDate != null) {
+				end = dateFormat.parse(endDate);
+			} else {
+				end = cDate;
+			}
+		}
+		catch(Exception e){
+			System.out.println("begin date : ");
+			System.out.println(beginDate);
+			System.out.println("endDate : ");
+			System.out.println(endDate);
+			e.printStackTrace();
+			return 0;
 		}
 
 		double beginTrace = (cDate.getTime() - begin.getTime()) / 1000;

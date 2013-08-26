@@ -137,8 +137,10 @@ public class APIService extends RouteBuilder  {
 				.setHeader("ElasticType").constant("trace")
 				.setHeader("ElasticIndex").constant("privacy")
 				.process(prepSearch)
-				.removeHeader("Host")	
+				.removeHeader("Host")
 				.to("direct:elastic.search")
+				.to("log:send traces?showHeaders=true")
+
 			;
 			
 			
@@ -217,6 +219,7 @@ public class APIService extends RouteBuilder  {
 			
 			
 			from("jetty:http://localhost:11564/api/v0/query/enrich")
+			//.to("log:just_trace sent?showAll=true")
 				.to("direct:context.safe.load")
 				.process(prepPonderation)
 				.process(recommendationQueryAggregator)

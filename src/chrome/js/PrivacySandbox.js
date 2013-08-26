@@ -1,22 +1,55 @@
+var traceValuesMapping=[];
 function initSandbox(){
-	var maxScore = 10;
+	var maxScore = 50;
 	var recommendation = localStorage["recommend"];
 	$('#results').html(recommendation);
-	var recommendation_query = localStorage["recommendation_query"];
 	
-	var svgQuery = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="190"><g transform=translate(100)>';
-	{
-		var score = 3.5;
-		var term  = "Toto";
+	var recommendation_query = localStorage["recommendation_query"];
+	if ( recommendation_query != undefined){
+	
+		var svgQ = "";
 		
-		var barWidth = 250 * score / maxScore;
-		
-		svgQuery += '<text x="-10" y="10" text-anchor="end" style="fill:black; font-size:14;font-weight:bold;">'+term+'</text>';
-		svgQuery += '<rect x="+10" y="0" width="'+barWidth+'" height="10" style="fill: red" />';
-		svgQuery += '<text x="'+(barWidth+20)+'" y="10" style="fill:black; font-size:10">'+score+'</text>';
+		fullQuery = JSON.parse(recommendation_query);
+		var svgQuery = "";
+		var y = 0;
+		var y2 = 10;
+		for ( var i = 0 ; i< fullQuery.content.length; i++){
+				
+				var score = fullQuery.content[i].score ;
+				var term  = fullQuery.content[i].term;
+				var barWidth = 250 * score / maxScore;
+				
+				svgQuery += '<text x="-10" y="'+y2+'" text-anchor="end" style="fill:black; font-size:14;font-weight:bold;">'+term+'</text>'; //y+10
+				svgQuery += '<rect x="+10" y="'+y+'" width="'+barWidth+'" height="10" style="fill: red" />';
+				svgQuery += '<text x="'+(barWidth+20)+'" y="'+y2+'" style="fill:black; font-size:10">'+score+'</text>'; // y +10
+				y = y +15;
+				y2 = y +10;
+				
+				
+			}
+		if ( fullQuery.ponderatedTopics != undefined){
+			for ( var i = 0 ; i< fullQuery.ponderatedTopics.length; i++){
+				
+				var score = fullQuery.ponderatedTopics[i].value ;
+				var term  = fullQuery.ponderatedTopics[i].term;
+				var barWidth = 250 * score / maxScore;
+				
+				
+				svgQuery += '<text x="-10" y="'+y2+'" text-anchor="end" style="fill:black; font-size:14;font-weight:bold;">'+term+'</text>'; //y+10
+				svgQuery += '<rect x="+10" y="'+y+'" width="'+barWidth+'" height="10" style="fill: blue" />';
+				svgQuery += '<text x="'+(barWidth+20)+'" y="'+y2+'" style="fill:black; font-size:10">'+score+'</text>'; // y +10
+				y = y +15;
+				y2 = y +10;
+				
+			}
 	}
-	svgQuery += '</g></svg>';
-	$('#recommendation_query').html(svgQuery);
+		svgQuery += '</g></svg>';
+		
+		svgQ= '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="'+y2+'"><g transform=translate(100)>';
+		svgQ+= svgQuery;
+		
+		$('#recommendation_query').html(svgQ);
+	}
 };
 
 function findNearest(values, includeLeft, includeRight, value) {
@@ -44,14 +77,24 @@ $.fn.addSliderSegmentsUser = function (amount, values) {
 	
 	var sliderLength = $("#sliderUserTrace").width(); // length in px of the full slider
 	var arrowHeight = 5;
-	var sliderPosition = $("#sliderUserTrace").position();
+	var sliderPosition = $("#sliderUserTrace").position(); // pb : the position seems to be relative to the container ...
+	
 	for(var i=amount-1;i>=0;i--){
 		var segmentMargin = i==0 ? 0 : (100*(values[i]-values[i-1])/range);
 		
-		var arrowPositionTop = sliderPosition.top-10;//+(values[i]*sliderLength)/values[amount-1];
-		var arrowPositionLeft = sliderPosition.left+(values[i]*sliderLength)/values[amount-1];
+		var arrowPositionTop = sliderPosition.top-10//+(values[i]*sliderLength)/values[amount-1];
+		var arrowPositionLeft = 8+sliderPosition.left+(values[i]*sliderLength)/values[amount-1];
+		var boxPosition =  $("#sliderUserTrace").parent().position();
+		
+		
+		arrowPositionTop += boxPosition.top;
+		arrowPositionLeft += boxPosition.left;
+		
+		//arrowPositionTop+=128;
+		//arrowPositionLeft+=578;
+		console.log('slider position : '+sliderPosition.left+' '+sliderPosition.top);
 		var tooltipPosition = 35 + (values[i]*sliderLength)/values[amount-1];
-		var arrowPosition = 0;
+		arrowPosition = 0;
 		//var tooltipPosition = 0 ;
 		gapSum += segmentMargin;
 		//var displayedTrace = "toto";
@@ -67,6 +110,12 @@ $.fn.addSliderSegmentsUser = function (amount, values) {
 		               "</div>";
 		//alert(JSON.stringify(traces[i]));
 		$(this).prepend(segment);
+		var obj = {
+				value: values[i],
+				trace: JSON.stringify(traces[amount-1-i]["_source"])
+		};
+		
+		traceValuesMapping.push(obj);
 	}
 };
 
@@ -123,7 +172,7 @@ function initSliderUser(){
 		else{
 			values[j-1] = values[j] - (range/25);
 		}
-		j--;
+		j = j-1;
 		if(j<0){
 			valuesIncorrect = false;
 		}
@@ -138,13 +187,30 @@ function initSliderUser(){
 		    var includeRight = event.keyCode != $.ui.keyCode.LEFT;
 		    var value = findNearest(values, includeLeft, includeRight, ui.value);
 		    slider.slider('values', 0, value);
-		    updateRecommendation();
+		    updateRecommendation(initSandbox);
+		    //initSandbox();
 		    //$(this).find('.ui-slider-handle').find(".tooltip-inner").html(ui.value);
 		    return false;
 		    
 		},
 		change: function(event, ui) { 
+			console.log("values : "+values);
+			console.log("mapping : "+traceValuesMapping);
+			console.log ("range : "+range);
+			console.log("handle : "+ui.handle);
+			console.log("value : "+ui.value);
+			console.log("values : "+ui.values);
+			var correspondingItem;
+			for ( var i = 0; i <traceValuesMapping.length; i++){
+				if ( traceValuesMapping[i].value == ui.value){
+					correspondingItem = traceValuesMapping[i].trace;
+				}
+			}
+			console.log("corresponding item : "+ correspondingItem );
+			
 		}
+		//TODO
+		//envoyer une requete de recommendation avec la trace correspondante a la position du slider
 	});
 	$("#sliderUserTrace").addSliderSegmentsUser(10, values);
 	

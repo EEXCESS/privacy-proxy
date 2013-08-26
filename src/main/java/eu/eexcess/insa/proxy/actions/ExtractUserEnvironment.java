@@ -1,6 +1,8 @@
 package eu.eexcess.insa.proxy.actions;
 
 import java.io.InputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -15,7 +17,10 @@ public class ExtractUserEnvironment implements Processor{
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
 		
-		InputStream is = in.getBody(InputStream.class);
+		String is = in.getBody(String.class);
+		
+		System.out.println (" trace from frontend : "+is);
+		//InputStream is = in.getBody(InputStream.class);
 	
 		JsonFactory factory = new JsonFactory();
 	    JsonParser jp = factory.createJsonParser(is);
