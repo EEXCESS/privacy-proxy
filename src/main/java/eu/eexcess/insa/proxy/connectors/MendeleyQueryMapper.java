@@ -47,6 +47,12 @@ public class MendeleyQueryMapper implements Processor {
 	    Iterator<JsonNode> itNodes = rootNode.path("query").getElements();
 	    String termBuffer = "";
 	    String scoreBuffer = "";
+	    if ( ! itNodes.hasNext()){
+	    	exchange.setProperty("no_terms", true);
+	    }
+	    else{
+	    	exchange.setProperty("no_terms", false);
+	    }
 	    while ( itNodes.hasNext()){
 	    	nodeBuffer = itNodes.next();
 	    	termBuffer = nodeBuffer.path("term").asText();

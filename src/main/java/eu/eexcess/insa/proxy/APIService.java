@@ -118,6 +118,7 @@ public class APIService extends RouteBuilder  {
 			from("jetty:http://localhost:12564/api/v0/recommend")	
 				.removeHeaders("CamelHttp*")
 				.removeHeader("Host")	
+				//.to("log:recommendation route start?showAll=true")
 				.to("direct:context.safe.load")
 				.to("direct:recommend")
 				.setHeader("Content-Type").constant("text/html")
@@ -323,18 +324,28 @@ public class APIService extends RouteBuilder  {
 			from("direct:recommend.mendeley")
 				.onException(HttpOperationFailedException.class)
 					
-					.handled(true) .log("exception handled")   /// a changer  (detruit tout l'exchange ?)
+					//.handled(true) .log("exception handled")   /// a changer  (detruit tout l'exchange ?)
 					.log("erreur mandeley")
-					//.continued(true)
+					.to("string-template:templates/empty-results.tm")
+					
+					.continued(true)
 					//.to("string-template:templates/empty-results.tm")
 					//.to("log:Mendeley.recommendation.httpexception?showAll=true")
 				.end()
 			    
 		    	.process(prepMendeleyQuery)
-				.recipientList().header("QueryEndpoint")
-			    .process(prepDocumentSearch)
-			    .recipientList(header("QueryEndPoint").tokenize(",")).aggregationStrategy(new MendeleyQueriesAggregator())
-			    .process(closeJson)
+		    	.choice()
+		    		.when(simple("${property.no_terms} == true"))
+		    			.to("log:no terms")
+		    			.to("string-template:templates/empty-results.tm")
+		    		.otherwise()
+		    			.to("log:terms")
+		    			.recipientList().header("QueryEndpoint")
+					    .process(prepDocumentSearch)
+					    .recipientList(header("QueryEndPoint").tokenize(",")).aggregationStrategy(new MendeleyQueriesAggregator())
+					    .process(closeJson)
+		    	.end()
+				
 			    .to("log:ex1.1?showAll=true")
 
 			    

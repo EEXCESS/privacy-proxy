@@ -1,5 +1,10 @@
 var traceValuesMapping=[];
+
+
+
+
 function initSandbox(){
+	
 	var maxScore = 50;
 	var recommendation = localStorage["recommend"];
 	$('#results').html(recommendation);
@@ -80,6 +85,7 @@ $.fn.addSliderSegmentsUser = function (amount, values) {
 	var sliderPosition = $("#sliderUserTrace").position(); // pb : the position seems to be relative to the container ...
 	
 	for(var i=amount-1;i>=0;i--){
+		if ( traces[amount-1-i] != undefined ){
 		var segmentMargin = i==0 ? 0 : (100*(values[i]-values[i-1])/range);
 		
 		var arrowPositionTop = sliderPosition.top-10//+(values[i]*sliderLength)/values[amount-1];
@@ -97,7 +103,7 @@ $.fn.addSliderSegmentsUser = function (amount, values) {
 		arrowPosition = 0;
 		//var tooltipPosition = 0 ;
 		gapSum += segmentMargin;
-		//var displayedTrace = "toto";
+		
 		var displayedTrace = JSON.stringify(traces[amount-1-i]["_source"]["document"].title);
 		displayedTrace += "\n";
 		displayedTrace += JSON.stringify(traces[amount-1-i]["_source"]["temporal"].begin);
@@ -117,16 +123,23 @@ $.fn.addSliderSegmentsUser = function (amount, values) {
 		
 		traceValuesMapping.push(obj);
 	}
+	}
 };
 
 function initSliderUser(){
 	var trace = JSON.parse(localStorage["traces"]).hits.hits;
 	
-	for (i=0;i<10;i++){
-		trace[i] = trace[i]["_source"];
-	};
+	var i = 0;
 	
-	var begin = new Date(trace[9].temporal.begin);
+	for (i=0;i<10 && i< trace.length;i++){
+
+		trace[i] = trace[i]._source;
+
+	};
+	i--;
+	
+	
+	var begin = new Date(trace[i].temporal.begin);
 	var beginMilli = begin.getTime();
 	var end = new Date(trace[0].temporal.begin);
 	var endMilli = end.getTime();
@@ -144,19 +157,21 @@ function initSliderUser(){
 	 */
     var values = [0];
 	for(i=8;i>=0;i--){
-		var current = new Date(trace[i].temporal.begin);
-		var currentMilli = current.getTime();
-		var diffMilli = currentMilli-beginMilli;
-		var test = (((diffMilli-previousMilli)/range)*25);
-		if (test < 1) {
-			diffMilli = range/25 + previousMilli;
+		if (trace[i] != undefined){
+			var current = new Date(trace[i].temporal.begin);
+			var currentMilli = current.getTime();
+			var diffMilli = currentMilli-beginMilli;
+			var test = (((diffMilli-previousMilli)/range)*25);
+			if (test < 1) {
+				diffMilli = range/25 + previousMilli;
+			}
+			values.push(diffMilli);
+			previousMilli = diffMilli;
 		}
-		values.push(diffMilli);
-		previousMilli = diffMilli;
 	};
 		
 	for(i=0;i<10;i++){
-		if(values[i] > range){
+		if(values[i] > range && values[i] != undefined){
 			values[i] = range - ( 9 - i );
 		}
 	}
@@ -182,37 +197,101 @@ function initSliderUser(){
 		min: 0,
 		max: range,
 		values: [range],
+		create: function(){
+			$(this).children(".ui-slider-handle").html('<div class="tooltip top slider-tip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>');
+			$(this).find(".slider-tip").hide();
+		},
 		slide: function(event, ui) {
 		    var includeLeft = event.keyCode != $.ui.keyCode.RIGHT;
 		    var includeRight = event.keyCode != $.ui.keyCode.LEFT;
 		    var value = findNearest(values, includeLeft, includeRight, ui.value);
 		    slider.slider('values', 0, value);
-		    updateRecommendation(initSandbox);
+		    //updateRecommendation(initSandbox);
 		    //initSandbox();
 		    //$(this).find('.ui-slider-handle').find(".tooltip-inner").html(ui.value);
+		    
 		    return false;
 		    
 		},
 		change: function(event, ui) { 
+			console.log("change : ui value = "+ui.value);
+			/*
 			console.log("values : "+values);
 			console.log("mapping : "+traceValuesMapping);
 			console.log ("range : "+range);
 			console.log("handle : "+ui.handle);
 			console.log("value : "+ui.value);
 			console.log("values : "+ui.values);
+			*/
 			var correspondingItem;
 			for ( var i = 0; i <traceValuesMapping.length; i++){
 				if ( traceValuesMapping[i].value == ui.value){
 					correspondingItem = traceValuesMapping[i].trace;
 				}
 			}
+			
+			
 			console.log("corresponding item : "+ correspondingItem );
+			var item = JSON.parse(correspondingItem);
+			var displayed = item.document.title;
+			displayed+="\n";
+			displayed+= item.temporal.begin;
+			$(this).find('.tooltip-arrow').css("margin-bottom","-8px");
+			$(this).find('.tooltip-arrow').css("margin-left","3px");
+		    $(this).find('.ui-slider-handle').find(".tooltip-inner").html(displayed);
+			/*$.ajax({
+				   url: "http://localhost:12564/api/v0/recommend",
+				   type: "POST",
+				   contentType: "application/json;charset=UTF-8",
+				   data: correspondingItem,
+				   complete: function(response, status){
+				   
+						var xml = $(response.responseText);
+						var hitCount = $(xml).attr("data-hits");
+						localStorage["recommend"] = response.responseText;
+					
+						if (hitCount != 0) {
+							chrome.browserAction.setBadgeText({text: hitCount});
+						}
+						//localStorage["recommendation_query"] = response.getResponseHeader('recommendation_query');
+						
+						
+				   }
+				});*/
+			updateRecommendation(initSandbox, JSON.parse(correspondingItem));
+				/*$.ajax({
+					   url: "http://localhost:11564/api/v0/query/enrich",
+					   type: "POST",
+					   contentType: "application/json;charset=UTF-8",
+					   data: correspondingItem,
+					   complete: function(response, status){
+
+							localStorage["recommendation_query"] = response.responseText;
+							updateRecommendation(initSandbox, JSON.parse(correspondingItem));
+
+					   }
+					});*/
 			
 		}
-		//TODO
-		//envoyer une requete de recommendation avec la trace correspondante a la position du slider
+		
 	});
-	$("#sliderUserTrace").addSliderSegmentsUser(10, values);
+	
+	$("#sliderUserTrace").addSliderSegmentsUser(values.length, values);
 	
 	
 }
+function tracesSelectionHoverIn(){
+	/*if ($(this).find(".tooltip-inner").html() == "undefined"){
+		$(this).find(".tooltip-inner").html("coucou");
+	}*/
+	$(this).find(".slider-tip").show();
+	
+}
+
+function tracesSelectionHoverOut(){
+	$(this).find(".slider-tip").hide();
+	
+}
+$(document).ready(function(){
+	$("#sliderUserTrace").find(".ui-slider-handle").live("mouseenter",tracesSelectionHoverIn).live("mouseleave",tracesSelectionHoverOut);
+});

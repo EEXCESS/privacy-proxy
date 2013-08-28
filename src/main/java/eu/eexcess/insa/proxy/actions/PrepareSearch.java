@@ -20,7 +20,7 @@ public class PrepareSearch implements Processor {
 		in.setHeader("ElasticType", "trace");
 		in.setHeader("ElasticIndex", "privacy");
 		in.setHeader(Exchange.HTTP_METHOD, "POST");
-		body = "{\"query\":{\"bool\":{\"should\":["+body+"]}}}";
+		body = "{\"query\":{\"bool\":{\"must\":["+body+"]}}}"; //must or should ?
 		in.setBody(body);
 		
 

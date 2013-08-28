@@ -24,7 +24,9 @@ function initUserInfo(){
 	   		userInfo = JSON.parse(response.responseText);
 	   		idUser = userInfo["id"];
 	   		userInfo = userInfo["values"];
-	   		generateProfilePage();	
+	   		if ( userInfo != null ){
+	   			generateProfilePage();
+	   		}
 	   		initSettings();
 
 	   }

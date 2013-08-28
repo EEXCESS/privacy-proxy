@@ -31,7 +31,8 @@ import eu.eexcess.insa.proxy.Utils;
 
 public class PrepareRecommendationTermsPonderation implements Processor {
 	Logger logger = LoggerFactory.getLogger(PrepareRecommendationTermsPonderation.class);
-	static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	// simpledateformat no thread safe : we make a new instnace very time we need it
+	//static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); 
 	
 	long T = 3600; // time range ( seconds ) to be considered in the calculation
 	//( older obsels in the JsonNode parameter won't be taken into consideration )
@@ -253,6 +254,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 			endDate = hitJson.path("_source").path("temporal").path("end")
 					.asText();
 		}
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		try{
 			begin = dateFormat.parse(beginDate);
 			if (!endDate.equals("") && endDate != null) {

@@ -307,6 +307,8 @@ function updateRecommendation(callback, trace){
 						$("#results").html(xml);
 						
 						$('.loader').attr("src","flat_ui/images/todo/done.png");
+						localStorage["recommend"] = xml;
+						var hitCount = $(xml).attr("data-hits");
 						
 						$.ajax({
 							   url: "http://localhost:11564/api/v0/query/enrich",

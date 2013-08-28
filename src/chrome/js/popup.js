@@ -46,13 +46,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
 if (localStorage["env"] == "work"){
 	$("#workButton").addClass("active");
+	$("#displayed_env").text("Environnement is set to : work");
 }
 else{
 	$("#homeButton").addClass("active");
+	$("#displayed_env").text("Environnement is set to : home");
 }
 
-$("#workButton").on("click",function(){localStorage["env"]="work";});
-$("#homeButton").on("click",function(){localStorage["env"]="home";});
+$("#workButton").on("click",function(){
+		localStorage["env"]="work";
+		$("#displayed_env").text("Environnement is set to : work");
+	});
+$("#homeButton").on("click",function(){
+		localStorage["env"]="home";
+		$("#displayed_env").text("Environnement is set to : home");
+	});
 
 /*<script>
 		chrome.browserAction.setBadgeBackgroundColor({color:[190, 190, 190, 230]});

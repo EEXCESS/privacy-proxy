@@ -71,6 +71,15 @@ public class PrepareRecommendationTracesRequest implements Processor {
 			//System.out.println("user_id = "+user_id);
 
 			jg.writeStartObject();
+				jg.writeFieldName("sort");
+				jg.writeStartArray();
+					jg.writeStartObject();
+						jg.writeFieldName("temporal.begin");
+						jg.writeStartObject();
+							jg.writeStringField("order", "desc");
+						jg.writeEndObject();
+					jg.writeEndObject();
+				jg.writeEndArray();
 				jg.writeFieldName("query");
 				jg.writeStartObject();
 					jg.writeFieldName("bool");
@@ -133,7 +142,7 @@ public class PrepareRecommendationTracesRequest implements Processor {
 			
 			Message in = exchange.getIn();
 			
-			//System.out.println("traces query : "+query);
+			System.out.println("traces query : "+query);
 			in.setBody(query);
 			exchange.setProperty("needMoreTraces", "yes");
 		}
@@ -162,6 +171,7 @@ public class PrepareRecommendationTracesRequest implements Processor {
 			jg.close();
 			
 			String query = sWriter.toString();
+			
 			Message in = exchange.getIn();
 			in.setBody(query);
 			

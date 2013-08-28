@@ -122,7 +122,7 @@ function traces(user_id,email) {
 	if(email != '') {
 		body = body + "{\"term\":{\"user.user_id\": \""+email+"\"}}";
 	}	
-	
+	body = body + ",{\"term\":{\"user.environnement\": \""+localStorage["env"]+"\"}}";
 	request.open(method, url, async);	
 	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	request.send(body);
@@ -282,6 +282,15 @@ $(document).ready(function () {
 	
 	$('.tabProfile').live("click",function(){document.location = pluginUrl+"profile.html"});
 	$('.tabSettings').live("click",function(){document.location = pluginUrl+"privacySandbox.html"});
+	if (localStorage["env"] == "work"){
+		$("#workButton").addClass("active");
+	}
+	else{
+		$("#homeButton").addClass("active");
+	}
+
+	$("#workButton").on("click",function(){localStorage["env"]="work"; document.location.reload(true);});
+	$("#homeButton").on("click",function(){localStorage["env"]="home"; document.location.reload(true);});
 	
   chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
 	  var uuid = response.data;

@@ -193,12 +193,12 @@ function click_btn() {
 	});
 	
 	document.getElementById("fullName").addEventListener('focus',function(){
-		if(this.value=='Full Name')document.getElementById("fullName").value='';
+		if(this.value=='Username')document.getElementById("fullName").value='';
 	});
 
 	document.getElementById("fullName").addEventListener('blur',function(){
 		if(this.value==''){
-			this.value='Full Name';
+			this.value='Username';
 		}
 	});
 	

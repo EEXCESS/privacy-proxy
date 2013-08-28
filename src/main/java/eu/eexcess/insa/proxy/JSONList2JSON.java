@@ -33,7 +33,7 @@ public class JSONList2JSON implements Processor {
 			jg = factory.createJsonGenerator(sWriter);
 			jg.writeStartObject();
 			jg.writeArrayFieldStart(rootNodeName);
-			for(JsonNode n: mergedArray) {
+			for(JsonNode n: mergedArray) { //bug hier
 				if(n != null) {
 					mapper.writeTree(jg, n);
 				}
