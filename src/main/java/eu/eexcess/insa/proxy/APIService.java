@@ -43,6 +43,7 @@ import eu.eexcess.insa.proxy.connectors.MendeleyUpdateProfileInfo;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueriesAggregator;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
 import eu.eexcess.insa.proxy.connectors.RecomendationResultAggregator;
+import eu.eexcess.insa.recommend.APIRecommendation;
 
 public class APIService extends RouteBuilder  {
 	final ElasticExtractHitCount elasticExtractHitCount = new ElasticExtractHitCount();
@@ -82,6 +83,7 @@ public class APIService extends RouteBuilder  {
 	final UserProfileEnricherAggregator userContextAggregator = new UserProfileEnricherAggregator();
 	final EnrichedRecommendationQueryAggregator recommendationQueryAggregator = new EnrichedRecommendationQueryAggregator();
 	//final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
+	
 	
 		public void configure() throws Exception {
 			final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
@@ -202,6 +204,7 @@ public class APIService extends RouteBuilder  {
 			/*=========================================================================
 			 *  Recommendation routes
 			 *=========================================================================*/
+			/*
 			//TODO
 			// mettre dans un package et route builder à part
 			
@@ -215,7 +218,7 @@ public class APIService extends RouteBuilder  {
 			/*
 			 *  Route to get recommendations 
 			 */
-			
+			/*
 			from("jetty:http://localhost:12564/api/v0/recommend")	
 				.removeHeaders("CamelHttp*")
 				.removeHeader("Host")	
@@ -248,6 +251,7 @@ public class APIService extends RouteBuilder  {
 			 * 
 			 *  
 			 */
+			/*
 			from("direct:context.safe.load")
 				.process(extractUserEnv)  //this sets the user_id and plugin_uuid exchange properties
 				// we need to get the user context
@@ -285,6 +289,7 @@ public class APIService extends RouteBuilder  {
 			/* This route gets the traces needed to prepare a recommendation
 			 * 
 			 */
+			/*
 			from("direct:get.recommendation.traces")
 				.setHeader("ElasticType").constant("trace")
 				.setHeader("ElasticIndex").constant("privacy")
@@ -308,6 +313,7 @@ public class APIService extends RouteBuilder  {
 			 /* route to get recommendation content from EconBiz
 			  *    
 			  */
+			/*
 			from("direct:recommend.econbiz")
 				.process(prepEconBizQuery)
 			    .choice()
@@ -324,6 +330,7 @@ public class APIService extends RouteBuilder  {
 			/* Route to get recommendation content from Mendeley
 			 * 
 			 */
+			/*
 			from("direct:recommend.mendeley")
 				.onException(HttpOperationFailedException.class)
 					
@@ -461,6 +468,8 @@ public class APIService extends RouteBuilder  {
 	public static void main( String[] args ) {
     	final org.apache.camel.spring.Main main = new org.apache.camel.spring.Main();
     	main.addRouteBuilder(new APIService());
+    	main.addRouteBuilder(new APIRecommendation());
+
     	//insert other routebuilders here
     	Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {			
 			public void run() {
