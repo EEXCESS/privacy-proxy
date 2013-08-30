@@ -51,7 +51,7 @@ public class PrepareRespLogin implements Processor {
 	    
 	    String loginValid = rootNode.path("hits").path("total").asText();
 	    String id = entryNode.path("_id").asText();
-	    System.out.println(id);
+	    //System.out.println(id);
 	    //String email = entryNode.path("_source").path("email").asText();
 	    String username = entryNode.path("_source").path("username").asText();
 	    

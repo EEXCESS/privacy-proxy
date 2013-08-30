@@ -143,7 +143,7 @@ function date_heure()
 */
 
 
-// function triggerContext(event, tabId) {
+
 function triggerContext(tabId,event) {
 	var requestContext = {
 		method: "getContext",
@@ -173,7 +173,6 @@ function get_geolocation_context(event,id,request){
 	    		   
 	    		   coord = "lat="+latitude+",lng="+longitude;
 	    		   var geolocation = {
-	    				nothing:"nothing",
 	    				country:response.postalCodes[0].countryCode,
 	    				region:response.postalCodes[0].adminName1,
 	    		   		district: response.postalCodes[0].adminName3,

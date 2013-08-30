@@ -1,6 +1,24 @@
 $('.nav-tabs').button();
 
 
+function oauthMendeley(){
+	$.ajax({
+		   	url: "http://localhost:11564/oauth/mendeley/init",
+		    type: "POST",
+		    contentType: "application/json;charset=UTF-8",
+		    success:function(response, status, xhr){
+		    	var token = xhr.getResponseHeader("oauth_token");
+		    	localStorage["token_secret"] = xhr.getResponseHeader("oauth_token_secret");
+		    	//window.location = "http://api.mendeley.com/oauth/authorize/?oauth_token="+token;
+		    	chrome.tabs.create({'url' : 'http://api.mendeley.com/oauth/authorize/?oauth_token='+token},function(window) {
+		    	   });
+		    	
+		    	/*chrome.windows.create({'url': 'http://api.mendeley.com/oauth/authorize/?oauth_token='+token, 'type': 'detached_panel'}, function(window) {
+		    	   });*/
+		    }
+		});
+}
+
 
 function logout(){
 	localStorage.removeItem("privacy_email");
@@ -12,6 +30,8 @@ function logout(){
 	$('#username').html("Good Bye !");
 	$('#logout_btn').hide();
 	$('#sign_in').show();
+	$('#mendeley_btn').hide();
+	localStorage.removeItem("mendeley_enabled");
 }
 
 
@@ -19,8 +39,8 @@ function username() {
 	if(localStorage["username"] != undefined){
 		$('#username').html("Welcome "+localStorage["username"]);
 		$('#logout_btn').show();
-		//$('#sign_in').hide();
-		
+		$('#sign_in').hide();
+		$('#mendeley_btn').show();
 		if (localStorage["env"] == "home"){
 			$('#home').addClass("active");
 		}
@@ -29,7 +49,15 @@ function username() {
 		}
 	}
 	
+	if ( localStorage["mendeley_enabled"]!= undefined && localStorage["mendeley_enabled"]=='true'){
+		
+		$('#mendeley_btn').attr('value', 'Synchronize Mendeley');
+		
+	}
+	
 	document.getElementById("logout_btn").addEventListener('click',logout);
+	document.getElementById("mendeley_btn").addEventListener('click',oauthMendeley);
+	
 }
 
 function recommend() {

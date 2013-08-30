@@ -94,3 +94,18 @@ ul {
   padding: 5px;
   margin-right:30px;
 }
+
+/*
+#mendeley_btn {
+    background-image: url("mendeley.png") !important; 
+    /*background-color: transparent !important; // make the button transparent 
+    background-repeat: no-repeat !important;  // make the background image appear only once 
+    background-position: 0px 0px !important;  // equivalent to 'top left' 
+    /*border: none !important;           // assuming we don't want any borders 
+    //cursor: pointer !important;        // make the cursor like hovering over an <a> element 
+    height: 16px !important;           // make this the size of your image 
+    padding-right: 16px !important;     // make text start to the right of the image 
+    vertical-align: left !important; // align the text vertically centered 
+
+}*/
+

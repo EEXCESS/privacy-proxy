@@ -43,7 +43,7 @@ public class EnrichedRecommendationQueryAggregator implements Processor {
 		}
 		generator.writeFieldName("ponderatedTopics");
 		generator.writeStartArray();
-		System.out.println("ponderated topics : "+ponderatedTopics);
+		//System.out.println("ponderated topics : "+ponderatedTopics);
 		Iterator<Entry<String, Integer>> it = ponderatedTopics.entrySet().iterator();
 		
 		while ( it.hasNext()){

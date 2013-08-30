@@ -32,6 +32,7 @@ $.ajax({
     	var idJSON = JSON.parse(response.responseText);
     	var id = idJSON["_id"];
     	localStorage["user_id"] = id;
+    	localStorage["mendeley_enabled"]='true';
     	var redirect = url.split("oauth/index.html")[0];
     	redirect += "traces.html";
     	document.location.href = redirect;

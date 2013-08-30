@@ -5,7 +5,7 @@ var traceValuesMapping=[];
 
 function initSandbox(){
 	
-	var maxScore = 50;
+	var maxScore = 100;
 	var recommendation = localStorage["recommend"];
 	$('#results').html(recommendation);
 	

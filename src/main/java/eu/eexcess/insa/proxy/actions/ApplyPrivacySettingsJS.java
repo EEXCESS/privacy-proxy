@@ -204,7 +204,7 @@ public class ApplyPrivacySettingsJS implements Processor{
 								}
 								String birthdate = applyPrivacy("birthdate",userProfile.path("_source").path("birthdate").asText(),level-1);
 								if ( !birthdate.equals("nothing")){
-									System.out.println("birthdate :"+birthdate);
+									//System.out.println("birthdate :"+birthdate);
 									JsonParser jp = factory.createJsonParser(birthdate);
 									JsonNode birthdateNode = mapper.readValue(jp, JsonNode.class);
 									jg.writeFieldName("birthdate");
@@ -358,7 +358,7 @@ public class ApplyPrivacySettingsJS implements Processor{
 			JsonNode jnode = mapper.readTree(is);
 			System.out.println(jnode);
 		}*/
-		System.out.println(privacy.engine.eval("privacy.gender.levels"));
+		//System.out.println(privacy.engine.eval("privacy.gender.levels"));
 		//int i = (Integer)privacy.engine.eval("privacy.gender.levels");
 		Object o = privacy.engine.eval("privacy.birthdate.levels");
 		int level;

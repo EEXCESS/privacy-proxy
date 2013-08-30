@@ -543,6 +543,7 @@ function drop() {
 }
 
 function dragover(){
+	
 	return false;
 }
 
@@ -595,8 +596,19 @@ $(document).ready(function(){
 			lastTag.attr("draggable",true).attr("id",id);
 			var htmlTag = lastTag.html();
 			lastTag.html('<img class="imgTag" src="media/icon.png">'+htmlTag);
+			
 		}
 	});
+	/*$('.mytagbuckets').droppable({
+		accept: ".tag",
+		over: function ( event, ui ){
+			alert("ach");
+			$('#all_tagsinput').css('border-color','red');
+		},
+		drop: function (event, ui){
+			alert("mg");
+		}
+	});*/
 
 });
 

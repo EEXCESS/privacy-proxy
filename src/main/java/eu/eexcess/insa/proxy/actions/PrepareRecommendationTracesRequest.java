@@ -142,7 +142,7 @@ public class PrepareRecommendationTracesRequest implements Processor {
 			
 			Message in = exchange.getIn();
 			
-			System.out.println("traces query : "+query);
+			//System.out.println("traces query : "+query);
 			in.setBody(query);
 			exchange.setProperty("needMoreTraces", "yes");
 		}

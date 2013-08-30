@@ -19,7 +19,7 @@ public class MendeleyProfileMapper implements Processor {
 		Message in = exchange.getIn();
 		//JsonNode existingProfile = in.getBody(JsonNode.class);
 		JsonNode mendeleyProfile = exchange.getProperty("profile.mendeley",JsonNode.class);
-		System.out.println(mendeleyProfile);
+		//System.out.println(mendeleyProfile);
 		
 		if ( mendeleyProfile != null){
 			// Map main.location -> addressCity + addressCountry

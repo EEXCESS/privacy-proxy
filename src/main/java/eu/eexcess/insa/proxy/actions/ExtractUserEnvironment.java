@@ -19,7 +19,7 @@ public class ExtractUserEnvironment implements Processor{
 		
 		String is = in.getBody(String.class);
 		
-		System.out.println (" trace from frontend : "+is);
+		//System.out.println (" trace from frontend : "+is);
 		//InputStream is = in.getBody(InputStream.class);
 	
 		JsonFactory factory = new JsonFactory();

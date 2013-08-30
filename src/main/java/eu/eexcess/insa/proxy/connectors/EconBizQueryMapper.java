@@ -55,7 +55,12 @@ public int itemsPerPage = 5; //maximum amount of responses we get ftom mendeley
 	   String encodedQuery = URLEncoder.encode(query.toString(), "UTF8"); 
 	    in.setHeader(Exchange.HTTP_QUERY,"q="+encodedQuery+"&size="+itemsPerPage);
 	   // System.out.println("q="+URLDecoder.decode(encodedQuery)+"&size="+itemsPerPage);
-	    
+	    if ( encodedQuery.equals("")){
+	    	exchange.setProperty("emptyQuery", "yes");
+	    }
+	    else{
+	    	exchange.setProperty("emptyQuery", "no");
+	    }
 	    in.setHeader(Exchange.HTTP_METHOD, "GET");
 	}
 	

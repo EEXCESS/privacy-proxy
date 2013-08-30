@@ -33,7 +33,7 @@ public class MendeleyInitOAuthRequestTokenParams implements Processor {
 		Message in = exchange.getIn();
 		exchange.setProperty("oauth_callback", in.getHeader("Origin",String.class)+"/oauth/index.html" );
 		//exchange.setProperty("oauth_callback", "http://localhost.com/oauth/token" );
-		System.out.println(in.getHeader("Origin",String.class));
+		//System.out.println(in.getHeader("Origin",String.class));
 		in.setHeader(Exchange.HTTP_BASE_URI, "http://api.mendeley.com");
 		in.setHeader(Exchange.HTTP_PATH,"/oauth/request_token/");
 		in.setHeader(Exchange.HTTP_METHOD, "GET"); 

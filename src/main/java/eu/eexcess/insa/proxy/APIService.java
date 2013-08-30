@@ -112,22 +112,7 @@ public class APIService extends RouteBuilder  {
 			;
 				
 			
-			/*
-			 *  Route to get recommendations 
-			 */
-			from("jetty:http://localhost:12564/api/v0/recommend")	
-				.removeHeaders("CamelHttp*")
-				.removeHeader("Host")	
-				//.to("log:recommendation route start?showAll=true")
-				.to("direct:context.safe.load")
-				.to("direct:recommend")
-				.setHeader("Content-Type").constant("text/html")
-				//.setHeader("recommendation_query", property("recommendation_query"));
-				//.setHeader("recommendation_query",simple("${property[recommendation_query]}"))
-				.setHeader("recommendation_query",property("recommendation_query"))
-				
-			    .to("log:headerestilla?showHeaders=true")
-			;
+			
 			
 			
 			
@@ -217,13 +202,31 @@ public class APIService extends RouteBuilder  {
 			/*=========================================================================
 			 *  Recommendation routes
 			 *=========================================================================*/
-			
+			//TODO
+			// mettre dans un package et route builder à part
 			
 			from("jetty:http://localhost:11564/api/v0/query/enrich")
 			//.to("log:just_trace sent?showAll=true")
 				.to("direct:context.safe.load")
 				.process(prepPonderation)
 				.process(recommendationQueryAggregator)
+			;
+			
+			/*
+			 *  Route to get recommendations 
+			 */
+			
+			from("jetty:http://localhost:12564/api/v0/recommend")	
+				.removeHeaders("CamelHttp*")
+				.removeHeader("Host")	
+				//.to("log:recommendation route start?showAll=true")
+				.to("direct:context.safe.load")
+				.to("direct:recommend")
+				.setHeader("Content-Type").constant("text/html")
+				//.setHeader("recommendation_query", property("recommendation_query"));
+				//.setHeader("recommendation_query",simple("${property[recommendation_query]}"))
+				.setHeader("recommendation_query",property("recommendation_query"))
+ 
 			;
 			
 
@@ -264,7 +267,6 @@ public class APIService extends RouteBuilder  {
 					.parallelProcessing()
 					.timeout(5000)
 					.to("direct:recommend.econbiz","direct:recommend.mendeley")
-					.log("multicast : end")
 					
 				.end()
 				.process(new JSONList2JSON())
@@ -309,13 +311,14 @@ public class APIService extends RouteBuilder  {
 			from("direct:recommend.econbiz")
 				.process(prepEconBizQuery)
 			    .choice()
-					.when().simple("${in.header.CamelHttpQuery} != 'q='")
+					//.when().simple("${in.header.CamelHttpQuery} != 'q='")
+			    	.when().simple("${property.emptyQuery} == 'no'")
 						.to("http4://api.econbiz.de/v1/search")
 					.otherwise()
+						.to("log:mendeley recommendation : no query")
 						.to("string-template:templates/empty-results.tm")
 				.end()
 				.process(econBizResultFormater)
-				.log("EconBiz recommendations retrieved")
 			; 
 			
 			/* Route to get recommendation content from Mendeley
@@ -325,7 +328,7 @@ public class APIService extends RouteBuilder  {
 				.onException(HttpOperationFailedException.class)
 					
 					//.handled(true) .log("exception handled")   /// a changer  (detruit tout l'exchange ?)
-					.log("erreur mandeley")
+					.to("log:Mendeley recommendation error")
 					.to("string-template:templates/empty-results.tm")
 					
 					.continued(true)
@@ -350,6 +353,16 @@ public class APIService extends RouteBuilder  {
 
 			    
 			;
+			
+			
+			
+			/* ================================================================
+			 * 						MENDELEY OAUTH ROUTES
+			 * ================================================================
+			 */
+			
+			
+			
 			
 			/* Route to initialize Mendeley OAuth authentifiaction
 			 *  ( get request token and other informations
@@ -379,7 +392,7 @@ public class APIService extends RouteBuilder  {
 				.to("http4://api.mendeley.com/oauth/access_token/")
 				.to("direct:oauth.access")
 			;
-					
+			
 			/* Route to get user's Mendely profile informations
 			 * 
 			 */
@@ -391,6 +404,16 @@ public class APIService extends RouteBuilder  {
 				.to("http4://api.mendeley.com/")
 				.to("direct:elastic.save")
 			;
+			
+			
+			//=======================================================
+			
+			
+			
+			
+			
+			
+			
 			
 			/* Route to save user's Mendeley profile informations to ElasticSearch
 			 * 
@@ -438,7 +461,7 @@ public class APIService extends RouteBuilder  {
 	public static void main( String[] args ) {
     	final org.apache.camel.spring.Main main = new org.apache.camel.spring.Main();
     	main.addRouteBuilder(new APIService());
-    	
+    	//insert other routebuilders here
     	Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {			
 			public void run() {
 				try {
