@@ -9,6 +9,7 @@
 	
     <camelContext xmlns="http://camel.apache.org/schema/spring" useMDCLogging="true">
 	    <propertyPlaceholder id="properties" location="config.properties"/>
+	    
     
 		<route>
 			<from uri="seda:elastic.trace.index?concurrentConsumers=4" />
@@ -21,6 +22,7 @@
     		<setProperty propertyName="CamelCharsetName">
     			<constant>UTF-8</constant>
     		</setProperty>
+    		<log message="elastic.xml reporting in"/>
 			<to uri="http4://localhost:9200/" />
 			<removeHeaders pattern="CamelHttp*" />
 		</route>

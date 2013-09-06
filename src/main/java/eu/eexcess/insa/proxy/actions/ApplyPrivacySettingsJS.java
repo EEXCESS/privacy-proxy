@@ -261,16 +261,10 @@ public class ApplyPrivacySettingsJS implements Processor{
 							}
 							
 							jg.writeEndArray();
-							
-							
-							
+
 							//mapper.writeTree(jg, userProfile.path("_source").path("topics"));
 						}
-						
-						
-						
-						
-						
+
 					}
 
 					jg.writeEndObject();

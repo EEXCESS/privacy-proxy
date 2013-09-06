@@ -52,10 +52,12 @@ public class APIRecommendation extends RouteBuilder {
 		/*=========================================================================
 		 *  Recommendation routes
 		 *=========================================================================*/
-		//TODO
-		// mettre dans un package et route builder à part
+		
 		
 		from("jetty:http://localhost:11564/api/v0/query/enrich")
+			.to("direct:query.enrich")
+		;
+		from("direct:query.enrich")
 		//.to("log:just_trace sent?showAll=true")
 			.to("direct:context.safe.load")
 			.process(prepPonderation)
@@ -66,7 +68,10 @@ public class APIRecommendation extends RouteBuilder {
 		 *  Route to get recommendations 
 		 */
 		
-		from("jetty:http://localhost:12564/api/v0/recommend")	
+		from("jetty:http://localhost:12564/api/v0/recommend")
+			.to("direct:recommendation.route")
+		;
+		from("direct:recommendation.route")
 			.removeHeaders("CamelHttp*")
 			.removeHeader("Host")	
 			//.to("log:recommendation route start?showAll=true")
@@ -76,7 +81,6 @@ public class APIRecommendation extends RouteBuilder {
 			//.setHeader("recommendation_query", property("recommendation_query"));
 			//.setHeader("recommendation_query",simple("${property[recommendation_query]}"))
 			.setHeader("recommendation_query",property("recommendation_query"))
-
 		;
 		
 
@@ -115,7 +119,7 @@ public class APIRecommendation extends RouteBuilder {
 			.setHeader("origin").simple("exchangeId")
 			.multicast().aggregationStrategy(new RecomendationResultAggregator())
 				.parallelProcessing()
-				.timeout(5000)
+				.timeout(10000)
 				.to("direct:recommend.econbiz","direct:recommend.mendeley")
 				
 			.end()
@@ -180,8 +184,8 @@ public class APIRecommendation extends RouteBuilder {
 				//.handled(true) .log("exception handled")   /// a changer  (detruit tout l'exchange ?)
 				.to("log:Mendeley recommendation error")
 				.to("string-template:templates/empty-results.tm")
-				
-				.continued(true)
+				.log("mendeley error ( nearly ? ) handled")
+				.continued(false)
 				//.to("string-template:templates/empty-results.tm")
 				//.to("log:Mendeley.recommendation.httpexception?showAll=true")
 			.end()
@@ -193,10 +197,12 @@ public class APIRecommendation extends RouteBuilder {
 	    			.to("string-template:templates/empty-results.tm")
 	    		.otherwise()
 	    			.to("log:terms")
-	    			.recipientList().header("QueryEndpoint")
-				    .process(prepDocumentSearch)
-				    .recipientList(header("QueryEndPoint").tokenize(",")).aggregationStrategy(new MendeleyQueriesAggregator())
-				    .process(closeJson)
+	    			.throttle(30).timePeriodMillis(1000)
+	    				.recipientList().header("QueryEndpoint")
+	    				.process(prepDocumentSearch)
+	    				.recipientList(header("QueryEndPoint").tokenize(",")).aggregationStrategy(new MendeleyQueriesAggregator())
+	    			.end()
+	    			.process(closeJson)
 	    	.end()
 			
 		    //.to("log:ex1.1?showAll=true")

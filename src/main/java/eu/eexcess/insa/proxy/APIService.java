@@ -91,8 +91,16 @@ public class APIService extends RouteBuilder  {
 			 * 
 			 */
 			from("jetty:http://localhost:12564/api/v0/privacy/trace")
+				.to("direct:trace.index")
+			;
+			
+			
+			from("direct:trace.index")
+				.streamCaching()
+				//.log("Indexing trace ...")
 				.setHeader("ElasticType").constant("trace")
 				.setHeader("ElasticIndex").constant("privacy")
+				.to("log:indexing trace :?showAll=true&showStreams=true ")
 				.to("seda:elastic.trace.index")
 			;	
 			
@@ -110,6 +118,7 @@ public class APIService extends RouteBuilder  {
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.to("string-template:templates/elastic/user.account.search.tm")
+				.to("log:DEBUG : getUserData?showAll=true")
 				.to("direct:elastic.userSearch")
 			;
 				
@@ -122,12 +131,21 @@ public class APIService extends RouteBuilder  {
 			 * 
 			 */
 			from("jetty:http://localhost:11564/user/traces")
+				.to("direct:retrieve.user.traces")
+			;
+			from("direct:retrieve.user.traces")
+				.streamCaching()
+				.convertBodyTo(String.class)
+				.to("log:send traces : input?showAll=true")
 				.setHeader("ElasticType").constant("trace")
 				.setHeader("ElasticIndex").constant("privacy")
 				.process(prepSearch)
 				.removeHeader("Host")
 				.to("direct:elastic.search")
+				// for testing purposes
+				.convertBodyTo(String.class)
 				.to("log:send traces?showHeaders=true")
+				.wireTap("file:test_data")
 
 			;
 			

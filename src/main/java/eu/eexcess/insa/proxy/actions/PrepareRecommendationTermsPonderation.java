@@ -61,13 +61,18 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 		//System.out.println("profil : \n"+userProfile);
 		
 		
-		InputStream isTraces = exchange.getProperty("user_context-traces",InputStream.class);
-		//String isTraces = exchange.getProperty("user_context-traces",String.class);
+		//InputStream isTraces = exchange.getProperty("user_context-traces",InputStream.class);
+		String isTraces = exchange.getProperty("user_context-traces",String.class);
 		
-		InputStream isUserProfile = exchange.getProperty("user_context-profile",InputStream.class);
+		//InputStream isUserProfile = exchange.getProperty("user_context-profile",InputStream.class);
+		String isUserProfile = exchange.getProperty("user_context-profile",String.class);
 		
 		
-		HashMap<String, Integer> ponderatedTerms = extractQueryFromTraces(isTraces);
+		System.out.println("DEBUG    PREPARE_RECOMMENDATION_TERMS_PONDERATION");
+		System.out.println("    retrieved user profile : \n"+isUserProfile);
+		System.out.println("retrieved user traces : \n"+isTraces);
+		
+		HashMap<String, Integer> ponderatedTerms = extractQueryFromTraces(isTraces, exchange);
 		extractQueryFromProfile( ponderatedTerms, isUserProfile, exchange); 
 		
 		
@@ -75,6 +80,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    Utils.writeWeightedQuery(stringWriter, ponderatedTerms);
 	    logger.info(ponderatedTerms.toString());
 	    String q = stringWriter.toString();
+	    System.out.println("DEGUG    recommendation query : \n"+q);
 	    in.setBody(q);
 	    logger.info("recommendation query : "+q);
 	    exchange.setProperty("recommendation_query", q);
@@ -87,7 +93,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	/*
 	 *  The user's profile is assumed to have been already filtered following the privacy settings
 	 */
-	private HashMap<String, Integer> extractQueryFromProfile ( HashMap<String, Integer> tracesQuery, InputStream is, Exchange exchange ) throws JsonParseException, IOException{
+	private HashMap<String, Integer> extractQueryFromProfile ( HashMap<String, Integer> tracesQuery, String is/*InputStream is*/, Exchange exchange ) throws JsonParseException, IOException{
 	
 		JsonFactory factory = new JsonFactory();
 		JsonParser jp = factory.createJsonParser(is);
@@ -138,7 +144,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	}
 	
 		
-	private HashMap<String, Integer> extractQueryFromTraces( InputStream is ) throws ParseException, JsonParseException, JsonMappingException, IOException{
+	private HashMap<String, Integer> extractQueryFromTraces( String /*InputStream*/ is, Exchange exchange ) throws ParseException, JsonParseException, JsonMappingException, IOException{
 		//coefficients are calculated for each term from the obsel's title 
 		// ************************************************************
 		JsonFactory factory = new JsonFactory();
@@ -146,8 +152,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
 	   
-	  
-	    
+	    //System.out.println(rootNode);
 	    HashMap<String, Integer> ponderatedTerms = new HashMap<String,Integer>();
 	    JsonNode hitsNode = rootNode.path("hits").path("hits");
 	    Iterator<JsonNode> itJson = hitsNode.getElements();
@@ -158,7 +163,18 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    	// to give them a coefficient
 	    	JsonNode obsel = itJson.next();
 	    	// the date value needs to be dependant on the trace sent from the front end !
-	    	coefficient = calcOneObselWeight(obsel, new Date()); 
+	    	
+	    	Date d = new Date ();
+	    	String lastTrace_date = exchange.getProperty("lastTrace_date",String.class);
+	    	if ( !lastTrace_date.equals("")){
+	    		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	    		d = dateFormat.parse(lastTrace_date);
+	    	}
+	    	
+	    	
+	    	
+	    	coefficient = calcOneObselWeight(obsel, d); 
+	    	System.out.println(coefficient);
 	    	titleBuffer = obsel.path("_source").path("document").path("title").asText();
 	    	
 	    	
@@ -233,7 +249,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 		return coefficients;
 	}
 
-	/** Attributes a coefficient from 0 to 1 to a given obsel
+	/** Attributes a coefficient from 0 to 10 to a given obsel
 	 * 
 	 * @param hitJson : the JsonNode refering to the obsel taken into consideration
 	 * @param cDate = the current date
@@ -243,6 +259,14 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	 */
 	private int calcOneObselWeight(JsonNode hitJson, Date cDate)
 			throws ParseException {
+		int highestCoefficient = 10;
+		double truncatedCoefficient = 0;
+		if ( !hitJson.path("_source").path("events").path("end").isMissingNode()){
+			if (hitJson.path("_source").path("events").path("end").asText().equals("active") ){
+				return highestCoefficient;
+			}
+		}
+		
 		Date begin = null;
 		Date end = null;
 
@@ -263,6 +287,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 				end = cDate;
 			}
 		}
+		
 		catch(Exception e){
 			System.out.println("begin date : ");
 			System.out.println(beginDate);
@@ -270,6 +295,12 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 			System.out.println(endDate);
 			e.printStackTrace();
 			return 0;
+		}
+		System.out.println("begin date : "+begin);
+		System.out.println("enddate : "+ end);
+		System.out.println("currentDate : "+ cDate);
+		if ( begin.equals(cDate) || end.getTime()> cDate.getTime()){ // the obsel is considered active so we give it the highest coefficient
+			return highestCoefficient;
 		}
 
 		double beginTrace = (cDate.getTime() - begin.getTime()) / 1000;
@@ -279,6 +310,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 		}
 		if (endTrace >= T) {
 			endTrace = T;
+			// better return 0 ?
 		}
 
 		double coefficient = (Math.log((k * beginTrace + b)
@@ -286,7 +318,10 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 				* (1 / k) + B * (beginTrace - endTrace))
 				/ (Math.log((k * T + b) / b) * (1 / k) + B * T);
 		//double truncatedCoefficient = coefficient - coefficient % 0.001;
-		double truncatedCoefficient = Math.round(coefficient*10);
+		System.out.println(coefficient);
+		truncatedCoefficient = Math.round(coefficient*10);
+			
+		
 		
 		return (int)(truncatedCoefficient);
 	}

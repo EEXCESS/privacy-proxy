@@ -1,4 +1,5 @@
 var traceValuesMapping=[];
+var tracesSliderCurrentValue = 0;
 
 
 
@@ -206,15 +207,17 @@ function initSliderUser(){
 		    var includeRight = event.keyCode != $.ui.keyCode.LEFT;
 		    var value = findNearest(values, includeLeft, includeRight, ui.value);
 		    slider.slider('values', 0, value);
+		    console.log(value);
 		    //updateRecommendation(initSandbox);
 		    //initSandbox();
 		    //$(this).find('.ui-slider-handle').find(".tooltip-inner").html(ui.value);
-		    
+		    tracesSliderCurrentValue = value;
 		    return false;
 		    
 		},
 		change: function(event, ui) { 
 			console.log("change : ui value = "+ui.value);
+			tracesSliderCurrentValue = ui.value;
 			/*
 			console.log("values : "+values);
 			console.log("mapping : "+traceValuesMapping);

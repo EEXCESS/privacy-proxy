@@ -369,7 +369,26 @@ function settingSlider(field, max, tooltips, privacy){
 			userInfo.privacy[field.toLowerCase()] = "" + ui.value;
 			privacy = userInfo.privacy[field.toLowerCase()];
 			$("#list_settings").find("."+field.toLowerCase()+" span").html(tooltips[parseInt(privacy)]);
-			updateRecommendation(initSandbox);
+			var correspondingItem;
+			
+			
+			//var sliderValue =  $('#sliderUserTrace').slider("option","value"); 
+			var sliderValue = tracesSliderCurrentValue;
+			console.log("slider value : "+sliderValue);
+		
+			for ( var i = 0; i <traceValuesMapping.length; i++){
+				if ( traceValuesMapping[i].value == sliderValue){
+					correspondingItem = traceValuesMapping[i].trace;
+				}
+			}
+			console.log(correspondingItem);
+			if ( correspondingItem != undefined){
+				updateRecommendation(initSandbox, JSON.parse(correspondingItem));
+			}
+			else{
+				updateRecommendation(initSandbox);
+			}
+			
 
 			$(this).find('.ui-slider-handle').find(".tooltip-inner").html(tooltips[parseInt(privacy)]);
 		},

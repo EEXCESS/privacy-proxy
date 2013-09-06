@@ -19,16 +19,20 @@ public class ExtractUserEnvironment implements Processor{
 		
 		String is = in.getBody(String.class);
 		
-		//System.out.println (" trace from frontend : "+is);
+		System.out.println("DEBUG    EXTRACT USER ENVIRONNEMENT ( trace from frontend");
+		System.out.println(is);
+		
 		//InputStream is = in.getBody(InputStream.class);
 	
 		JsonFactory factory = new JsonFactory();
 	    JsonParser jp = factory.createJsonParser(is);
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
+	    System.out.println("rootnode : "+rootNode);
 	    String user_id = "";
 	    String uuid = "";
 	    String environnement = "";
+	    String beginDate ="";
 		if ( !rootNode.path("user").path("user_id").isMissingNode()){
 			user_id = rootNode.path("user").path("user_id").asText();
 			
@@ -41,10 +45,14 @@ public class ExtractUserEnvironment implements Processor{
 			uuid = rootNode.path("plugin").path("uuid").asText();
 			
 		}
+		if ( !rootNode.path("temporal").path("begin").isMissingNode()){
+			beginDate = rootNode.path("temporal").path("begin").asText();
+		}
 		
 		exchange.setProperty("user_id", user_id);
 		exchange.setProperty("plugin_uuid",uuid);
 		exchange.setProperty("environnement", environnement);
+		exchange.setProperty("lastTrace_date", beginDate);
 		//exchange.setProperty("trace_recommendation", rootNode);
 		in.setBody(rootNode);
 	}

@@ -27,6 +27,7 @@ import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
@@ -223,13 +224,9 @@ public class ApplyPrivacySettingsTest extends CamelTestSupport {
 		return inputData;	
 		}
 
-	public ArrayList<String[]> applyPrivacySettingsTestDataGenerator() throws IOException{
-		ArrayList<String[]> generatedProfiles = new ArrayList<String[]>();
-		
-		HashMap<String, String>data1 = new HashMap<String, String>();
-		data1.put("userName", "userName");
-		data1.put("email", "email");
-		data1.put("password", "password");
+	
+	public ArrayList<String[]> applyPrivacySettingsTestDataGenerator( ) throws IOException{
+		HashMap<String,String> data1 = new HashMap<String,String>(); 
 		data1.put("privacyEmail", "0");
 		data1.put("privacyGender", "1");
 		data1.put("privacyTitle", "1");
@@ -237,6 +234,17 @@ public class ApplyPrivacySettingsTest extends CamelTestSupport {
 		data1.put("privacyGeoloc", "2");
 		data1.put("privacyAge", "2");
 		data1.put("privacyAddress", "3");
+		return applyPrivacySettingsTestDataGenerator(data1);
+	}
+	
+	public ArrayList<String[]> applyPrivacySettingsTestDataGenerator(HashMap<String,String> privacySettings) throws IOException{
+		ArrayList<String[]> generatedProfiles = new ArrayList<String[]>();
+		
+		HashMap<String, String>data1 = new HashMap<String, String>();
+		data1.put("userName", "userName");
+		data1.put("email", "email");
+		data1.put("password", "password");
+		data1.putAll(privacySettings);
 		data1.put("title", "title");
 		data1.put("lastname", "lastname");
 		data1.put("firstname", "firstname");
@@ -414,7 +422,7 @@ public class ApplyPrivacySettingsTest extends CamelTestSupport {
 									){
 									jg.writeFieldName("privacy");
 									jg.writeStartObject();
-										
+										/*
 										writePrivacyField(jg, "email", data, "privacyEmail");
 										writePrivacyField(jg, "gender", data, "privacyGender");
 										writePrivacyField(jg, "title", data, "privacyTitle");
@@ -422,6 +430,15 @@ public class ApplyPrivacySettingsTest extends CamelTestSupport {
 										writePrivacyField(jg, "geoloc", data, "privacyGeoloc");
 										writePrivacyField(jg, "age", data, "privacyAge");
 										writePrivacyField(jg, "address", data, "privacyAddress");
+										*/
+										
+										jg.writeStringField("email", data.get("privacyEmail"));
+										jg.writeStringField("gender", data.get("privacyGender"));
+										jg.writeStringField("title", data.get("privacyTitle"));
+										jg.writeStringField("traces", data.get("privacyTraces"));
+										jg.writeStringField("geoloc", data.get("privacyGeoloc"));
+										jg.writeStringField("age", data.get("privacyAge"));
+										jg.writeStringField("address", data.get("privacyAddress"));
 										
 									jg.writeEndObject();
 									}
@@ -563,23 +580,70 @@ public class ApplyPrivacySettingsTest extends CamelTestSupport {
     }
     
     class ParametrizedProcessor implements Processor{
-    	String profile;
+    	JsonNode profile;
+    	HashMap<String,Integer> pSettings;
+    	String env;
 		public void process(Exchange exchange) throws Exception {
 			exchange.setProperty("user_context-profile",this.profile);
+			exchange.setProperty("privacy_settings", pSettings);
+			exchange.setProperty("environnement", this.env);
 		}
     	
-		public ParametrizedProcessor ( String p){
-			this.profile = p;
+		public ParametrizedProcessor ( String p, HashMap<String,String> pSettings,String env) throws JsonParseException, IOException{
+			JsonFactory factory = new JsonFactory();
+			ObjectMapper mapper = new ObjectMapper();
+			JsonParser jp = factory.createJsonParser(p);
+			JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
+			this.profile = rootNode;
+			
+			HashMap<String,Integer> settings = new HashMap<String,Integer>();
+			if ( pSettings.containsKey("privacyAge")){
+				settings.put("age", Integer.parseInt(pSettings.get("privacyAge")));
+			}
+			if ( pSettings.containsKey("privacyEmail")){
+				settings.put("email", Integer.parseInt(pSettings.get("privacyEmail")));
+			}
+			if ( pSettings.containsKey("privacyTitle")){
+				settings.put("title", Integer.parseInt(pSettings.get("privacyTitle")));
+			}
+			if ( pSettings.containsKey("privacyTraces")){
+				settings.put("traces", Integer.parseInt(pSettings.get("privacyTraces")));
+			}
+			if ( pSettings.containsKey("privacyGeoloc")){
+				settings.put("geoloc", Integer.parseInt(pSettings.get("privacyGeoloc")));
+			}
+			if ( pSettings.containsKey("privacyAddress")){
+				settings.put("address", Integer.parseInt(pSettings.get("privacyAddress")));
+			}
+			if ( pSettings.containsKey("privacyGender")){
+				settings.put("gender", Integer.parseInt(pSettings.get("privacyGender")));
+			}
+			this.pSettings = settings;
+			this.env=env;
+			
+			
 		}
     }
     
+    
+    /*
+     * test obsolete : the processor apply privacy settings has been modified but the test remained the same
+     */
     @Test
     public void test_applyPrivacySettings() throws ScriptException, IOException{
-    	ArrayList<String[]> data = applyPrivacySettingsTestDataGenerator();
+    	HashMap<String,String> pSettings = new HashMap<String,String>();
+    	pSettings.put("privacyEmail", "0");
+    	pSettings.put("privacyGender", "1");
+    	pSettings.put("privacyTitle", "1");
+    	pSettings.put("privacyTraces", "1");
+    	pSettings.put("privacyGeoloc", "2");
+    	pSettings.put("privacyAge", "2");
+    	pSettings.put("privacyAddress", "3");
+    	ArrayList<String[]> data = applyPrivacySettingsTestDataGenerator(pSettings);
     	Iterator<String[]> it = data.iterator();
     	while ( it.hasNext()){
     		String[] profile = it.next();
-	    	Processor p = new ParametrizedProcessor(profile[0]);	
+	    	Processor p = new ParametrizedProcessor(profile[0], pSettings,"home");	
     		Exchange resp = template.request("direct:apply_privacy",p);
     		assertEquals(profile[1],resp.getProperty("user_context-profile",String.class));
     	}

@@ -10,7 +10,7 @@ console.log("EEXCESS privacy plugin version "+version);
 //active tab's id
 var activeTabId = 0;
 
-//Envirronnement init
+//Environnement init
 localStorage["env"] = "home";
 
 // plugin's unique id
@@ -46,6 +46,13 @@ chrome.tabs.onActivated.addListener(function(info) {
 	}
 });
 
+// event trigered when the tab is being closed
+chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
+	if ( arrayTraceID[tabId] != undefined ){
+		triggerContext(tabId, "unload");
+	}
+	
+});
 
 
 
@@ -90,7 +97,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     	if (request.event == "load") {
     		triggerContext(sender.tab.id,"load");
     	}
-    	else if (request.event == "onunload"){
+    	else if (request.event == "unload"){
     		updateContext(sender.tab.id,"unload");
     	}
     }
@@ -239,7 +246,7 @@ function send_context(event, tabID, context){
 }
 
 function recommend(traces){
-
+	localStorage.removeItem("recommend");
 	$.ajax({
 	   url: "http://localhost:12564/api/v0/recommend",
 	   type: "POST",
@@ -278,7 +285,6 @@ function recommend(traces){
 function updateContext(tabID, evnt) {
 	console.log("Putting document context");
 	var date = date_heure();
-
 	var trace = arrayTraceID[tabID];
 	if (trace != undefined) {
 		console.log("tabID (update): " +tabID);

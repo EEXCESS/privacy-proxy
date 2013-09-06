@@ -105,27 +105,26 @@ function parseDate(date){
 }
 
 function traces(user_id,email) {
-	// a query is send to the elasticsearch database
+	// a query is send to the proxy
 	var url = "http://localhost:11564/user/traces";
 	var method = 'POST';
 	var async = false;
 	var request = new XMLHttpRequest();
 	
-		// we should perhaps build the request in the proxy
 	var body = '';
+	var userData = new Object();
+	
 	if(user_id != '') {
-		body = body + "{\"term\":{\"plugin.uuid\": \""+user_id+"\"}}";
+		userData.pluginId = user_id;
 	}
-	if (user_id != '' && email!='') {
-		body = body + ",";
-	}
+	
 	if(email != '') {
-		body = body + "{\"term\":{\"user.user_id\": \""+email+"\"}}";
+		userData.userId = email;
 	}	
-	body = body + ",{\"term\":{\"user.environnement\": \""+localStorage["env"]+"\"}}";
+	userData.environnement = localStorage["env"];
 	request.open(method, url, async);	
 	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-	request.send(body);
+	request.send(JSON.stringify(userData));
 	
 	
 	// useful data are collected from the response
@@ -292,10 +291,5 @@ $(document).ready(function () {
 	$("#workButton").on("click",function(){localStorage["env"]="work"; document.location.reload(true);});
 	$("#homeButton").on("click",function(){localStorage["env"]="home"; document.location.reload(true);});
 	
-  chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
-	  var uuid = response.data;
-	  chrome.extension.sendRequest({method: "getLocalStorage", key: "user_id"}, function(response) {
-		  traces(uuid,response.data);
-	  })
-  })
+	traces(localStorage["uuid"],localStorage["user_id"]);
 });

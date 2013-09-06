@@ -63,7 +63,12 @@ function username() {
 function recommend() {
 	chrome.browserAction.setBadgeText({text:""});
 	var recommendation = localStorage["recommend"];
-	document.getElementById('recommend').innerHTML = recommendation;
+	if ( recommendation != undefined){
+		document.getElementById('recommend').innerHTML = recommendation;
+	}
+	else{
+		document.getElementById('recommend').innerHTML = "";
+	}
 	var recommendation_terms = localStorage[""]
 }
 
