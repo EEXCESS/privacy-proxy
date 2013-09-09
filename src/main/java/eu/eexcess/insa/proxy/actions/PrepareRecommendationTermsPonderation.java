@@ -61,16 +61,14 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 		//System.out.println("profil : \n"+userProfile);
 		
 		
-		//InputStream isTraces = exchange.getProperty("user_context-traces",InputStream.class);
-		String isTraces = exchange.getProperty("user_context-traces",String.class);
+		InputStream isTraces = exchange.getProperty("user_context-traces",InputStream.class);
+		//String isTraces = exchange.getProperty("user_context-traces",String.class);
 		
-		//InputStream isUserProfile = exchange.getProperty("user_context-profile",InputStream.class);
-		String isUserProfile = exchange.getProperty("user_context-profile",String.class);
+		InputStream isUserProfile = exchange.getProperty("user_context-profile",InputStream.class);
+		//String isUserProfile = exchange.getProperty("user_context-profile",String.class);
 		
 		
-		System.out.println("DEBUG    PREPARE_RECOMMENDATION_TERMS_PONDERATION");
-		System.out.println("    retrieved user profile : \n"+isUserProfile);
-		System.out.println("retrieved user traces : \n"+isTraces);
+		
 		
 		HashMap<String, Integer> ponderatedTerms = extractQueryFromTraces(isTraces, exchange);
 		extractQueryFromProfile( ponderatedTerms, isUserProfile, exchange); 
@@ -80,7 +78,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    Utils.writeWeightedQuery(stringWriter, ponderatedTerms);
 	    logger.info(ponderatedTerms.toString());
 	    String q = stringWriter.toString();
-	    System.out.println("DEGUG    recommendation query : \n"+q);
+	    
 	    in.setBody(q);
 	    logger.info("recommendation query : "+q);
 	    exchange.setProperty("recommendation_query", q);
@@ -93,7 +91,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	/*
 	 *  The user's profile is assumed to have been already filtered following the privacy settings
 	 */
-	private HashMap<String, Integer> extractQueryFromProfile ( HashMap<String, Integer> tracesQuery, String is/*InputStream is*/, Exchange exchange ) throws JsonParseException, IOException{
+	private HashMap<String, Integer> extractQueryFromProfile ( HashMap<String, Integer> tracesQuery, InputStream is, Exchange exchange ) throws JsonParseException, IOException{
 	
 		JsonFactory factory = new JsonFactory();
 		JsonParser jp = factory.createJsonParser(is);
@@ -144,7 +142,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	}
 	
 		
-	private HashMap<String, Integer> extractQueryFromTraces( String /*InputStream*/ is, Exchange exchange ) throws ParseException, JsonParseException, JsonMappingException, IOException{
+	private HashMap<String, Integer> extractQueryFromTraces( InputStream is, Exchange exchange ) throws ParseException, JsonParseException, JsonMappingException, IOException{
 		//coefficients are calculated for each term from the obsel's title 
 		// ************************************************************
 		JsonFactory factory = new JsonFactory();
@@ -174,7 +172,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    	
 	    	
 	    	coefficient = calcOneObselWeight(obsel, d); 
-	    	System.out.println(coefficient);
+	    	
 	    	titleBuffer = obsel.path("_source").path("document").path("title").asText();
 	    	
 	    	
@@ -296,9 +294,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 			e.printStackTrace();
 			return 0;
 		}
-		System.out.println("begin date : "+begin);
-		System.out.println("enddate : "+ end);
-		System.out.println("currentDate : "+ cDate);
+		
 		if ( begin.equals(cDate) || end.getTime()> cDate.getTime()){ // the obsel is considered active so we give it the highest coefficient
 			return highestCoefficient;
 		}
@@ -318,7 +314,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 				* (1 / k) + B * (beginTrace - endTrace))
 				/ (Math.log((k * T + b) / b) * (1 / k) + B * T);
 		//double truncatedCoefficient = coefficient - coefficient % 0.001;
-		System.out.println(coefficient);
+		
 		truncatedCoefficient = Math.round(coefficient*10);
 			
 		

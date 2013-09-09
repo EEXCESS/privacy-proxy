@@ -47,7 +47,6 @@ public class RecomendationResultAggregator implements TimeoutAwareAggregationStr
 			// Load and parse results from new source
 			String newResultsJSON = singleExchange.getIn().getBody(String.class);
 			JsonParser jp = factory.createJsonParser(newResultsJSON);
-			System.out.println("recommendation result aggregator : "+newResultsJSON);
 			JsonNode newResultNode = mapper.readValue(jp, JsonNode.class);
 			JsonNode newResultsDoc = newResultNode.path("documents");
 			

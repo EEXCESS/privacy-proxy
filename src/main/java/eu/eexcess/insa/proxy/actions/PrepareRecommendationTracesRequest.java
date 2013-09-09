@@ -26,8 +26,7 @@ public class PrepareRecommendationTracesRequest implements Processor {
 		int privacyTrace = 2; // privacy level is set to the minimum by default
 		if ( privacySettings.containsKey("traces")){
 			privacyTrace = privacySettings.get("traces");
-			System.out.println("DEBUG    PrepareRecommendationTravesRequest");
-			System.out.println("privacy settings : traces --> "+privacyTrace);
+
 			
 		}
 		if ( privacyTrace != 0){
@@ -144,10 +143,7 @@ public class PrepareRecommendationTracesRequest implements Processor {
 			
 			Message in = exchange.getIn();
 			
-			//   /!\ attention le log est à 2 endroits dfans le fichier
-			System.out.println("DEBUG    PrepareRecommendationtracesRequest");
-			System.out.println(" need more traces = yes");
-			System.out.println("query = \n"+query);
+			
 			
 			in.setBody(query);
 			exchange.setProperty("needMoreTraces", "yes");
@@ -177,12 +173,7 @@ public class PrepareRecommendationTracesRequest implements Processor {
 			jg.close();
 			
 			String query = sWriter.toString();
-			
-			//   /!\ attention le log est à 2 endroits dfans le fichier
 
-			System.out.println("DEBUG    PrepareRecommendationtracesRequest");
-			System.out.println(" need more traes = no");
-			System.out.println("request = \n"+query);
 			Message in = exchange.getIn();
 			in.setBody(query);
 			

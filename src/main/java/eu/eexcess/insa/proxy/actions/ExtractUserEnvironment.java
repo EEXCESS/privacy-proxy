@@ -17,18 +17,16 @@ public class ExtractUserEnvironment implements Processor{
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
 		
-		String is = in.getBody(String.class);
 		
-		System.out.println("DEBUG    EXTRACT USER ENVIRONNEMENT ( trace from frontend");
-		System.out.println(is);
 		
-		//InputStream is = in.getBody(InputStream.class);
+		
+		
+		InputStream is = in.getBody(InputStream.class);
 	
 		JsonFactory factory = new JsonFactory();
 	    JsonParser jp = factory.createJsonParser(is);
 	    ObjectMapper mapper = new ObjectMapper();
 	    JsonNode rootNode = mapper.readValue(jp, JsonNode.class);
-	    System.out.println("rootnode : "+rootNode);
 	    String user_id = "";
 	    String uuid = "";
 	    String environnement = "";

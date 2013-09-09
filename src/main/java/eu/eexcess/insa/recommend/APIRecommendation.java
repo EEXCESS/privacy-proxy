@@ -60,7 +60,7 @@ public class APIRecommendation extends RouteBuilder {
 		from("direct:query.enrich")
 		//.to("log:just_trace sent?showAll=true")
 			.to("direct:context.safe.load")
-			.process(prepPonderation)
+			.process(prepPonderatidirect:recommend.mendeleyon)
 			.process(recommendationQueryAggregator)
 		;
 		
@@ -124,7 +124,7 @@ public class APIRecommendation extends RouteBuilder {
 				
 			.end()
 			.process(new JSONList2JSON())
-			.to("log:aggregation complete")
+			//.to("log:aggregation complete")
 			.unmarshal().string("UTF-8")
 		    .unmarshal(new JsonXMLDataFormat())
 		    //.wireTap("file:///tmp/econbiz/?fileName=example.xml")
@@ -154,7 +154,7 @@ public class APIRecommendation extends RouteBuilder {
 			// filter the traces following the privacy settings
 			//.log("${in.body}")
 			//.convertBodyTo(String.class)
-			.to("log:recommendations.traces?showAll=true") 
+			//.to("log:recommendations.traces?showAll=true") 
 			.setProperty("user_context-traces",simple("${in.body}", String.class))
 		;
 		
@@ -184,7 +184,6 @@ public class APIRecommendation extends RouteBuilder {
 				//.handled(true) .log("exception handled")   /// a changer  (detruit tout l'exchange ?)
 				.to("log:Mendeley recommendation error")
 				.to("string-template:templates/empty-results.tm")
-				.log("mendeley error ( nearly ? ) handled")
 				.continued(false)
 				//.to("string-template:templates/empty-results.tm")
 				//.to("log:Mendeley.recommendation.httpexception?showAll=true")
@@ -193,10 +192,8 @@ public class APIRecommendation extends RouteBuilder {
 	    	.process(prepMendeleyQuery)
 	    	.choice()
 	    		.when(simple("${property.no_terms} == true"))
-	    			.to("log:no terms")
 	    			.to("string-template:templates/empty-results.tm")
 	    		.otherwise()
-	    			.to("log:terms")
 	    			.throttle(30).timePeriodMillis(1000)
 	    				.recipientList().header("QueryEndpoint")
 	    				.process(prepDocumentSearch)
@@ -204,15 +201,9 @@ public class APIRecommendation extends RouteBuilder {
 	    			.end()
 	    			.process(closeJson)
 	    	.end()
-			
-		    //.to("log:ex1.1?showAll=true")
 
-		    
 		;
-		
-		
-		
-		
+
 
 	}
 

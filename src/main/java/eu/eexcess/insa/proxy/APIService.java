@@ -96,11 +96,11 @@ public class APIService extends RouteBuilder  {
 			
 			
 			from("direct:trace.index")
-				.streamCaching()
+				//.streamCaching()
 				//.log("Indexing trace ...")
 				.setHeader("ElasticType").constant("trace")
 				.setHeader("ElasticIndex").constant("privacy")
-				.to("log:indexing trace :?showAll=true&showStreams=true ")
+				//.to("log:indexing trace :?showAll=true&showStreams=true ")
 				.to("seda:elastic.trace.index")
 			;	
 			
@@ -118,7 +118,7 @@ public class APIService extends RouteBuilder  {
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.to("string-template:templates/elastic/user.account.search.tm")
-				.to("log:DEBUG : getUserData?showAll=true")
+				//.to("log:DEBUG : getUserData?showAll=true")
 				.to("direct:elastic.userSearch")
 			;
 				
@@ -134,9 +134,9 @@ public class APIService extends RouteBuilder  {
 				.to("direct:retrieve.user.traces")
 			;
 			from("direct:retrieve.user.traces")
-				.streamCaching()
-				.convertBodyTo(String.class)
-				.to("log:send traces : input?showAll=true")
+				//.streamCaching()
+				//.convertBodyTo(String.class)
+				//.to("log:send traces : input?showAll=true")
 				.setHeader("ElasticType").constant("trace")
 				.setHeader("ElasticIndex").constant("privacy")
 				.process(prepSearch)
@@ -144,8 +144,8 @@ public class APIService extends RouteBuilder  {
 				.to("direct:elastic.search")
 				// for testing purposes
 				.convertBodyTo(String.class)
-				.to("log:send traces?showHeaders=true")
-				.wireTap("file:test_data")
+				//.to("log:send traces?showHeaders=true")
+				//.wireTap("file:test_data")
 
 			;
 			
@@ -219,165 +219,6 @@ public class APIService extends RouteBuilder  {
 				.process(prepRespUser)
 			;
 			
-			/*=========================================================================
-			 *  Recommendation routes
-			 *=========================================================================*/
-			/*
-			//TODO
-			// mettre dans un package et route builder à part
-			
-			from("jetty:http://localhost:11564/api/v0/query/enrich")
-			//.to("log:just_trace sent?showAll=true")
-				.to("direct:context.safe.load")
-				.process(prepPonderation)
-				.process(recommendationQueryAggregator)
-			;
-			
-			/*
-			 *  Route to get recommendations 
-			 */
-			/*
-			from("jetty:http://localhost:12564/api/v0/recommend")	
-				.removeHeaders("CamelHttp*")
-				.removeHeader("Host")	
-				//.to("log:recommendation route start?showAll=true")
-				.to("direct:context.safe.load")
-				.to("direct:recommend")
-				.setHeader("Content-Type").constant("text/html")
-				//.setHeader("recommendation_query", property("recommendation_query"));
-				//.setHeader("recommendation_query",simple("${property[recommendation_query]}"))
-				.setHeader("recommendation_query",property("recommendation_query"))
- 
-			;
-			
-
-			/*
-			 *  Loads a user context and ensures it is privacy safe by applying the user privacy settings
-			 *   User context is composed of:
-			 *     - a user profile (demographic information)
-			 *     - a list of user traces relative to a current time
-			 *     
-			 *  INPUT HEADERS:
-			 *  
-			 *  INPUT BODY: A JSON of a trace
-			 *  
-			 *  INPUT PROPERTIES:
-			 *    
-			 *  OUTPUT HEADERS:
-			 * 
-			 *  OUTPUT HEADERS:
-			 * 
-			 *  
-			 */
-			/*
-			from("direct:context.safe.load")
-				.process(extractUserEnv)  //this sets the user_id and plugin_uuid exchange properties
-				// we need to get the user context
-				 .enrich("direct:get.user.data", userContextAggregator)
-				
-				// we get the last traces
-				.to("direct:get.recommendation.traces")
-				 // filter the user profile following the privacy settings
-			    .process(applyPrivacySettings)
-			;
-			
-			from("direct:recommend")
-				// user's context is used to prepare a query
-				.process(prepPonderation)
-				.setHeader("origin").simple("exchangeId")
-				.multicast().aggregationStrategy(new RecomendationResultAggregator())
-					.parallelProcessing()
-					.timeout(5000)
-					.to("direct:recommend.econbiz","direct:recommend.mendeley")
-					
-				.end()
-				.process(new JSONList2JSON())
-				.to("log:aggregation complete")
-				.unmarshal().string("UTF-8")
-			    .unmarshal(new JsonXMLDataFormat())
-			    //.wireTap("file:///tmp/econbiz/?fileName=example.xml")
-			    .to("xslt:eu/eexcess/insa/xslt/results2html.xsl")
-			    
-			    
-			    //.log("${property.recommendation_query}")
-			    //.setHeader("recommendation_query",simple("${property.recommendation_query}"))
-			    // .wireTap("file:///tmp/econbiz/?fileName=example.html")
-			;
-			
-			/* This route gets the traces needed to prepare a recommendation
-			 * 
-			 */
-			/*
-			from("direct:get.recommendation.traces")
-				.setHeader("ElasticType").constant("trace")
-				.setHeader("ElasticIndex").constant("privacy")
-				.process(prepTraces)
-				.choice()
-					.when().simple("${property.needMoreTraces} == 'yes'")
-						.to("direct:elastic.userSearch")
-					.otherwise()
-						.to("log:no need for a traces query")
-					
-				.end()
-				
-				// filter the traces following the privacy settings
-				//.log("${in.body}")
-				//.convertBodyTo(String.class)
-				.to("log:recommendations.traces?showAll=true") 
-				.setProperty("user_context-traces",simple("${in.body}", String.class))
-			;
-			
-			    
-			 /* route to get recommendation content from EconBiz
-			  *    
-			  */
-			/*
-			from("direct:recommend.econbiz")
-				.process(prepEconBizQuery)
-			    .choice()
-					//.when().simple("${in.header.CamelHttpQuery} != 'q='")
-			    	.when().simple("${property.emptyQuery} == 'no'")
-						.to("http4://api.econbiz.de/v1/search")
-					.otherwise()
-						.to("log:mendeley recommendation : no query")
-						.to("string-template:templates/empty-results.tm")
-				.end()
-				.process(econBizResultFormater)
-			; 
-			
-			/* Route to get recommendation content from Mendeley
-			 * 
-			 */
-			/*
-			from("direct:recommend.mendeley")
-				.onException(HttpOperationFailedException.class)
-					
-					//.handled(true) .log("exception handled")   /// a changer  (detruit tout l'exchange ?)
-					.to("log:Mendeley recommendation error")
-					.to("string-template:templates/empty-results.tm")
-					
-					.continued(true)
-					//.to("string-template:templates/empty-results.tm")
-					//.to("log:Mendeley.recommendation.httpexception?showAll=true")
-				.end()
-			    
-		    	.process(prepMendeleyQuery)
-		    	.choice()
-		    		.when(simple("${property.no_terms} == true"))
-		    			.to("log:no terms")
-		    			.to("string-template:templates/empty-results.tm")
-		    		.otherwise()
-		    			.to("log:terms")
-		    			.recipientList().header("QueryEndpoint")
-					    .process(prepDocumentSearch)
-					    .recipientList(header("QueryEndPoint").tokenize(",")).aggregationStrategy(new MendeleyQueriesAggregator())
-					    .process(closeJson)
-		    	.end()
-				
-			    .to("log:ex1.1?showAll=true")
-
-			    
-			;
 			
 			
 			
@@ -463,7 +304,7 @@ public class APIService extends RouteBuilder  {
 				.process(getProfiles)
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("profiles")
-				.to("log:ex1.1?showAll=true") 	
+				//.to("log:ex1.1?showAll=true") 	
 				.to("direct:elastic.userSearch")
 				
 				.unmarshal().string("UTF-8")
@@ -473,12 +314,12 @@ public class APIService extends RouteBuilder  {
 				.process(eexcessProfileMapper)
 				.process(mendeleyProfileMapper)
 				.to("string-template:templates/profile.tm")
-				.to("log:coucou2?showAll=true")
+				//.to("log:coucou2?showAll=true")
 
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.setHeader("traceId").property("user_id")
-				.to("log:just_befire_indexing?showAll=true")
+				//.to("log:just_befire_indexing?showAll=true")
 				.to("seda:elastic.trace.index")
 			;
 		}
