@@ -60,7 +60,7 @@ public class APIRecommendation extends RouteBuilder {
 		from("direct:query.enrich")
 		//.to("log:just_trace sent?showAll=true")
 			.to("direct:context.safe.load")
-			.process(prepPonderatidirect:recommend.mendeleyon)
+			.process(prepPonderation)
 			.process(recommendationQueryAggregator)
 		;
 		
