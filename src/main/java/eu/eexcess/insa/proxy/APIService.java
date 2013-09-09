@@ -1,9 +1,7 @@
 	package eu.eexcess.insa.proxy;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.http4.HttpOperationFailedException;
 
 import eu.eexcess.insa.camel.JsonXMLDataFormat;
 import eu.eexcess.insa.oauth.MendeleyAuthorizationHeaderGenerator;
@@ -40,15 +38,11 @@ import eu.eexcess.insa.proxy.connectors.EconBizQueryMapper;
 import eu.eexcess.insa.proxy.connectors.EconBizResultFormater;
 import eu.eexcess.insa.proxy.connectors.MendeleyDocumentQueryMapper;
 import eu.eexcess.insa.proxy.connectors.MendeleyUpdateProfileInfo;
-import eu.eexcess.insa.proxy.connectors.MendeleyQueriesAggregator;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
-import eu.eexcess.insa.proxy.connectors.RecomendationResultAggregator;
 import eu.eexcess.insa.recommend.APIRecommendation;
 
 public class APIService extends RouteBuilder  {
 	final ElasticExtractHitCount elasticExtractHitCount = new ElasticExtractHitCount();
-	
-	
 	final PrepareRequest prepReq = new PrepareRequest();
 	final PrepareSearch prepSearch = new PrepareSearch();
 	final JSONBody2Properties jsonBody2Properties = new JSONBody2Properties();
@@ -85,12 +79,14 @@ public class APIService extends RouteBuilder  {
 	//final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
 	
 	
+	String apiBaseURI = // "jetty:http://localhost:12564";
+						"servlet://";
 		public void configure() throws Exception {
 			final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
 			/* Route used to register traces
 			 * 
 			 */
-			from("jetty:http://localhost:12564/api/v0/privacy/trace")
+			from(apiBaseURI + "/api/v0/privacy/trace")
 				.to("direct:trace.index")
 			;
 			
@@ -107,7 +103,7 @@ public class APIService extends RouteBuilder  {
 			/* Route used to retrieve user's profile data
 			 * 
 			 */
-			from("jetty:http://localhost:12564/api/v0/users/profile")
+			from(apiBaseURI+ "/api/v0/users/profile")
 				.process(getUserIdFromBdy)
 				.to("direct:get.user.data")
 				.process(prepUserProfile)
@@ -124,13 +120,10 @@ public class APIService extends RouteBuilder  {
 				
 			
 			
-			
-			
-			
 			/* Route to retrieve the user's traces
 			 * 
 			 */
-			from("jetty:http://localhost:11564/user/traces")
+			from(apiBaseURI+"/user/traces")
 				.to("direct:retrieve.user.traces")
 			;
 			from("direct:retrieve.user.traces")
@@ -154,7 +147,7 @@ public class APIService extends RouteBuilder  {
 			 * 
 			 * 
 			 */
-			from("jetty:http://localhost:12564/api/v0/users/data")
+			from(apiBaseURI + "/api/v0/users/data")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("profiles")
 				.process(updateEexcessProfile)
@@ -174,7 +167,7 @@ public class APIService extends RouteBuilder  {
 			/*
 			 *  Route to directly save the privacy settings into the user index ( without merging the data with other profiles first )
 			 */
-			from("jetty:http://localhost:12564/api/v0/users/privacy_settings")
+			from(apiBaseURI + "/api/v0/users/privacy_settings")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.to("seda:elastic.trace.index")
@@ -196,7 +189,7 @@ public class APIService extends RouteBuilder  {
 			 * OUTPUT BODY:
 			 *   ElasticSearch results
 			 */
-			from("jetty:http://localhost:11564/user/verify")
+			from(apiBaseURI + "/user/verify")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.process(jsonBody2Properties)
@@ -210,7 +203,7 @@ public class APIService extends RouteBuilder  {
 			 * Route to log a user in
 			 * 
 			 */
-			from("jetty:http://localhost:11564/user/login")
+			from(apiBaseURI+"/user/login")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.process(prepUserLogin)
@@ -233,7 +226,7 @@ public class APIService extends RouteBuilder  {
 			/* Route to initialize Mendeley OAuth authentifiaction
 			 *  ( get request token and other informations
 			 */
-			from("jetty:http://localhost:11564/oauth/mendeley/init")	
+			from(apiBaseURI+"/oauth/mendeley/init")	
 				.process(mendeleyInitOAuthParams)
 				.process(signingProcessor)
 				.process(oauthQueryGenerator)
@@ -247,7 +240,7 @@ public class APIService extends RouteBuilder  {
 			/* Route to continue Mendeley Oauth authentification
 			 *  (get access token and other informations)
 			 */
-			from("jetty:http://localhost:11564/oauth/mendeley/connect")
+			from(apiBaseURI+ "/oauth/mendeley/connect")
 				 
 				.process(mendeleyInitAccessParams)
 				.process(signingProcessor)

@@ -23,6 +23,9 @@ public class ApplyPrivacySettingsJS implements Processor{
 	ScriptEngine engine;
 	public ApplyPrivacySettingsJS() throws ScriptException {
 		InputStream privacyJS= ClassLoader.getSystemResourceAsStream("javascript/PrivacyRules.js");
+		if(privacyJS == null) {
+			privacyJS = Thread.currentThread().getContextClassLoader().getResourceAsStream("javascript/PrivacyRules.js");
+		}
 		ScriptEngineManager factory = new ScriptEngineManager();
 		engine = factory.getEngineByName("JavaScript");
 		engine.eval(new InputStreamReader(privacyJS));

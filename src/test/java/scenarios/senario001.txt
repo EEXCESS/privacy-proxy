@@ -1,0 +1,17 @@
+user: anonymous
+
+1. Installs plugin
+2. Goes to google.com
+3. searches for "fund raising"
+3. visits http://en.wikipedia.org/wiki/Fundraising
+4. stays a while
+5. Goes to http://en.wikipedia.org/wiki/Crowd_funding
+6. Stays a while
+7. Goes to http://en.wikipedia.org/wiki/Angel_investor
+8. Back to Google
+9. Searches for crowdfunding
+10. Visits http://www.kickstarter.com/
+11. Bach to search results
+12. Visits http://crowdfunding.com/
+13. http://www.apce.com/pid14215/crowdfunding.html
+14. http://www.kisskissbankbank.com/
