@@ -90,7 +90,7 @@ public class PrepareRecommendationTracesRequest implements Processor {
 							jg.writeStartArray();
 								
 								// 
-								if ( onlyUseTracesFromSameEnvironnement){
+								if ( onlyUseTracesFromSameEnvironnement){ // is always true
 									jg.writeStartObject();
 										jg.writeFieldName("term");
 										jg.writeStartObject();
@@ -153,7 +153,7 @@ public class PrepareRecommendationTracesRequest implements Processor {
 			exchange.setProperty("needMoreTraces", "yes");
 		}
 		else{ // privacy.traces = 0 : only the current trace is used
-			// we need a query to retrieve the exact same trace that we received OR to bypass the query and to keep the original one
+			// we need to bypass the query and to keep the original trace ( since no other trace is needed )
 			JsonFactory factory = new JsonFactory();
 			StringWriter sWriter = new StringWriter();
 			JsonGenerator jg = factory.createJsonGenerator(sWriter);
