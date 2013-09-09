@@ -35,6 +35,8 @@ public class OAuthSignTest extends CamelTestSupport {
 			in.setHeader(Exchange.HTTP_URI, "http://example.com/request");
 			in.setHeader(Exchange.HTTP_METHOD, "POST");   // Méthode GET plutôt ?
 			in.setHeader(Exchange.HTTP_QUERY, "b5=%3D%253D&a3=a&c%40=&a2=r%20b&c2&a3=2+q");
+			in.setHeader(Exchange.HTTP_BASE_URI, "http://example.com");
+			in.setHeader(Exchange.HTTP_PATH, "/request");
 	
 			exchange.setProperty("oauth_consumer_key", "9djdj82h48djs9d2");
 			exchange.setProperty("oauth_signature_method", "HMAC-SHA1");
@@ -50,8 +52,10 @@ public class OAuthSignTest extends CamelTestSupport {
 			in.setHeader(Exchange.HTTP_URI, "http://photos.example.net/initiate");
 			in.setHeader(Exchange.HTTP_METHOD, "POST");   // Méthode GET plutôt ?
 			in.setHeader(Exchange.HTTP_QUERY, "");
-	
+			in.setHeader(Exchange.HTTP_BASE_URI, "http://photos.example.com");
+			in.setHeader(Exchange.HTTP_PATH, "/initiate");
 			exchange.setProperty("oauth_consumer_key", "dpf43f3p2l4k3l03");
+			exchange.setProperty("oauth_consumer_secret", "kd94hf93k423kf44");
 			exchange.setProperty("oauth_signature_method", "HMAC-SHA1");
 			exchange.setProperty("oauth_timestamp", "137131200");
 			exchange.setProperty("oauth_callback","http://printer.example.com/ready");
@@ -63,7 +67,7 @@ public class OAuthSignTest extends CamelTestSupport {
     @Test
     public void testEncoding() throws Exception {
     	String expectedString = "POST&http%3A%2F%2Fexample.com%2Frequest&a2%3Dr%2520b%26a3%3D2%2520q%26a3%3Da%26b5%3D%253D%25253D%26c%2540%3D%26c2%3D%26oauth_consumer_key%3D9djdj82h48djs9d2%26oauth_nonce%3D7d8f3e4a%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D137131201%26oauth_token%3Dkkk9d7dh3k39sjv7";
-    	
+    	System.out.println("is this real life ?");
     	Exchange resp = template.send("direct:oauth.encode", prepMessageProcessor);
 		String result = resp.getIn().getBody(String.class);
 	    assertEquals(expectedString, result);
@@ -71,7 +75,7 @@ public class OAuthSignTest extends CamelTestSupport {
     
     @Test
     public void testSignature() throws Exception {
-    	String expectedSign = "hYN3tMeJmdK%2Fd74HqUzV2D0oICA%3D";
+    	String expectedSign = "RyOXu4kZmg2gDfv+L4IB/H5VRu4=";
     	Exchange resp = template.send("direct:oauth.sign", prepMessageSigningProcessor);
         
         String resultSign = resp.getProperty("oauth_signature",String.class);
@@ -84,7 +88,7 @@ public class OAuthSignTest extends CamelTestSupport {
         	public void configure() throws Exception {
         		super.configure();
 
-        		from("direct:oauth.encode").bean(oauthSign,"calcBaseString");
+        		from("direct:oauth.encode").log("youhou").bean(oauthSign,"calcBaseString");
         		from("direct:oauth.sign").process(oauthSign);
         	}
         };

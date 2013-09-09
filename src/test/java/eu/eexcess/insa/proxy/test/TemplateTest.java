@@ -36,7 +36,7 @@ public class TemplateTest extends CamelTestSupport {
 			in.setHeader("profileAddressPostalCode","profileAddressPostalCode");
 			in.setHeader("profilePrivacyEmail","profilePrivacyEmail");
 			in.setHeader("profilePrivacyGender","profilePrivacyGender");
-			in.setHeader("profilePrivacyGender","profilePrivacyGender");
+			in.setHeader("profilePrivacyBirthdate","profilePrivacyAge");
 			in.setHeader("profilePrivacyTitle","profilePrivacyTitle");
 			in.setHeader("profilePrivacyTraces","profilePrivacyTraces");
 			in.setHeader("profilePrivacyGeoloc","profilePrivacyGeoloc");
@@ -49,6 +49,9 @@ public class TemplateTest extends CamelTestSupport {
 			in.setHeader("profileBirthDate","profileBirthDate");
 			in.setHeader("profileAddressStreet","profileAddressStreet");
 			in.setHeader("profileAddressCity","profileAddressCity");
+			in.setHeader("profileAddressRegion","profileAddressRegion");
+			in.setHeader("profileAddressDistrict","profileAddressDistrict");
+			
 			in.setHeader("profileAddressCountry","profileAddressCountry");
 			in.setHeader("profileTopics",new String[] { "{\"label\":\"topic1\",\"env\":\"nothing\"}", "{\"label\":\"topic2\",\"env\":\"home\"}" });
 
@@ -67,7 +70,7 @@ public class TemplateTest extends CamelTestSupport {
         "\"title\": \"profilePrivacyTitle\","+
         "\"traces\": \"profilePrivacyTraces\","+
         "\"geoloc\": \"profilePrivacyGeoloc\","+
-        "\"age\": \"profilePrivacyAge\","+
+        "\"birthdate\": \"profilePrivacyAge\","+
         "\"address\": \"profilePrivacyAddress\""+
     "},"+
     "\"title\": \"profileTitle\","+
@@ -79,7 +82,9 @@ public class TemplateTest extends CamelTestSupport {
         "\"street\": \"profileAddressStreet\","+
         "\"postalcode\": \"profileAddressPostalCode\","+
         "\"city\": \"profileAddressCity\","+
-        "\"country\": \"profileAddressCountry\""+
+        "\"country\": \"profileAddressCountry\","+
+        "\"region\": \"profileAddressRegion\","+
+        "\"district\": \"profileAddressDistrict\""+
     "},"+
     "\"topics\": ["+
     	 

@@ -27,6 +27,7 @@ import eu.eexcess.insa.commons.Strings;
 public class OAuthSigningProcessor implements Processor {
 	public String calcBaseString( Exchange exchange ) {
 		Message in = exchange.getIn();
+		
 
 		List<String> urlQueryParameters = getHTTPQueryParameters(in.getHeader(Exchange.HTTP_QUERY,String.class));
 		
