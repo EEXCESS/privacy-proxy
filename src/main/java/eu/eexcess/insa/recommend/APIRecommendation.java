@@ -43,6 +43,11 @@ public class APIRecommendation extends RouteBuilder {
 		// TODO Auto-generated constructor stub
 	}
 	*/
+	
+	String apiBaseURI = // "jetty:http://localhost:12564";
+			"servlet://";
+	
+	
 	@Override
 	public void configure() throws Exception {
 		final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
@@ -54,7 +59,7 @@ public class APIRecommendation extends RouteBuilder {
 		 *=========================================================================*/
 		
 		
-		from("jetty:http://localhost:12564/api/v0/query/enrich")
+		from(apiBaseURI + "api/v0/query/enrich")
 			.to("direct:query.enrich")
 		;
 		from("direct:query.enrich")
@@ -68,7 +73,7 @@ public class APIRecommendation extends RouteBuilder {
 		 *  Route to get recommendations 
 		 */
 		
-		from("jetty:http://localhost:12564/api/v0/recommend")
+		from(apiBaseURI + "api/v0/recommend")
 			.to("direct:recommendation.route")
 		;
 		from("direct:recommendation.route")

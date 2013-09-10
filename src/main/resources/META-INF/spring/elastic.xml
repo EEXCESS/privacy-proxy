@@ -6,56 +6,13 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
-	
+
+	<import resource="classpath:/elasticRoutes.xml" />
+
     <camelContext xmlns="http://camel.apache.org/schema/spring" useMDCLogging="true">
 	    <propertyPlaceholder id="properties" location="config.properties"/>
 	    
-    
-		<route>
-			<from uri="seda:elastic.trace.index?concurrentConsumers=4" />
-			<setHeader headerName="CamelHttpURI">
-				<simple>{{elastic.url}}/${in.header.ElasticIndex}/${in.header.ElasticType}/${in.header.traceId}?refresh=true</simple>
-			</setHeader>
-    		<setHeader headerName="CamelHttpMethod">
-    			<constant>POST</constant>
-    		</setHeader>
-    		<setProperty propertyName="CamelCharsetName">
-    			<constant>UTF-8</constant>
-    		</setProperty>
-    		<log message="elastic.xml reporting in"/>
-			<to uri="http4://localhost:9200/" />
-			<removeHeaders pattern="CamelHttp*" />
-		</route>
-
-		<route>
-			<from uri="direct:elastic.search" />
-			<setHeader headerName="CamelHttpURI">
-				<simple>{{elastic.url}}/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
-			</setHeader>
-    		<setHeader headerName="CamelHttpMethod">
-    			<constant>POST</constant>
-    		</setHeader>
-    		<setProperty propertyName="CamelCharsetName">
-    			<constant>UTF-8</constant>
-    		</setProperty>
-			<to uri="http4://localhost:9200/privacy/trace/_search?sort=temporal.begin:desc&amp;size=50" />
-			<removeHeaders pattern="CamelHttp*" />
-		</route>
-		
-		<route>
-			<from uri="direct:elastic.userSearch" />
-			<setHeader headerName="CamelHttpURI">
-				<simple>{{elastic.url}}/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
-			</setHeader>
-    		<setHeader headerName="CamelHttpMethod">
-    			<constant>POST</constant>
-    		</setHeader>
-    		<setProperty propertyName="CamelCharsetName">
-    			<constant>UTF-8</constant>
-    		</setProperty>
-			<to uri="http4://localhost:9200/privacy/trace/_search" />
-			<removeHeaders pattern="CamelHttp*" />
-		</route>
+	    <routeContextRef ref="elasticRoutes" />
 
     </camelContext>
 </beans>

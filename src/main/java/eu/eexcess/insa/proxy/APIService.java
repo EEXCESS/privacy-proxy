@@ -79,14 +79,14 @@ public class APIService extends RouteBuilder  {
 	//final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
 	
 	
-	String apiBaseURI = // "jetty:http://localhost:12564";
+	String apiBaseURI = // "jetty:http://localhost:12564/";
 						"servlet://";
 		public void configure() throws Exception {
 			final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
 			/* Route used to register traces
 			 * 
 			 */
-			from(apiBaseURI + "/api/v0/privacy/trace")
+			from(apiBaseURI + "api/v0/privacy/trace")
 				.to("direct:trace.index")
 			;
 			
@@ -103,7 +103,7 @@ public class APIService extends RouteBuilder  {
 			/* Route used to retrieve user's profile data
 			 * 
 			 */
-			from(apiBaseURI+ "/api/v0/users/profile")
+			from(apiBaseURI+ "api/v0/users/profile")
 				.process(getUserIdFromBdy)
 				.to("direct:get.user.data")
 				.process(prepUserProfile)
@@ -123,7 +123,7 @@ public class APIService extends RouteBuilder  {
 			/* Route to retrieve the user's traces
 			 * 
 			 */
-			from(apiBaseURI+"/user/traces")
+			from(apiBaseURI+"user/traces")
 				.to("direct:retrieve.user.traces")
 			;
 			from("direct:retrieve.user.traces")
@@ -147,7 +147,7 @@ public class APIService extends RouteBuilder  {
 			 * 
 			 * 
 			 */
-			from(apiBaseURI + "/api/v0/users/data")
+			from(apiBaseURI + "api/v0/users/data")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("profiles")
 				.process(updateEexcessProfile)
@@ -167,7 +167,7 @@ public class APIService extends RouteBuilder  {
 			/*
 			 *  Route to directly save the privacy settings into the user index ( without merging the data with other profiles first )
 			 */
-			from(apiBaseURI + "/api/v0/users/privacy_settings")
+			from(apiBaseURI + "api/v0/users/privacy_settings")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.to("seda:elastic.trace.index")
@@ -189,7 +189,7 @@ public class APIService extends RouteBuilder  {
 			 * OUTPUT BODY:
 			 *   ElasticSearch results
 			 */
-			from(apiBaseURI + "/user/verify")
+			from(apiBaseURI + "user/verify")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.process(jsonBody2Properties)
@@ -204,7 +204,7 @@ public class APIService extends RouteBuilder  {
 			 * 
 			 */
 
-			from(apiBaseURI+"/user/login")
+			from(apiBaseURI+"user/login")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.process(prepUserLogin)
@@ -227,7 +227,7 @@ public class APIService extends RouteBuilder  {
 			/* Route to initialize Mendeley OAuth authentifiaction
 			 *  ( get request token and other informations
 			 */
-			from(apiBaseURI+"/oauth/mendeley/init")	
+			from(apiBaseURI+"oauth/mendeley/init")	
 				.process(mendeleyInitOAuthParams)
 				.process(signingProcessor)
 				.process(oauthQueryGenerator)
@@ -241,7 +241,7 @@ public class APIService extends RouteBuilder  {
 			/* Route to continue Mendeley Oauth authentification
 			 *  (get access token and other informations)
 			 */
-			from(apiBaseURI+ "/oauth/mendeley/connect")		 
+			from(apiBaseURI+ "oauth/mendeley/connect")		 
 				.process(mendeleyInitAccessParams)
 				.process(signingProcessor)
 				.process(oauthQueryGenerator)

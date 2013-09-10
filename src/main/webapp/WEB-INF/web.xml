@@ -32,6 +32,16 @@
     
     <servlet-mapping>
     	<servlet-name>CamelServlet</servlet-name>
-    	<url-pattern>/services/*</url-pattern>
+    	<url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+    	<servlet-name>CamelServlet</servlet-name>
+    	<url-pattern>/user/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+    	<servlet-name>CamelServlet</servlet-name>
+    	<url-pattern>/oauth/*</url-pattern>
     </servlet-mapping>
 </web-app>

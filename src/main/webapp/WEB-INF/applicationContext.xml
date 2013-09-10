@@ -8,9 +8,19 @@
        http://camel.apache.org/schema/spring
        http://camel.apache.org/schema/spring/camel-spring.xsd">
 
+	<import resource="classpath:/elasticRoutes.xml" />
+	 
 	<bean id="proxyService" class="eu.eexcess.insa.proxy.APIService" />
+	<bean id="recommendService" class="eu.eexcess.insa.recommend.APIRecommendation" />
 
     <camelContext xmlns="http://camel.apache.org/schema/spring">
-		<routeBuilder ref="proxyService" />
+		<propertyPlaceholder id="properties" location="config.properties"/>
+		
+	    
+	    <routeBuilder ref="proxyService" />
+		<routeBuilder ref="recommendService" />
+
+	    <routeContextRef ref="elasticRoutes" />
+	    
     </camelContext>
 </beans>
