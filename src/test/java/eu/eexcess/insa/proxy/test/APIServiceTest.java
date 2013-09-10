@@ -8,7 +8,7 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
 
-import eu.eexcess.insa.proxy.APIService;
+import eu.eexcess.insa.proxy.ProxyRoutes;
 
 public class APIServiceTest extends CamelTestSupport {
 	 
@@ -40,6 +40,6 @@ public class APIServiceTest extends CamelTestSupport {
  
     @Override
     protected RouteBuilder createRouteBuilder() {
-        return new APIService();
+        return new ProxyRoutes();
     }
 }

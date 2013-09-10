@@ -22,7 +22,7 @@ import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
-import eu.eexcess.insa.proxy.APIService;
+import eu.eexcess.insa.proxy.ProxyRoutes;
 import eu.eexcess.insa.proxy.actions.ApplyPrivacySettingsJS;
 import eu.eexcess.insa.recommend.APIRecommendation;
 
@@ -986,7 +986,7 @@ HashMap<String,String> simulatedElasticSearchResponses = new HashMap<String,Stri
     	
 		
 		//RouteBuilder rb = new RouteBuilder();
-		APIService apiService = new APIService(){
+		ProxyRoutes apiService = new ProxyRoutes(){
         	public void configure() throws Exception {
         		super.configure();
         		// this route resets the privacy index

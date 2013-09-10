@@ -41,7 +41,7 @@ import eu.eexcess.insa.proxy.connectors.MendeleyUpdateProfileInfo;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
 import eu.eexcess.insa.recommend.APIRecommendation;
 
-public class APIService extends RouteBuilder  {
+public class ProxyRoutes extends RouteBuilder  {
 	final ElasticExtractHitCount elasticExtractHitCount = new ElasticExtractHitCount();
 	final PrepareRequest prepReq = new PrepareRequest();
 	final PrepareSearch prepSearch = new PrepareSearch();
@@ -78,17 +78,9 @@ public class APIService extends RouteBuilder  {
 	final EnrichedRecommendationQueryAggregator recommendationQueryAggregator = new EnrichedRecommendationQueryAggregator();
 	//final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
 	
-	
-	String apiBaseURI = // "jetty:http://localhost:12564/";
-						"servlet://";
+
 		public void configure() throws Exception {
-			final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
-			/* Route used to register traces
-			 * 
-			 */
-			from(apiBaseURI + "api/v0/privacy/trace")
-				.to("direct:trace.index")
-			;
+	
 			
 			
 			from("direct:trace.index")
@@ -100,10 +92,8 @@ public class APIService extends RouteBuilder  {
 				.to("seda:elastic.trace.index")
 			;	
 			
-			/* Route used to retrieve user's profile data
-			 * 
-			 */
-			from(apiBaseURI+ "api/v0/users/profile")
+			
+			from("direct:get.user.profile")
 				.process(getUserIdFromBdy)
 				.to("direct:get.user.data")
 				.process(prepUserProfile)
@@ -117,15 +107,7 @@ public class APIService extends RouteBuilder  {
 				//.to("log:DEBUG : getUserData?showAll=true")
 				.to("direct:elastic.userSearch")
 			;
-				
-			
-			
-			/* Route to retrieve the user's traces
-			 * 
-			 */
-			from(apiBaseURI+"user/traces")
-				.to("direct:retrieve.user.traces")
-			;
+
 			from("direct:retrieve.user.traces")
 				//.streamCaching()
 				//.convertBodyTo(String.class)
@@ -142,12 +124,8 @@ public class APIService extends RouteBuilder  {
 
 			;
 			
-			
-			/* Route to update and retrieve user information
-			 * 
-			 * 
-			 */
-			from(apiBaseURI + "api/v0/users/data")
+		
+			from("direct:update.user.profile")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("profiles")
 				.process(updateEexcessProfile)
@@ -167,7 +145,7 @@ public class APIService extends RouteBuilder  {
 			/*
 			 *  Route to directly save the privacy settings into the user index ( without merging the data with other profiles first )
 			 */
-			from(apiBaseURI + "api/v0/users/privacy_settings")
+			from("direct:save.privacy.settings")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.to("seda:elastic.trace.index")
@@ -175,21 +153,7 @@ public class APIService extends RouteBuilder  {
 				.process(getUserId)	
 			;
 			
-
-			/*
-			 * Route to check if given username or email currently exit
-			 * INPUT BODY: JSON with the following structure
-			 *   {
-			 *      "user_email": <USER_EMAIL>,
-			 *      "user_id": <USER_ID>
-			 *   }
-			 *   
-			 * NOTE: Only one of the keys is necessary
-			 * 
-			 * OUTPUT BODY:
-			 *   ElasticSearch results
-			 */
-			from(apiBaseURI + "user/verify")
+			from("direct:verify.user")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.process(jsonBody2Properties)
@@ -199,12 +163,9 @@ public class APIService extends RouteBuilder  {
 				.to("string-template:templates/results/hits.tm")
 			;
 			
-			/*
-			 * Route to log a user in
-			 * 
-			 */
+			
 
-			from(apiBaseURI+"user/login")
+			from("direct:user.login")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.process(prepUserLogin)
@@ -220,14 +181,8 @@ public class APIService extends RouteBuilder  {
 			 * 						MENDELEY OAUTH ROUTES
 			 * ================================================================
 			 */
-			
-			
-			
-			
-			/* Route to initialize Mendeley OAuth authentifiaction
-			 *  ( get request token and other informations
-			 */
-			from(apiBaseURI+"oauth/mendeley/init")	
+
+			from("direct:oauth.mendeley.init")	
 				.process(mendeleyInitOAuthParams)
 				.process(signingProcessor)
 				.process(oauthQueryGenerator)
@@ -238,10 +193,8 @@ public class APIService extends RouteBuilder  {
 				.process(new MendeleyProcessResponse())			
 			;
 			
-			/* Route to continue Mendeley Oauth authentification
-			 *  (get access token and other informations)
-			 */
-			from(apiBaseURI+ "oauth/mendeley/connect")		 
+
+			from("direct:oauth.mendeley.connect")		 
 				.process(mendeleyInitAccessParams)
 				.process(signingProcessor)
 				.process(oauthQueryGenerator)
@@ -316,26 +269,4 @@ public class APIService extends RouteBuilder  {
 				.to("seda:elastic.trace.index")
 			;
 		}
-
-	public static void main( String[] args ) {
-    	final org.apache.camel.spring.Main main = new org.apache.camel.spring.Main();
-    	main.addRouteBuilder(new APIService());
-    	main.addRouteBuilder(new APIRecommendation());
-
-    	//insert other routebuilders here
-    	Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {			
-			public void run() {
-				try {
-					main.stop();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}));
-    	try {
-			main.run();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-    }
 }

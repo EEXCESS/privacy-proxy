@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.springframework.retry.ExhaustedRetryException;
 
 import eu.eexcess.insa.oauth.OAuthSigningProcessor;
-import eu.eexcess.insa.proxy.APIService;
+import eu.eexcess.insa.proxy.ProxyRoutes;
 
 public class TemplateTest extends CamelTestSupport {
 	//http://tools.ietf.org/html/rfc5849
@@ -106,6 +106,6 @@ public class TemplateTest extends CamelTestSupport {
      
     @Override
     protected RouteBuilder createRouteBuilder() {
-        return new APIService();
+        return new ProxyRoutes();
     }
 }

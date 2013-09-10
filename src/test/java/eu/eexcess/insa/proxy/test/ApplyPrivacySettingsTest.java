@@ -34,7 +34,7 @@ import org.junit.Test;
 import org.springframework.retry.ExhaustedRetryException;
 
 import eu.eexcess.insa.oauth.OAuthSigningProcessor;
-import eu.eexcess.insa.proxy.APIService;
+import eu.eexcess.insa.proxy.ProxyRoutes;
 import eu.eexcess.insa.proxy.actions.ApplyPrivacySettingsJS;
 
 public class ApplyPrivacySettingsTest extends CamelTestSupport {
@@ -654,7 +654,7 @@ public class ApplyPrivacySettingsTest extends CamelTestSupport {
     @Override
     protected RouteBuilder createRouteBuilder() {
     	
-    	return new APIService(){
+    	return new ProxyRoutes(){
         	public void configure() throws Exception {
         		super.configure();
         		ApplyPrivacySettingsJS privacy = new ApplyPrivacySettingsJS();
