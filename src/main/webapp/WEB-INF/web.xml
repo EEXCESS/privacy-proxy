@@ -44,4 +44,8 @@
     	<servlet-name>CamelServlet</servlet-name>
     	<url-pattern>/oauth/*</url-pattern>
     </servlet-mapping>
+    
+  
+    
+   
 </web-app>

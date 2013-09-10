@@ -53,6 +53,13 @@
 	</build>
  
   <dependencies>
+  
+	  <dependency>
+      <groupId>org.elasticsearch</groupId>
+    <artifactId>elasticsearch-transport-wares</artifactId>
+    <version>1.7.0-SNAPSHOT</version>
+    </dependency>
+    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -114,12 +121,6 @@
     	<artifactId>camel-stringtemplate</artifactId>
     	<version>${camel.version}</version>
     </dependency>
-
-	<dependency>
-		<groupId>org.apache.camel</groupId>
-		<artifactId>camel-servlet</artifactId>
-		<version>${camel.version}</version>
-	</dependency>
     
 	<!-- Lucene dependencies -->
     <dependency>
