@@ -130,7 +130,7 @@ public class APIService extends RouteBuilder  {
 			/* Route to retrieve the user's traces
 			 * 
 			 */
-			from("jetty:http://localhost:11564/user/traces")
+			from("jetty:http://localhost:12564/user/traces")
 				.to("direct:retrieve.user.traces")
 			;
 			from("direct:retrieve.user.traces")
@@ -196,7 +196,7 @@ public class APIService extends RouteBuilder  {
 			 * OUTPUT BODY:
 			 *   ElasticSearch results
 			 */
-			from("jetty:http://localhost:11564/user/verify")
+			from("jetty:http://localhost:12564/user/verify")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.process(jsonBody2Properties)
@@ -210,7 +210,7 @@ public class APIService extends RouteBuilder  {
 			 * Route to log a user in
 			 * 
 			 */
-			from("jetty:http://localhost:11564/user/login")
+			from("jetty:http://localhost:12564/user/login")
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")
 				.process(prepUserLogin)
@@ -233,7 +233,7 @@ public class APIService extends RouteBuilder  {
 			/* Route to initialize Mendeley OAuth authentifiaction
 			 *  ( get request token and other informations
 			 */
-			from("jetty:http://localhost:11564/oauth/mendeley/init")	
+			from("jetty:http://localhost:12564/oauth/mendeley/init")	
 				.process(mendeleyInitOAuthParams)
 				.process(signingProcessor)
 				.process(oauthQueryGenerator)
@@ -247,7 +247,7 @@ public class APIService extends RouteBuilder  {
 			/* Route to continue Mendeley Oauth authentification
 			 *  (get access token and other informations)
 			 */
-			from("jetty:http://localhost:11564/oauth/mendeley/connect")
+			from("jetty:http://localhost:12564/oauth/mendeley/connect")
 				 
 				.process(mendeleyInitAccessParams)
 				.process(signingProcessor)
@@ -307,8 +307,8 @@ public class APIService extends RouteBuilder  {
 				//.to("log:ex1.1?showAll=true") 	
 				.to("direct:elastic.userSearch")
 				
-				.unmarshal().string("UTF-8")
-				.wireTap("file:///tmp/merge/?fileName=example.json")
+				//.unmarshal().string("UTF-8")
+				//.wireTap("file:///tmp/merge/?fileName=example.json")
 				
 				.process(profileSplitter)
 				.process(eexcessProfileMapper)

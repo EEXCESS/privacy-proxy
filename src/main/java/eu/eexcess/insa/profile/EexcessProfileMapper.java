@@ -118,7 +118,7 @@ public class EexcessProfileMapper implements Processor {
 					fillHeader(in, "ProfilePrivacyTitle", userPrivacyTitle);
 				}
 				
-				if(!userGivenProfile.path("privacy").path("Traces").isMissingNode()){
+				if(!userGivenProfile.path("privacy").path("traces").isMissingNode()){
 					String userPrivacyTraces = userGivenProfile.path("privacy").path("traces").getTextValue();
 					fillHeader(in, "ProfilePrivacyTraces", userPrivacyTraces);
 				}

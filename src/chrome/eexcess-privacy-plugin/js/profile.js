@@ -16,7 +16,7 @@ function initUserInfo(){
 	var JSONrequest = JSON.stringify(request);
 	
 	$.ajax({
-	   url: "http://localhost:12564/api/v0/users/profile",
+	   url: localStorage["API_BASE_URI"]+"api/v0/users/profile",
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: JSONrequest,
@@ -231,9 +231,17 @@ function doToggleTopics() {
 		if((!(userInfo.topics==null||userInfo.topics==undefined))&&userInfo.topics instanceof Array){
 			for(var i=0;i<userInfo.topics.length;i++){
 				if(userInfo.topics[i]!=undefined){
-					if($('span[name=\"'+userInfo.topics[i].label+'\"]').size()== 0){
+					if($('span[name=\"'+userInfo.topics[i].label+'\"]').size()== 0){ // bug : if there are more than one topic with the same label : all topics are not displayed
 						displayTopics(userInfo.topics[i].label,userInfo.topics[i].env,userInfo.topics[i].source);
 					}
+					/*else if($('span[name=\"'+userInfo.topics[i].label+'\"]').origin != userInfo.topics[i].origin 
+							|| $('span[name=\"'+userInfo.topics[i].label+'\"]').origin != userInfo.topics[i].origin 
+							
+					){
+						displayTopics(userInfo.topics[i].label,userInfo.topics[i].env,userInfo.topics[i].source);
+					}
+					*/
+					
 				}
 			}
 		}
@@ -264,7 +272,7 @@ function checkUpdate(){
 			user_email: email
 		});
 		$.ajax({
-		   url: "http://localhost:11564/user/verify",
+		   url: localStorage["API_BASE_URI"]+"user/verify",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
 		   data: query,
@@ -336,7 +344,7 @@ function updateBirthdate(){
 
 		
 		$.ajax({
-		   url: "http://localhost:12564/api/v0/users/data",
+		   url: localStorage["API_BASE_URI"]+"api/v0/users/data",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
 		   data: userDataJSON,
@@ -376,7 +384,7 @@ function updateAddress(){
 			var userDataJSON = JSON.stringify(userInfo);
 			
 			$.ajax({
-			   url: "http://localhost:12564/api/v0/users/data",
+			   url: localStorage["API_BASE_URI"]+"api/v0/users/data",
 			   type: "POST",
 			   contentType: "application/json;charset=UTF-8",
 			   data: userDataJSON,
@@ -405,7 +413,7 @@ function doUpdate(field){
 	var userDataJSON = JSON.stringify(userInfo);
 	
 	$.ajax({
-	   url: "http://localhost:12564/api/v0/users/data",
+	   url: localStorage["API_BASE_URI"]+"api/v0/users/data",
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: userDataJSON,
@@ -440,14 +448,15 @@ function updateTopics(){
 	var values=new Array();
 	var tags = document.getElementsByClassName("tag");
 	for(var i=0; i<tags.length;i++){
-		var env = tags[i].parentNode.id;
-		env = env.split("_")[0];
-		values[i]={label:tags[i].innerText,env:env};
+		var orig = tags[i].origin;
+		var envi = tags[i].parentNode.id;
+		envi = envi.split("_")[0];
+		values[i]={label:tags[i].innerText,origin:orig,env:envi}; //*********************
 	}
 	userInfo.topics=values;
 	var userDataJSON = JSON.stringify(userInfo);
 	$.ajax({
-	   url: "http://localhost:12564/api/v0/users/data",
+	   url: localStorage["API_BASE_URI"]+"api/v0/users/data",
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: userDataJSON,
@@ -484,6 +493,8 @@ function doAddTag (env){
 	
 	var newTag = document.createElement('span');
 	newTag.setAttribute('class','tag');
+	newTag.setAttribute('origin','eexcess');
+	//newTag.setAttribute('origin','tag');
 	var innerSpan = document.createElement('span');
 	var tagValue = document.getElementById('tagsinput_tag_'+env).value;
 	document.getElementById('tagsinput_tag_'+env).value="";
@@ -524,8 +535,14 @@ function displayTopics( topic,env,source ){
 	var innerSpan = document.createElement('span');
 	$("."+env+"_tagsinput").value="";
 	innerSpan.innerHTML="";
-	if (source == "eexcess") innerSpan.innerHTML='<img class="imgTag" src="media/icon.png">';
-	if (source == "mendeley") innerSpan.innerHTML='<img class="imgTag" src="media/mendeley.png">';
+	if (source == "eexcess") {
+		innerSpan.innerHTML='<img class="imgTag" src="media/icon.png">';
+		newTag.setAttribute('origin','eexcess');
+	}
+	if (source == "mendeley"){
+		innerSpan.innerHTML='<img class="imgTag" src="media/mendeley.png">';
+		newTag.setAttribute('origin','mendeley');
+	}
 	innerSpan.innerHTML+=topic+'<a class="tagsinput-remove-link"></a>';
 	newTag.appendChild(innerSpan);
 	document.getElementById(env+'_tagsinput').insertBefore(newTag,document.getElementById(env+'_tagsinput').firstChild);

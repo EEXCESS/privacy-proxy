@@ -3,6 +3,9 @@
 ***************************************************************/
 var version = "1.00";
 console.log("EEXCESS privacy plugin version "+version);
+if ( localStorage["API_BASE_URI"]==undefined){
+	localStorage["API_BASE_URI"] = "http://localhost:8080/privacy-proxy/";
+}
 
 /////////////////////////////////////////////////////// global variables
 
@@ -231,7 +234,7 @@ function send_context(event, tabID, context){
 	console.log("Context: "+traceJSON);
 	
 	$.ajax({
-	   url: "http://localhost:12564/api/v0/privacy/trace",
+	   url: localStorage["API_BASE_URI"]+"api/v0/privacy/trace",
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: traceJSON,
@@ -248,7 +251,7 @@ function send_context(event, tabID, context){
 function recommend(traces){
 	localStorage.removeItem("recommend");
 	$.ajax({
-	   url: "http://localhost:12564/api/v0/recommend",
+	   url: localStorage["API_BASE_URI"]+"api/v0/recommend",
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: traces,
@@ -268,7 +271,7 @@ function recommend(traces){
 	});
 	
 	$.ajax({
-		   url: "http://localhost:11564/api/v0/query/enrich",
+		   url: localStorage["API_BASE_URI"]+"api/v0/query/enrich",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
 		   data: traces,
@@ -298,7 +301,7 @@ function updateContext(tabID, evnt) {
 		var traceJSON = JSON.stringify(trace);
 		console.log("Context: "+traceJSON);
 		$.ajax({
-		   url: "http://localhost:12564/api/v0/privacy/trace",
+		   url: localStorage["API_BASE_URI"]+"api/v0/privacy/trace",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
 		   data: traceJSON,

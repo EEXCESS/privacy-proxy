@@ -3,7 +3,7 @@ $('.nav-tabs').button();
 
 function oauthMendeley(){
 	$.ajax({
-		   	url: "http://localhost:11564/oauth/mendeley/init",
+		   	url: localStorage["API_BASE_URI"]+"oauth/mendeley/init",
 		    type: "POST",
 		    contentType: "application/json;charset=UTF-8",
 		    success:function(response, status, xhr){

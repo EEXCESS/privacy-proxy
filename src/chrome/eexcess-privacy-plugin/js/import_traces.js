@@ -106,7 +106,7 @@ function parseDate(date){
 
 function traces(user_id,email) {
 	// a query is send to the proxy
-	var url = "http://localhost:11564/user/traces";
+	var url = localStorage["API_BASE_URI"]+"user/traces";
 	var method = 'POST';
 	var async = false;
 	var request = new XMLHttpRequest();
@@ -281,6 +281,8 @@ $(document).ready(function () {
 	
 	$('.tabProfile').live("click",function(){document.location = pluginUrl+"profile.html"});
 	$('.tabSettings').live("click",function(){document.location = pluginUrl+"privacySandbox.html"});
+	$('.tabPluginSettings').live("click",function(){document.location = pluginUrl+"settings.html"});
+	//********************************
 	if (localStorage["env"] == "work"){
 		$("#workButton").addClass("active");
 	}

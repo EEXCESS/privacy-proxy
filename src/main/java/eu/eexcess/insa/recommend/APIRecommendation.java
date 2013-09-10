@@ -54,7 +54,7 @@ public class APIRecommendation extends RouteBuilder {
 		 *=========================================================================*/
 		
 		
-		from("jetty:http://localhost:11564/api/v0/query/enrich")
+		from("jetty:http://localhost:12564/api/v0/query/enrich")
 			.to("direct:query.enrich")
 		;
 		from("direct:query.enrich")
