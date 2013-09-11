@@ -26,7 +26,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 public class GetUserIdFromBody implements Processor {
 
 	public void process(Exchange exchange) throws Exception {
-		// TODO Auto-generated method stub
 		Message in = exchange.getIn();
 		InputStream is = in.getBody( InputStream.class);
 		

@@ -35,12 +35,12 @@ public class ProxyRecommendService extends RouteBuilder {
 
 	/*
 	public APIRecommendation() {
-		// TODO Auto-generated constructor stub
+	
 	}
 
 	public APIRecommendation(CamelContext context) {
 		super(context);
-		// TODO Auto-generated constructor stub
+		
 	}
 	*/
 	
@@ -51,28 +51,22 @@ public class ProxyRecommendService extends RouteBuilder {
 	@Override
 	public void configure() throws Exception {
 		final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
-		// TODO Auto-generated method stub
+
 		
 		
 		/*=========================================================================
 		 *  Recommendation routes
 		 *=========================================================================*/
+		//TODO : map api/v0/query/enrich to api/v0/recommend/rewrite
 		
-		
-		from(apiBaseURI + "api/v0/query/enrich")
-			.to("direct:query.enrich")
-		;
+		from(apiBaseURI + "api/v0/recommend/rewrite").to("direct:query.enrich");
 		
 		
 		/*
 		 *  Route to get recommendations 
 		 */
-		
-		from(apiBaseURI + "api/v0/recommend")
-			.to("direct:recommendation.route")
-		;
-		
-		
+		//TODO : map api/v0/recommend to api/v0/recommend/fetch
+		from(apiBaseURI + "api/v0/recommend/fetch").to("direct:recommendation.route");		
 
 	}
 

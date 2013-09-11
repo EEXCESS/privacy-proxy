@@ -1079,7 +1079,6 @@ HashMap<String,String> simulatedElasticSearchResponses = new HashMap<String,Stri
         			.process(new Processor(){
 
 						public void process(Exchange exchange) throws Exception {
-							// TODO Auto-generated method stub
 							Message in = exchange.getIn();
 							String index = in.getHeader("ElasticIndex",String.class);
 							String type = in.getHeader("ElasticType",String.class);

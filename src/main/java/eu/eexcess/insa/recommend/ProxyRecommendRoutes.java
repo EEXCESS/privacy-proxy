@@ -33,23 +33,13 @@ public class ProxyRecommendRoutes extends RouteBuilder {
 	final CloseJsonObject closeJson = new CloseJsonObject();
 
 
-	/*
-	public APIRecommendation() {
-		// TODO Auto-generated constructor stub
-	}
 
-	public APIRecommendation(CamelContext context) {
-		super(context);
-		// TODO Auto-generated constructor stub
-	}
-	*/
 
 	
 	
 	@Override
 	public void configure() throws Exception {
 		final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
-		// TODO Auto-generated method stub
 		
 		
 		/*=========================================================================
