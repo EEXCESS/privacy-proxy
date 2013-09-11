@@ -14,7 +14,7 @@
 	<bean id="recommendService" class="eu.eexcess.insa.recommend.APIRecommendation" />
 
     <camelContext xmlns="http://camel.apache.org/schema/spring">
-		<propertyPlaceholder id="properties" location="config.properties"/>
+		<propertyPlaceholder id="properties" location="local.properties"/>
 		
 	    
 	    <routeBuilder ref="proxyService" />

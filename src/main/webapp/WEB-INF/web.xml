@@ -45,7 +45,5 @@
     	<url-pattern>/oauth/*</url-pattern>
     </servlet-mapping>
     
-  
     
-   
 </web-app>
