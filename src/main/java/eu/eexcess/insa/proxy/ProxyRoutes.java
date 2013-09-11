@@ -89,6 +89,7 @@ public class ProxyRoutes extends RouteBuilder  {
 				.setHeader("ElasticIndex").constant("privacy")
 				//.to("log:indexing trace :?showAll=true&showStreams=true ")
 				.to("seda:elastic.trace.index")
+				//.to("log:indexing trace :?showAll=true&showStreams=true ")
 			;	
 			
 			

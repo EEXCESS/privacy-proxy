@@ -42,7 +42,7 @@ public class ApplyPrivacySettingsJS implements Processor{
 		// applyPrivacy(...) and replace value with output
 		
 		//InputStream is = exchange.getProperty("user_context-profile", InputStream.class);
-		//String is = exchange.getProperty("user_context-profile", String.class); //TODO : remettre en inputstream
+		//String is = exchange.getProperty("user_context-profile", String.class); 
 		//System.out.println("user profile : input \n"+is);
 		
 		JsonFactory factory = new JsonFactory();
