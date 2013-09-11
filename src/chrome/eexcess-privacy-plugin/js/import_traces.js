@@ -106,7 +106,7 @@ function parseDate(date){
 
 function traces(user_id,email) {
 	// a query is send to the proxy
-	var url = localStorage["API_BASE_URI"]+"user/traces";
+	var url = localStorage["API_BASE_URI"]+"api/v0/user/traces";
 	var method = 'POST';
 	var async = false;
 	var request = new XMLHttpRequest();

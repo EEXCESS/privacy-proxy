@@ -16,7 +16,7 @@ function valideIDs(){
 	
 	if(validEmail(email)){
 		$.ajax({
-		   url: localStorage["API_BASE_URI"]+"user/verify",
+		   url: localStorage["API_BASE_URI"]+"api/v0/user/exists",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
 		   data: query,
@@ -63,7 +63,7 @@ function register(){
 	var userDataJSON = JSON.stringify(userData);
 	
 	$.ajax({
-	   url: localStorage["API_BASE_URI"]+"api/v0/users/data",
+	   url: localStorage["API_BASE_URI"]+"api/v0/user/data",
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: userDataJSON,
@@ -109,7 +109,7 @@ function login() {
 		var userData = "{\"term\":{\"data."+field+"\":\""+id+"\"}},{\"term\":{\"data.password\":\""+password+"\"}}";
 	
 		$.ajax({
-		   	url: localStorage["API_BASE_URI"]+"user/login",
+		   	url: localStorage["API_BASE_URI"]+"api/v0/user/authenticate",
 		    type: "POST",
 		    contentType: "application/json;charset=UTF-8",
 		    data: userData,
@@ -133,7 +133,7 @@ function login() {
 
 function oauthMendeley(){
 	$.ajax({
-		   	url: localStorage["API_BASE_URI"]+"oauth/mendeley/init",
+		   	url: localStorage["API_BASE_URI"]+"api/v0/connect/mendeley/init",
 		    type: "POST",
 		    contentType: "application/json;charset=UTF-8",
 		    success:function(response, status, xhr){

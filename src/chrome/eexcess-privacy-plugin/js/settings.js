@@ -7,7 +7,7 @@ var lastTrace = {};
 function updateUserInfo(){
 	userDataJSON = JSON.stringify(userInfo);
 	$.ajax({
-		   url: localStorage["API_BASE_URI"]+"api/v0/users/privacy_settings",
+		   url: localStorage["API_BASE_URI"]+"api/v0/user/privacy_settings",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
 		   data: userDataJSON,
@@ -286,7 +286,7 @@ function updateRecommendation(callback, trace){
 	
 	userDataJSON = JSON.stringify(userInfo);
 	$.ajax({
-		   url: localStorage["API_BASE_URI"]+"api/v0/users/privacy_settings",
+		   url: localStorage["API_BASE_URI"]+"api/v0/user/privacy_settings",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
 		   data: userDataJSON,
@@ -297,7 +297,7 @@ function updateRecommendation(callback, trace){
 		   complete: function(response) {
 			   
 			   $.ajax({
-				   url: localStorage["API_BASE_URI"]+"api/v0/recommend",
+				   url: localStorage["API_BASE_URI"]+"api/v0/recommend/fetch",
 				   type: "POST",
 				   contentType: "application/json;charset=UTF-8",
 				   data: traces,
@@ -311,7 +311,7 @@ function updateRecommendation(callback, trace){
 						var hitCount = $(xml).attr("data-hits");
 						
 						$.ajax({
-							   url: localStorage["API_BASE_URI"]+"api/v0/query/enrich",
+							   url: localStorage["API_BASE_URI"]+"api/v0/recommend/rewrite",
 							   type: "POST",
 							   contentType: "application/json;charset=UTF-8",
 							   data: JSON.stringify(trace),
