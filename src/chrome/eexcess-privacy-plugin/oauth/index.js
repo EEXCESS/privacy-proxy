@@ -18,7 +18,7 @@ queryComponents.forEach(function(element){
 });
 
 $.ajax({
-   	url: localStorage["API_BASE_URI"]+"oauth/mendeley/connect",
+   	url: localStorage["API_BASE_URI"]+"api/v0/connect/mendeley/validate",
     type: "GET",
     contentType: "application/json;charset=UTF-8",
     beforeSend: function (request)

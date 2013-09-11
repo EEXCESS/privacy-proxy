@@ -40,7 +40,7 @@ public class ProxyService extends RouteBuilder  {
 		 *   <Format du message>
 		 *   
 		 */
-		from(apiBaseURI+ "api/v0/users/profile").to("direct:get.user.profile");
+		from(apiBaseURI+ "api/v0/user/profile").to("direct:get.user.profile");
 
 
 		/* 
@@ -73,7 +73,7 @@ public class ProxyService extends RouteBuilder  {
 		 *   <Format du message>
 		 *   
 		 */
-		from(apiBaseURI + "api/v0/users/data").to("direct:update.user.profile");
+		from(apiBaseURI + "api/v0/user/data").to("direct:update.user.profile");
 
 
 		/* 
@@ -90,7 +90,7 @@ public class ProxyService extends RouteBuilder  {
 		 *   
 		 * 
 		 */
-		from(apiBaseURI + "api/v0/users/privacy_settings").to("direct:save.privacy.settings");
+		from(apiBaseURI + "api/v0/user/privacy_settings").to("direct:save.privacy.settings");
 
 			
 
@@ -130,7 +130,7 @@ public class ProxyService extends RouteBuilder  {
 		 * TODO Complete with whatever is returned on user authentication
 		 *   }
 		 *  
-		 * TODO map user/verify -> api/v0/user/exists
+		 * TODO map user/login -> api/v0/user/authenticate
 		 */
 		from(apiBaseURI+"api/v0/user/authenticate").to("direct:user.login");
 			

@@ -251,7 +251,7 @@ function send_context(event, tabID, context){
 function recommend(traces){
 	localStorage.removeItem("recommend");
 	$.ajax({
-	   url: localStorage["API_BASE_URI"]+"api/v0/recommend",
+	   url: localStorage["API_BASE_URI"]+"api/v0/recommend/fetch",
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: traces,
@@ -271,7 +271,7 @@ function recommend(traces){
 	});
 	
 	$.ajax({
-		   url: localStorage["API_BASE_URI"]+"api/v0/query/enrich",
+		   url: localStorage["API_BASE_URI"]+"api/v0/recommend/rewrite",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
 		   data: traces,

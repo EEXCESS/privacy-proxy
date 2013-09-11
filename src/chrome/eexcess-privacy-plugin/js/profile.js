@@ -272,7 +272,7 @@ function checkUpdate(){
 			user_email: email
 		});
 		$.ajax({
-		   url: localStorage["API_BASE_URI"]+"user/verify",
+		   url: localStorage["API_BASE_URI"]+"api/v0/user/exists",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
 		   data: query,
@@ -344,7 +344,7 @@ function updateBirthdate(){
 
 		
 		$.ajax({
-		   url: localStorage["API_BASE_URI"]+"api/v0/users/data",
+		   url: localStorage["API_BASE_URI"]+"api/v0/user/data",
 		   type: "POST",
 		   contentType: "application/json;charset=UTF-8",
 		   data: userDataJSON,
@@ -384,7 +384,7 @@ function updateAddress(){
 			var userDataJSON = JSON.stringify(userInfo);
 			
 			$.ajax({
-			   url: localStorage["API_BASE_URI"]+"api/v0/users/data",
+			   url: localStorage["API_BASE_URI"]+"api/v0/user/data",
 			   type: "POST",
 			   contentType: "application/json;charset=UTF-8",
 			   data: userDataJSON,
@@ -413,7 +413,7 @@ function doUpdate(field){
 	var userDataJSON = JSON.stringify(userInfo);
 	
 	$.ajax({
-	   url: localStorage["API_BASE_URI"]+"api/v0/users/data",
+	   url: localStorage["API_BASE_URI"]+"api/v0/user/data",
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: userDataJSON,
@@ -456,7 +456,7 @@ function updateTopics(){
 	userInfo.topics=values;
 	var userDataJSON = JSON.stringify(userInfo);
 	$.ajax({
-	   url: localStorage["API_BASE_URI"]+"api/v0/users/data",
+	   url: localStorage["API_BASE_URI"]+"api/v0/user/data",
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: userDataJSON,
