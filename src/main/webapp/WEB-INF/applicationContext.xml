@@ -16,8 +16,7 @@
 	<bean id="recommendService" class="eu.eexcess.insa.recommend.ProxyRecommendService" />
 
     <camelContext xmlns="http://camel.apache.org/schema/spring">
-		<propertyPlaceholder id="properties" location="config.properties"/>
-		
+		<propertyPlaceholder id="properties" location="file:${env:HOME}/conf/privacy-proxy.properties"/>
 	    
 	    <routeBuilder ref="proxyService" />
 		<routeBuilder ref="recommendService" />

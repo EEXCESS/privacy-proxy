@@ -100,6 +100,12 @@
 			<version>${camel.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-servlet</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+
 		<!-- Camel dependencies (other scopes) -->
 		<dependency>
 			<groupId>org.apache.camel</groupId>
@@ -112,7 +118,7 @@
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-jetty</artifactId>
 			<version>${camel.version}</version>
-			<scope>jetty:run</scope>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- Lucene dependencies -->
