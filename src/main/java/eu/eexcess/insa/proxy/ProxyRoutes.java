@@ -39,7 +39,7 @@ import eu.eexcess.insa.proxy.connectors.EconBizResultFormater;
 import eu.eexcess.insa.proxy.connectors.MendeleyDocumentQueryMapper;
 import eu.eexcess.insa.proxy.connectors.MendeleyUpdateProfileInfo;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
-import eu.eexcess.insa.recommend.APIRecommendation;
+import eu.eexcess.insa.recommend.ProxyRecommendService;
 
 public class ProxyRoutes extends RouteBuilder  {
 	final ElasticExtractHitCount elasticExtractHitCount = new ElasticExtractHitCount();

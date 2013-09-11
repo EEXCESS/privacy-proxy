@@ -24,7 +24,8 @@ import org.junit.Test;
 
 import eu.eexcess.insa.proxy.ProxyRoutes;
 import eu.eexcess.insa.proxy.actions.ApplyPrivacySettingsJS;
-import eu.eexcess.insa.recommend.APIRecommendation;
+import eu.eexcess.insa.recommend.ProxyRecommendRoutes;
+import eu.eexcess.insa.recommend.ProxyRecommendService;
 
 
 public class TraceIndexingTest extends CamelTestSupport {
@@ -1096,7 +1097,7 @@ HashMap<String,String> simulatedElasticSearchResponses = new HashMap<String,Stri
         	}
         };
         
-        apiService.includeRoutes(new APIRecommendation());
+        apiService.includeRoutes(new ProxyRecommendRoutes());
         return apiService;
         
     }

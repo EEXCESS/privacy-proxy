@@ -20,7 +20,7 @@ import eu.eexcess.insa.proxy.connectors.MendeleyQueriesAggregator;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
 import eu.eexcess.insa.proxy.connectors.RecomendationResultAggregator;
 
-public class APIRecommendation extends RouteBuilder {
+public class ProxyRecommendRoutes extends RouteBuilder {
 	final PrepareRecommendationTermsPonderation prepPonderation = new PrepareRecommendationTermsPonderation();
 	final EnrichedRecommendationQueryAggregator recommendationQueryAggregator = new EnrichedRecommendationQueryAggregator();
 	final ExtractUserEnvironment extractUserEnv = new ExtractUserEnvironment();
@@ -43,9 +43,7 @@ public class APIRecommendation extends RouteBuilder {
 		// TODO Auto-generated constructor stub
 	}
 	*/
-	
-	String apiBaseURI = // "jetty:http://localhost:12564";
-			"servlet://";
+
 	
 	
 	@Override
@@ -57,11 +55,7 @@ public class APIRecommendation extends RouteBuilder {
 		/*=========================================================================
 		 *  Recommendation routes
 		 *=========================================================================*/
-		
-		
-		from(apiBaseURI + "api/v0/query/enrich")
-			.to("direct:query.enrich")
-		;
+
 		from("direct:query.enrich")
 		//.to("log:just_trace sent?showAll=true")
 			.to("direct:context.safe.load")
@@ -72,10 +66,7 @@ public class APIRecommendation extends RouteBuilder {
 		/*
 		 *  Route to get recommendations 
 		 */
-		
-		from(apiBaseURI + "api/v0/recommend")
-			.to("direct:recommendation.route")
-		;
+
 		from("direct:recommendation.route")
 			.removeHeaders("CamelHttp*")
 			.removeHeader("Host")	

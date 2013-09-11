@@ -39,7 +39,8 @@ import eu.eexcess.insa.proxy.connectors.EconBizResultFormater;
 import eu.eexcess.insa.proxy.connectors.MendeleyDocumentQueryMapper;
 import eu.eexcess.insa.proxy.connectors.MendeleyUpdateProfileInfo;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
-import eu.eexcess.insa.recommend.APIRecommendation;
+import eu.eexcess.insa.recommend.ProxyRecommendRoutes;
+import eu.eexcess.insa.recommend.ProxyRecommendService;
 
 public class ProxyService extends RouteBuilder  {
 	final ElasticExtractHitCount elasticExtractHitCount = new ElasticExtractHitCount();
@@ -189,7 +190,8 @@ public class ProxyService extends RouteBuilder  {
 	public static void main( String[] args ) {
     	final org.apache.camel.spring.Main main = new org.apache.camel.spring.Main();
     	main.addRouteBuilder(new ProxyService());
-    	main.addRouteBuilder(new APIRecommendation());
+    	main.addRouteBuilder(new ProxyRecommendService());
+     	main.addRouteBuilder(new ProxyRecommendRoutes());
 
     	//insert other routebuilders here
     	Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {			
