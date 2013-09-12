@@ -18,7 +18,7 @@ import org.codehaus.jackson.map.ObjectMapper;
  * The message is supposed to be formed in the following way : 
  * 
  * 			{
- * 				id: theIdValue
+ * 				_id: theIdValue
  * 			}
  * 
  */

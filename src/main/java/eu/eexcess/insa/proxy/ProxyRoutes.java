@@ -261,7 +261,6 @@ public class ProxyRoutes extends RouteBuilder  {
 				.process(eexcessProfileMapper)
 				.process(mendeleyProfileMapper)
 				.to("string-template:templates/profile.tm")
-				//.to("log:coucou2?showAll=true")
 
 				.setHeader("ElasticType").constant("data")
 				.setHeader("ElasticIndex").constant("users")

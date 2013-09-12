@@ -16,7 +16,7 @@ function initUserInfo(){
 	var JSONrequest = JSON.stringify(request);
 	
 	$.ajax({
-	   url: localStorage["API_BASE_URI"]+"api/v0/users/profile",
+	   url: localStorage["API_BASE_URI"]+"api/v0/user/profile",
 	   type: "POST",
 	   contentType: "application/json;charset=UTF-8",
 	   data: JSONrequest,

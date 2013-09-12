@@ -52,20 +52,43 @@ public class ProxyRecommendService extends RouteBuilder {
 	public void configure() throws Exception {
 		final ApplyPrivacySettingsJS applyPrivacySettings = new ApplyPrivacySettingsJS();
 
-		
-		
-		/*=========================================================================
-		 *  Recommendation routes
-		 *=========================================================================*/
-		//TODO : map api/v0/query/enrich to api/v0/recommend/rewrite
-		
+		/*
+		 * Route to get an array of weighted search terms from an user context
+		 * 
+		 * INPUT :
+		 * 	a trace, JSON format
+		 * //TODO : example of a trace
+		 * 
+		 * OUTPUT :
+		 * 
+		 * {"content":
+		 * 	[
+		 * 		{"term":"<term>","score":<score>},
+		 * 		{"term":"<term>","score":<score>}
+		 *  ],
+		 *  "ponderatedTopics":
+		 *  [
+		 *  	{"term":"<topic>","value":<value>},
+		 *  	{"term":"<topic>","value":<value>}
+		 *  ]
+		 * }
+		 * 	
+		 * 
+		 */
 		from(apiBaseURI + "api/v0/recommend/rewrite").to("direct:query.enrich");
 		
 		
 		/*
-		 *  Route to get recommendations 
+		 *  Route to get recommendations from an user context
+		 *  
+		 *  INPUT : 
+		 *  	a trace, JSON format
+		 *  //TODO : example trace
+		 *  
+		 *  OUTPUT :
+		 *  	a html list (<ul><li> [...] </li></ul>
+		 *  
 		 */
-		//TODO : map api/v0/recommend to api/v0/recommend/fetch
 		from(apiBaseURI + "api/v0/recommend/fetch").to("direct:recommendation.route");		
 
 	}
