@@ -88,7 +88,7 @@ a [trace](#trace)
 <pre><code>{
     "id": "%ID%",
     "values":{
-        %rest of the <a href='#profile'>user profile</a>%
+        %rest of the <a href='#user-profile'>user profile</a>%
     }
  }
 </code></pre>
