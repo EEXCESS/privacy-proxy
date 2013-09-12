@@ -19,7 +19,7 @@ a [trace](#trace)
  
   - #####OUTPUT :
 
- <pre><code>{
+<pre><code>{
     "content": [
         {
             "term": "%TERM%",
@@ -64,7 +64,7 @@ a [trace](#trace)
   - ##### OUTPUT:
  A response from Elasticsearch :
 
- <pre><code>{
+<pre><code>{
     "ok": true,
     "_index": "privacy",
     "_type": "trace",
@@ -79,13 +79,13 @@ a [trace](#trace)
  This route gets a given user's profile
  
   - <h5>INPUT:</h5>
- <pre><code>{
+<pre><code>{
   "_id": "%ID%"
 }
 </code></pre>
  
   - <h5>OUTPUT:</h5>
- <pre><code>{
+<pre><code>{
     "id": "%ID%",
     "values":{
         %rest of the <a href='#profile'>user profile</a>%
@@ -99,7 +99,7 @@ a [trace](#trace)
   This route gets traces corresponding to either a plugin, an user or both, depending of the informations sent 
 
   - <h5>INPUT:</h5>
- <pre><code>{
+<pre><code>{
     "pluginId": %plugin's id%";
     "userId": "%user's id%",
     "environnement": "%environnement ( either "work" or "home"%"
@@ -108,7 +108,7 @@ a [trace](#trace)
  
   - <h5>OUTPUT:</h5>
    an Elasticsearch list of [traces](#trace), ordered from latest to oldest, maximum 50	
- <pre><code>{
+<pre><code>{
     took: 4,
     timed_out: false,
     _shards: {
@@ -131,11 +131,11 @@ a [trace](#trace)
   This route updates an user profile
 
   - ##### INPUT:
-   the [user profile](#profile)
+   the [user profile](#user-profile)
    
   - ##### OUTPUT:
   a response from Elasticsearch :
- <pre><code>{
+<pre><code>{
     "ok": true,
     "_index": "users",
     "_type": "data",
@@ -148,7 +148,7 @@ a [trace](#trace)
   This route updates an user profile directly without merging it with other profiles first 
 
   - ##### INPUT:
-   the [user profile](#profile)
+   the [user profile](#user-profile)
   
   - ##### OUTPUT:
    %user id% 
@@ -159,7 +159,7 @@ a [trace](#trace)
 
   - <h5> INPUT: </h5>
 JSON with the following structure
- <pre><code>{
+<pre><code>{
     "user_email": "%user email%",
     "user_id": "%user id%"
 }</code></pre>
@@ -167,7 +167,7 @@ JSON with the following structure
 **NOTE:** Only one of the fields is necessary
  
   - <h5>OUTPUT:</h5> 
- <pre><code>{
+<pre><code>{
     "hits": %number%
  }</code></pre>
 
@@ -175,7 +175,7 @@ JSON with the following structure
  Route to get an user's id from his login informations ( username/ email and password )
 
   - <h5>INPUT:</h5>
- <pre><code>{
+<pre><code>{
     "term": 
       {
         "data.%email | username%": "%email | username%"
@@ -191,7 +191,7 @@ JSON with the following structure
 **NOTE:** You can either use the email or the username
  
   - <h5>OUTPUT:</h5>
- <pre><code>{
+<pre><code>{
     "loginValid": "% 1 if the credentials were correct, 0 if they weren't %",
     "id": "%user id%",
     "username": %username%
@@ -211,7 +211,7 @@ JSON with the following structure
 
 
 ###api/v0/connect/mendeley/validate
- Route to finalize the Mendeley oauth authentication, importing the user's Mendeley profile to the database and eventualy merging it with an existing eexcess [profile](#profile)
+ Route to finalize the Mendeley oauth authentication, importing the user's Mendeley profile to the database and eventualy merging it with an existing eexcess [profile](#user-profile)
 
   - INPUT :
     - HEADERS :
@@ -221,13 +221,15 @@ JSON with the following structure
  		ouath`_`verifier,
  
     - OUTPUT : 
- <pre><code>{
-    "ok": true
-    "_index": "users"
-    "_type": "data"
-    "_id": "%user id%"
+<pre><code>
+{
+    "ok": true,
+    "_index": "users",
+    "_type": "data",
+    "_id": "%user id%",
     "_version": %number of times the user have been updated%
-}</code></pre>
+}
+</code></pre>
 
 
 
@@ -236,7 +238,7 @@ JSON with the following structure
 Data formats
 ------------
 
-<h3 id='profile'>USER PROFILE :</h3>
+<h3 id='profile'>USER PROFILE</h3>
 <pre><code>
 {
     "username": "johndoe",
