@@ -11,7 +11,7 @@ user: anonymous
 8. Back to Google
 9. Searches for crowdfunding
 10. Visits http://www.kickstarter.com/
-11. Bach to search results
+11. Back to search results
 12. Visits http://crowdfunding.com/
 13. http://www.apce.com/pid14215/crowdfunding.html
 14. http://www.kisskissbankbank.com/

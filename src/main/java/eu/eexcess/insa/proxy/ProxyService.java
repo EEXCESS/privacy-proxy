@@ -206,8 +206,11 @@ public class ProxyService extends RouteBuilder  {
 		 *  	
 		 */
 		from(apiBaseURI+ "api/v0/connect/mendeley/validate").to("direct:oauth.mendeley.connect");
-				
-			
-		//=======================================================
+	
+		/* ================================================================
+		 * 						ADMIN ROUTES
+		 * ================================================================
+		 */
+		from(apiBaseURI+ "admin/wipe").to("direct:elastic.wipe");
 	}
 }
