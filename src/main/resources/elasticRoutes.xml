@@ -8,6 +8,9 @@
 	<routeContext id="elasticRoutes"  xmlns="http://camel.apache.org/schema/spring">
 		<route>
 			<from uri="seda:elastic.trace.index?concurrentConsumers=4" />
+			<removeHeaders pattern="CamelHttp*" />
+			<convertBodyTo type="String" />
+			
 			<setHeader headerName="CamelHttpURI">
 				<simple>{{elastic.url}}/${in.header.ElasticIndex}/${in.header.ElasticType}/${in.header.traceId}?refresh=true</simple>
 			</setHeader>
@@ -17,13 +20,14 @@
     		<setProperty propertyName="CamelCharsetName">
     			<constant>UTF-8</constant>
     		</setProperty>
-    		<log message="elastic.xml reporting in"/>
 			<to uri="http4://localhost:9200/" />
 			<removeHeaders pattern="CamelHttp*" />
 		</route>
 
 		<route>
 			<from uri="direct:elastic.search" />
+			<removeHeaders pattern="CamelHttp*" />
+			
 			<setHeader headerName="CamelHttpURI">
 				<simple>{{elastic.url}}/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
 			</setHeader>
@@ -33,12 +37,14 @@
     		<setProperty propertyName="CamelCharsetName">
     			<constant>UTF-8</constant>
     		</setProperty>
-			<to uri="http4://localhost:9200/privacy/trace/_search?sort=temporal.begin:desc&amp;size=50" />
+			<to uri="http4://localhost:9200/?sort=temporal.begin:desc&amp;size=50" />
 			<removeHeaders pattern="CamelHttp*" />
 		</route>
 		
 		<route>
 			<from uri="direct:elastic.userSearch" />
+			<removeHeaders pattern="CamelHttp*" />
+			
 			<setHeader headerName="CamelHttpURI">
 				<simple>{{elastic.url}}/${in.header.ElasticIndex}/${in.header.ElasticType}/_search</simple>
 			</setHeader>
@@ -48,8 +54,70 @@
     		<setProperty propertyName="CamelCharsetName">
     			<constant>UTF-8</constant>
     		</setProperty>
-			<to uri="http4://localhost:9200/privacy/trace/_search" />
+			<to uri="http4://localhost:9200/" />
 			<removeHeaders pattern="CamelHttp*" />
+		</route>
+		
+		
+		<route>
+			<from uri="direct:elastic.wipe" />
+			<removeHeaders pattern="CamelHttp*" />
+			
+			<!--  Reset privacy index -->
+			<setHeader headerName="CamelHttpMethod"><constant>DELETE</constant></setHeader>
+			<setHeader headerName="CamelHttpURI">
+				<simple>{{elastic.url}}/privacy/</simple>
+			</setHeader>
+			<to uri="http4://localhost:9200?throwExceptionOnFailure=false" />
+			
+			<setHeader headerName="CamelHttpMethod"><constant>PUT</constant></setHeader>
+			<setHeader headerName="CamelHttpURI">
+				<simple>{{elastic.url}}/privacy/</simple>
+			</setHeader>
+			<to uri="string-template://templates/elastic/index.config.tm" />
+			<to uri="http4://localhost:9200" />
+			
+			<setHeader headerName="CamelHttpMethod"><constant>PUT</constant></setHeader>
+			<setHeader headerName="CamelHttpURI">
+				<simple>{{elastic.url}}/privacy/trace/_mapping</simple>
+			</setHeader>
+			<to uri="string-template://templates/elastic/privacy.trace.mapping.tm" />
+			<to uri="http4://localhost:9200" />
+			
+			<!--  Reset user index -->
+			<setHeader headerName="CamelHttpMethod"><constant>DELETE</constant></setHeader>
+			<setHeader headerName="CamelHttpURI">
+				<simple>{{elastic.url}}/users/</simple>
+			</setHeader>
+			<to uri="http4://localhost:9200?throwExceptionOnFailure=false" />
+			
+			<setHeader headerName="CamelHttpMethod"><constant>PUT</constant></setHeader>
+			<setHeader headerName="CamelHttpURI">
+				<simple>{{elastic.url}}/users/</simple>
+			</setHeader>
+			<to uri="string-template://templates/elastic/index.config.tm" />
+			<to uri="http4://localhost:9200" />
+			
+			<setHeader headerName="CamelHttpMethod"><constant>PUT</constant></setHeader>
+			<setHeader headerName="CamelHttpURI">
+				<simple>{{elastic.url}}/users/data/_mapping</simple>
+			</setHeader>
+			<to uri="string-template://templates/elastic/users.data.mapping.tm" />
+			<to uri="http4://localhost:9200" />
+			
+			<!--  Reset profiles index -->
+			<setHeader headerName="CamelHttpMethod"><constant>DELETE</constant></setHeader>
+			<setHeader headerName="CamelHttpURI">
+				<simple>{{elastic.url}}/profiles/</simple>
+			</setHeader>
+			<to uri="http4://localhost:9200?throwExceptionOnFailure=false" />
+			
+			<setHeader headerName="CamelHttpMethod"><constant>PUT</constant></setHeader>
+			<setHeader headerName="CamelHttpURI">
+				<simple>{{elastic.url}}/profiles/</simple>
+			</setHeader>
+			<to uri="string-template://templates/elastic/index.config.tm" />
+			<to uri="http4://localhost:9200" />
 		</route>
 	</routeContext>
 </beans>

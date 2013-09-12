@@ -34,4 +34,9 @@
     	<servlet-name>CamelServlet</servlet-name>
     	<url-pattern>/api/*</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+    	<servlet-name>CamelServlet</servlet-name>
+    	<url-pattern>/admin/*</url-pattern>
+    </servlet-mapping>
 </web-app>
