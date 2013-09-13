@@ -104,7 +104,7 @@ function parseDate(date){
 	}
 }
 
-function traces(user_id,email) {
+function traces(pluginId,userId) {  //user_id = plugin_id; email = user_id
 	// a query is send to the proxy
 	var url = localStorage["API_BASE_URI"]+"api/v0/user/traces";
 	var method = 'POST';
@@ -114,12 +114,12 @@ function traces(user_id,email) {
 	var body = '';
 	var userData = new Object();
 	
-	if(user_id != '') {
-		userData.pluginId = user_id;
+	if(pluginId != '') {
+		userData.pluginId = pluginId;
 	}
 	
-	if(email != '') {
-		userData.userId = email;
+	if(userId != '') {
+		userData.userId = userId;
 	}	
 	userData.environnement = localStorage["env"];
 	request.open(method, url, async);	
@@ -217,7 +217,6 @@ function traces(user_id,email) {
 */
 
 function doReloadTraces(){
-
 	for(var i=0;i<50;i++){
 		var id = "list"+i;
 		$('#templateCopy').remove();
@@ -225,27 +224,45 @@ function doReloadTraces(){
 	
 	if($('#inputUserTraces').is(':checked')){
 		if($('#inputPluginTraces').is(':checked')) {
-			chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
+			/*chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
 				var uuidPlugin = response.data;
 				chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
 					traces(uuidPlugin,response.data);
  				 });
-  			});
+  			});*/
+			if ( localStorage["user_id"] != undefined && localStorage["user_id"] != ''){
+				traces(localStorage["uuid"],localStorage["user_id"]);
+			}
+			else{
+				traces(localStorage["uuid"],'');
+			}
+			
 		}
 		else {
-			chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
+			/*chrome.extension.sendRequest({method: "getLocalStorage", key: "privacy_email"}, function(response) {
 				traces('',response.data);
  			 });
+ 			 */
+			
+			if ( localStorage["user_id"]!=undefined && localStorage["user_id"]!=''){
+				traces('',localStorage["user_id"]);
+			}
+			else{
+				document.getElementById('nbTraces').innerHTML ="0 traces dans l'historique";
+			}
 		}
 	}
 	else {
 		if($('#inputPluginTraces').is(':checked')) {
-			chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
+			/*chrome.extension.sendRequest({method: "getLocalStorage", key: "uuid"}, function(response) {
 				traces(response.data,'');
   			});
+  			*/
+			traces(localStorage["uuid"],'');
 		}
 		else {
-			traces('','');
+			//traces('','');
+			document.getElementById('nbTraces').innerHTML ="0 traces dans l'historique";
  		}
 		
 	}

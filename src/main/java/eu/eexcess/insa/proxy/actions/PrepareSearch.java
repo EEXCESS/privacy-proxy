@@ -88,7 +88,6 @@ public class PrepareSearch implements Processor {
 		
 		
 		
-		
 		in.setBody(traceQuery);
 		
 

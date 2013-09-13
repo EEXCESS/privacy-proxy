@@ -14,7 +14,10 @@ if ( localStorage["API_BASE_URI"]==undefined){
 var activeTabId = 0;
 
 //Environnement init
-localStorage["env"] = "home";
+if (localStorage["env"]==undefined){
+	localStorage["env"] = "home";
+}
+
 
 // plugin's unique id
 var uuidUser = localStorage["uuid"];
@@ -103,6 +106,9 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     	else if (request.event == "unload"){
     		updateContext(sender.tab.id,"unload");
     	}
+    }
+    else if ( request.method ="updateRecommendation"){
+    	updateRecommendations();
     }
     else {  
       sendResponse({});
@@ -246,6 +252,38 @@ function send_context(event, tabID, context){
 			recommend(traceJSON);
 	   }
 	});
+}
+
+/*
+ * This function is used to update the recommendations based on the last trace corresponding to the curent environnement
+ */
+function updateRecommendations(){
+	// the traces stored in localstorage are reloaded
+	// the traces loaded are those corresponding to the user's (if set) + the plugin's (both checkbox enabeled on the trace page)
+	var url = localStorage["API_BASE_URI"]+"api/v0/user/traces";
+	var method = 'POST';
+	var async = false;
+	var request = new XMLHttpRequest();
+	
+	var body = '';
+	var userData = new Object();
+	
+	userData.pluginId = localStorage["uuid"];
+	
+	if(localStorage["user_id"]!=undefined && localStorage["user_id"]!="") {
+		userData.userId = localStorage["user_id"];
+	}	
+	userData.environnement = localStorage["env"];
+	request.open(method, url, async);	
+	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	request.send(JSON.stringify(userData));
+
+	var traces = request.responseText;
+	localStorage["traces"] = traces;
+	
+	tracesJson = JSON.parse(traces);
+	var traceToSend = tracesJson["hits"]["hits"][0];
+	recommend(JSON.stringify(traceToSend));
 }
 
 function recommend(traces){

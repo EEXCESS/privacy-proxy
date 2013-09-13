@@ -85,14 +85,27 @@ else{
 	$("#homeButton").addClass("active");
 	$("#displayed_env").text("Environnement is set to : home");
 }
+//TODO reload the recommendations when environnement switch
 
+// requete à background.js pour appeler la methode updaterecommendations
+// pb à la récupération des dernieres traces ( les parametres)
 $("#workButton").on("click",function(){
 		localStorage["env"]="work";
 		$("#displayed_env").text("Environnement is set to : work");
+		var documentRequest = {
+				method: "updateRecommendation",
+			}
+			
+			//chrome.extension.sendRequest(documentRequest, function(){});
 	});
 $("#homeButton").on("click",function(){
 		localStorage["env"]="home";
 		$("#displayed_env").text("Environnement is set to : home");
+		var documentRequest = {
+				method: "updateRecommendation",
+			}
+			
+			//chrome.extension.sendRequest(documentRequest, function(){});
 	});
 
 /*<script>

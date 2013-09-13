@@ -235,12 +235,11 @@ function doToggleTopics() {
 						displayTopics(userInfo.topics[i].label,userInfo.topics[i].env,userInfo.topics[i].source);
 					}
 					/*else if($('span[name=\"'+userInfo.topics[i].label+'\"]').origin != userInfo.topics[i].origin 
-							|| $('span[name=\"'+userInfo.topics[i].label+'\"]').origin != userInfo.topics[i].origin 
-							
-					){
+							|| $('span[name=\"'+userInfo.topics[i].label+'\"]').parent().parent().id != userInfo.topics[i].env ){
+						
 						displayTopics(userInfo.topics[i].label,userInfo.topics[i].env,userInfo.topics[i].source);
-					}
-					*/
+					}*/
+					
 					
 				}
 			}
