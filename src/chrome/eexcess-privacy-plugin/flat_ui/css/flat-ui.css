@@ -2926,7 +2926,7 @@ textarea[class*="span"] {
 }
 .todo-search:before {
   position: absolute;
-//  font-family: 'Flat-UI-Icons';
+  font-family: 'Flat-UI-Icons';
   content: "\e01c";
   font-size: 16px;
   display: inline-block;
