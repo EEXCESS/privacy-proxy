@@ -89,7 +89,14 @@ public class ProxyRecommendService extends RouteBuilder {
 		 *  	a html list (<ul><li> [...] </li></ul>
 		 *  
 		 */
-		from(apiBaseURI + "api/v0/recommend/fetch").to("direct:recommendation.route");		
+		from(apiBaseURI + "api/v0/recommend/fetch").to("direct:recommendation.route");	
+
+		
+		
+		/*
+		 * Integrated recommendation service
+		 */
+		from(apiBaseURI + "api/v1/recommend").to("direct:recommendation.v1.route");		
 
 	}
 

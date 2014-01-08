@@ -10,7 +10,7 @@
 	<import resource="classpath:/elasticRoutes.xml" />
 
     <camelContext xmlns="http://camel.apache.org/schema/spring" useMDCLogging="true">
-	    <propertyPlaceholder id="properties" location="config.properties"/>
+	    <propertyPlaceholder id="properties" location="classpath:config.properties"/>
 	    
 	    <routeContextRef ref="elasticRoutes" />
 

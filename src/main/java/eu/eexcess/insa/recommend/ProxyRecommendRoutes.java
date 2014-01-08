@@ -62,6 +62,7 @@ public class ProxyRecommendRoutes extends RouteBuilder {
 			.removeHeader("Host")	
 			//.to("log:recommendation route start?showAll=true")
 			.to("direct:context.safe.load")
+			.to("log:recommendationreq")
 			.to("direct:recommend")
 			.setHeader("Content-Type").constant("text/html")
 			//.setHeader("recommendation_query", property("recommendation_query"));
