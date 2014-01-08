@@ -33,6 +33,7 @@ public class ProxyRecommendRoutesV1 extends RouteBuilder {
 			.setHeader("Content-Type").constant("application/xml")
 			.to("http4://digv536.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend")
 			// .to("http4://digv536.joanneum.at/eexcess-partner-zbw-1.0-SNAPSHOT/partner/recommend")
+			.convertBodyTo(String.class)
 			.to("log:recommender-answer")
 			
 			.setHeader("Content-Type").constant("application/json; charset=utf-8")
