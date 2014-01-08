@@ -7,8 +7,8 @@
           "text": "Europe"
         },
         {
-          "-weight": "0.843",
-          "#text": "Society"
+          "weight": "0.843",
+          "text": "Society"
         }
       ]
     },

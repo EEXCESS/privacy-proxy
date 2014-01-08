@@ -26,8 +26,8 @@
 		<xsl:if test="position() != last()">, </xsl:if>
 	</xsl:template>
 
-	<xsl:template match="*" mode="facet">
-		<xsl:text>"</xsl:text><xsl:value-of select="local-name()" /><xsl:text>": </xsl:text>
+	<xsl:template match="facet" mode="facet">
+		<xsl:text>"</xsl:text><xsl:value-of select="@name" /><xsl:text>": </xsl:text>
 		<xsl:text>"</xsl:text><xsl:value-of select="." /><xsl:text>"</xsl:text>
 		<xsl:if test="position() != last()">, </xsl:if>
 	</xsl:template>
