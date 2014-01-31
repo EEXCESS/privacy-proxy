@@ -1,11 +1,7 @@
 package eu.eexcess.insa.recommend;
 
-import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.http4.HttpOperationFailedException;
 
-import eu.eexcess.insa.camel.JsonXMLDataFormat;
-import eu.eexcess.insa.proxy.JSONList2JSON;
 import eu.eexcess.insa.proxy.actions.ApplyPrivacySettingsJS;
 import eu.eexcess.insa.proxy.actions.EnrichedRecommendationQueryAggregator;
 import eu.eexcess.insa.proxy.actions.ExtractUserEnvironment;
@@ -16,9 +12,7 @@ import eu.eexcess.insa.proxy.connectors.CloseJsonObject;
 import eu.eexcess.insa.proxy.connectors.EconBizQueryMapper;
 import eu.eexcess.insa.proxy.connectors.EconBizResultFormater;
 import eu.eexcess.insa.proxy.connectors.MendeleyDocumentQueryMapper;
-import eu.eexcess.insa.proxy.connectors.MendeleyQueriesAggregator;
 import eu.eexcess.insa.proxy.connectors.MendeleyQueryMapper;
-import eu.eexcess.insa.proxy.connectors.RecomendationResultAggregator;
 
 public class ProxyRecommendService extends RouteBuilder {
 	final PrepareRecommendationTermsPonderation prepPonderation = new PrepareRecommendationTermsPonderation();
