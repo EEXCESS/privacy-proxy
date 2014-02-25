@@ -1,6 +1,5 @@
 package eu.eexcess.insa.recommend;
 
-import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.http4.HttpOperationFailedException;
 
@@ -31,11 +30,6 @@ public class ProxyRecommendRoutes extends RouteBuilder {
 	final MendeleyDocumentQueryMapper prepDocumentSearch = new MendeleyDocumentQueryMapper();
 	final EconBizResultFormater econBizResultFormater = new EconBizResultFormater();
 	final CloseJsonObject closeJson = new CloseJsonObject();
-
-
-
-
-	
 	
 	@Override
 	public void configure() throws Exception {

@@ -157,7 +157,10 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    String titleBuffer ="";
 	    String term = "";
 	    int coefficient = 0;
+	    int obselCount = 0;
 	    while(itJson.hasNext()){ //goes over all the obsels in order to extract their title's terms and 
+	    	obselCount++;
+	    	
 	    	// to give them a coefficient
 	    	JsonNode obsel = itJson.next();
 	    	// the date value needs to be dependant on the trace sent from the front end !
@@ -196,8 +199,8 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    	
 	    	
 	    }
-	   
-	    return ponderatedTerms;
+	   logger.info("Used "+obselCount+" obsels");
+	   return ponderatedTerms;
 
 	}
 
@@ -325,7 +328,7 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 
 
 
-	/** @param titleContent : the obsel's title to exctract tokens from
+	/** @param titleContent : the obsel's title to extract tokens from
 	 * 
 	 *  @ return : the trace's title as a list of tokens
 	 */

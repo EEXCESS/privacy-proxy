@@ -1,6 +1,5 @@
 package eu.eexcess.insa.proxy.actions;
 
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.HashMap;
 
@@ -10,14 +9,9 @@ import org.apache.camel.Processor;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 
 public class PrepareRecommendationTracesRequest implements Processor {
-
-	
-	
-	
 	public void process(Exchange exchange) throws Exception {
 		String user_id = exchange.getProperty("user_id", String.class);
 		String plugin_id = exchange.getProperty("plugin_uuid", String.class);
