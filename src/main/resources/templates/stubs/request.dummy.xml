@@ -1,0 +1,10 @@
+<eexcess-secure-user-profile firstName="Hugo" lastName="Boss" birthDay="2013-10-14T05:06:44.550+02:00">
+   <interests>
+      <interest>Machine Learning</interest>
+      <interest>Information Retrieval</interest>
+      <interest>Natural Language Processing</interest>
+   </interests>
+   <context-list>
+      <context>graz</context>
+   </context-list>
+</eexcess-secure-user-profile>

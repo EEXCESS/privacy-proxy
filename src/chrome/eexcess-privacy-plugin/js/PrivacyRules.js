@@ -12,7 +12,7 @@ var privacy = privacy || {
 privacy.birthdate = {
 	levels: 4,
 	apply: function (raw, level) {
-		var age;
+		var age;	
 		var birthY = raw.split('-')[0];
 		var birthM = raw.split('-')[1];
 		var birthD = raw.split('-')[2];

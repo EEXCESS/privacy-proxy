@@ -10,8 +10,8 @@ Endpoints
 
 ###api/v0/recommend/rewrite
 
-
- Route to get an array of weighted search terms from an user context
+ This endpoint requests a given user context (trace) to be mapped into an array of weighted search terms from an user context.
+ It is used by the plugin prototype to visualize the recommendation query. 
 
   - #####INPUT :
 a [trace](#trace)
@@ -45,7 +45,7 @@ a [trace](#trace)
 
 ###api/v0/recommend/fetch
 
-  Route to get recommendations from an user context
+  This endpoint allows obtaining recommendations for a given user context (trace).
 
   - #####INPUT : 
   	a [trace](#trace)
@@ -56,13 +56,13 @@ a [trace](#trace)
 
 ###api/v0/privacy/trace
 
-  This route stores a trace
+  This endpoint receives one trace (element of the browsing history) and stores it.
  
   - ##### INPUT:
    A [trace](#trace)
 
   - ##### OUTPUT:
- A response from Elasticsearch :
+ Acknowledgement that the trace has been stored.
 
 <pre><code>{
     "ok": true,
@@ -76,7 +76,7 @@ a [trace](#trace)
 
 ###api/v0/user/profile
 
- This route gets a given user's profile
+ This endpoint allows the retrieve the currently stored user profile.
  
   - <h5>INPUT:</h5>
 <pre><code>{
@@ -96,15 +96,15 @@ a [trace](#trace)
 
 ###api/v0/user/traces
 
-  This route gets traces corresponding to either a plugin, an user or both, depending of the informations sent 
+  This endpoint allows fetches a user's traces for either a given plugin installation id, a given user id or both, depending on which are specified.
 
   - <h5>INPUT:</h5>
 <pre><code>{
     "pluginId": %plugin's id%";
     "userId": "%user's id%",
-    "environnement": "%environnement ( either "work" or "home"%"
+    "environnement": "%environnement (either "work" or "home")%"
  }</code></pre>
- **NOTE:** If both fields are sent, the results will match both of them and be different than the combined results of an api call with the user id and another call with the plugin id
+ **NOTE:** If both pluginId and userId fields are filled, the results returned will be the traces which are for the given user *and* obtained through the given pluginId.
  
   - <h5>OUTPUT:</h5>
    an Elasticsearch list of [traces](#trace), ordered from latest to oldest, maximum 50	
@@ -128,7 +128,7 @@ a [trace](#trace)
    		 
 
 ###api/v0/user/data
-  This route updates an user profile
+  This endpoint allows to push an updated user profile
 
   - ##### INPUT:
    the [user profile](#user-profile)
@@ -145,7 +145,7 @@ a [trace](#trace)
   
 
 ###api/v0/user/privacy_settings
-  This route updates an user profile directly without merging it with other profiles first 
+  This endpoint allows to push an updated user profile directly without merging it with other profiles first. It is used mainly to store the user's privacy settings.
 
   - ##### INPUT:
    the [user profile](#user-profile)
@@ -155,7 +155,7 @@ a [trace](#trace)
 		 
 
 ###api/v0/user/exists
- Route to check if given username or email currently exit
+ This endpoint checks if given username or email currently exist
 
   - <h5> INPUT: </h5>
 JSON with the following structure
@@ -172,7 +172,7 @@ JSON with the following structure
  }</code></pre>
 
 ###api/v0/user/authenticate
- Route to get an user's id from his login informations ( username/ email and password )
+ Endpoint allowing to obtain a user's id from his login informations ( username/ email and password )
 
   - <h5>INPUT:</h5>
 <pre><code>{
@@ -199,7 +199,7 @@ JSON with the following structure
    
 
 ###api/v0/connect/mendeley/init
- Route to initiate Mendeley [OAuth authentication](http://apidocs.mendeley.com/home/authentication)
+ Endpoint to initiate Mendeley [OAuth authentication](http://apidocs.mendeley.com/home/authentication)
 
   - #####  INPUT : nothing
   
@@ -211,7 +211,7 @@ JSON with the following structure
 
 
 ###api/v0/connect/mendeley/validate
- Route to finalize the Mendeley oauth authentication, importing the user's Mendeley profile to the database and eventualy merging it with an existing eexcess [profile](#user-profile)
+ Endpoint to finalize the Mendeley oauth authentication, importing the user's Mendeley profile to the database and eventualy merging it with an existing eexcess [profile](#user-profile)
 
   - INPUT :
     - HEADERS :

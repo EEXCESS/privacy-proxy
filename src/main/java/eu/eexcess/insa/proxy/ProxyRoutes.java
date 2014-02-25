@@ -14,7 +14,6 @@ import eu.eexcess.insa.oauth.OAuthSigningProcessor;
 import eu.eexcess.insa.profile.EexcessProfileMapper;
 import eu.eexcess.insa.profile.MendeleyProfileMapper;
 import eu.eexcess.insa.profile.ProfileSplitter;
-import eu.eexcess.insa.proxy.actions.ApplyPrivacySettingsJS;
 import eu.eexcess.insa.proxy.actions.EnrichedRecommendationQueryAggregator;
 import eu.eexcess.insa.proxy.actions.GetUserId;
 import eu.eexcess.insa.proxy.actions.GetUserIdFromBody;
