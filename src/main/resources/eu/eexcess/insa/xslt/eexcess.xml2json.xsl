@@ -17,7 +17,7 @@
 		<xsl:text>{</xsl:text>
 		<xsl:for-each select="id|uri|title|creator|description|previewImage">
 	        <xsl:text> "</xsl:text><xsl:value-of select="local-name()" /><xsl:text>":</xsl:text>
-	        <xsl:text> "</xsl:text><xsl:value-of select="translate(.,'\&#x22;','')" /><xsl:text>", </xsl:text>
+	        <xsl:text> "</xsl:text><xsl:value-of select="translate(.,'\&#x22;&#x0D;&#x0A;','')" /><xsl:text>", </xsl:text>
 		</xsl:for-each>
         <xsl:text> "facets": {</xsl:text>
 			<xsl:apply-templates select="facets/*" mode="facet" />
