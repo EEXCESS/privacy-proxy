@@ -27,9 +27,17 @@
 	</xsl:template>
 
 	<xsl:template match="facet" mode="facet">
-		<xsl:text>"</xsl:text><xsl:value-of select="@name" /><xsl:text>": </xsl:text>
+		<xsl:text>"</xsl:text>
+			<xsl:choose>
+				<xsl:when test="@name">
+					<xsl:value-of select="@name" />
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="local-name()" />
+				</xsl:otherwise>
+			</xsl:choose>
+		<xsl:text>": </xsl:text>
 		<xsl:text>"</xsl:text><xsl:value-of select="." /><xsl:text>"</xsl:text>
 		<xsl:if test="position() != last()">, </xsl:if>
 	</xsl:template>
-	
 </xsl:stylesheet>
