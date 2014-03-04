@@ -1,0 +1,16 @@
+{
+    "eexcess-user-profile": {
+         "interests": [
+         ],
+         "context-list": [
+             {
+                   "text": "woman",
+                   "weight": 1.0
+             },
+             {
+                   "text": "workforce",
+                   "weight": 1.0
+             }
+         ]
+    } 
+}

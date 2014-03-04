@@ -26,7 +26,7 @@
 		<xsl:if test="position() != last()">, </xsl:if>
 	</xsl:template>
 
-	<xsl:template match="facet" mode="facet">
+	<xsl:template match="*" mode="facet">
 		<xsl:text>"</xsl:text>
 			<xsl:choose>
 				<xsl:when test="@name">
