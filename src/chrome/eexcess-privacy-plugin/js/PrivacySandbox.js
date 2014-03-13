@@ -51,7 +51,7 @@ function initSandbox(){
 	}
 		svgQuery += '</g></svg>';
 		
-		svgQ= '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="'+y2+'"><g transform=translate(100)>';
+		svgQ= '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="'+y2+'"><g transform=translate(250)>';
 		svgQ+= svgQuery;
 		
 		$('#recommendation_query').html(svgQ);

@@ -29,11 +29,6 @@ public class ProxyRecommendRoutes extends RouteBuilder {
 	final MendeleyDocumentQueryMapper prepDocumentSearch = new MendeleyDocumentQueryMapper();
 	final EconBizResultFormater econBizResultFormater = new EconBizResultFormater();
 	final CloseJsonObject closeJson = new CloseJsonObject();
-
-
-
-
-	
 	
 	@Override
 	public void configure() throws Exception {
