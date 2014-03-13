@@ -6,10 +6,13 @@ import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -38,10 +41,6 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	
 	double b = (-(k*T)+ Math.sqrt(Math.pow((k*T),2)+4*k*T))/2;
 	double B = -1/(k*T+b);
-
-	
-	
-	
 	
 	/**
 	 * Takes a user context to produce
@@ -153,7 +152,6 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    JsonNode hitsNode = rootNode.path("hits").path("hits");
 	    Iterator<JsonNode> itJson = hitsNode.getElements();
 	    String titleBuffer ="";
-	    String term = "";
 	    int coefficient = 0;
 	    while(itJson.hasNext()){ //goes over all the obsels in order to extract their title's terms and 
 	    	// to give them a coefficient
@@ -166,20 +164,40 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	    		d = dateFormat.parse(lastTrace_date);
 	    	}
-	    	
-	    	
-	    	
+	    
+
 	    	coefficient = calcOneObselWeight(obsel, d); 
-	    	
-	    	titleBuffer = obsel.path("_source").path("document").path("title").asText();
-	    	
-	    	
-	    	List<String> terms = tokenize(titleBuffer);
-	    	
-	    	Iterator<String> itTerms = terms.iterator();
 	    	if ( coefficient > 0 ){
+	    	
+		    	// Increase weight on content terms based on their frequency
+		    	JsonNode contentNode = obsel.path("_source").path("document").path("content");
+		    	for(int i=0; i<contentNode.size(); i++) {
+		    		String term = contentNode.get(i).path("text").asText();
+		    		// Do some cleaning up of the terms
+		    		term = term.replaceAll("[^a-zA-Z0-9-_\\'\\@]","");
+		    		term = term.replaceAll("^[^a-zA-Z0-9]","");
+		    		
+		    		if(!"".equals(term)) {
+			    		Integer freq = contentNode.get(i).path("frequency").asInt();
+			    		Integer w = ponderatedTerms.get(term);
+			    		if(w == null) {
+			    			w = 0;
+			    		}
+			    		
+			    		if(!term.matches("\"")) {
+			    			ponderatedTerms.put(term, w+freq*coefficient);
+			    		}
+		    		}
+		    	}
+		    	
+	
+		    	// Increase weight of terms in the title
+		    	titleBuffer = obsel.path("_source").path("document").path("title").asText();
+		    	List<String> terms = tokenize(titleBuffer);
+	
+		    	Iterator<String> itTerms = terms.iterator();
 		    	while ( itTerms.hasNext() ){
-		    		term = itTerms.next();
+		    		String term = itTerms.next();
 		    		if ( ponderatedTerms.containsKey(term)){
 		    			int newCoef = ponderatedTerms.get(term)+ coefficient;
 		    			
@@ -195,7 +213,21 @@ public class PrepareRecommendationTermsPonderation implements Processor {
 	    	
 	    }
 	   
-	    return ponderatedTerms;
+	    // Keep only 20 highest terms
+	    List<Map.Entry<String,Integer>> list = new ArrayList<Map.Entry<String,Integer>>();
+	    list.addAll(ponderatedTerms.entrySet());
+	    Comparator<Map.Entry<String,Integer>> comparator = new Comparator<Map.Entry<String,Integer>>() {
+	        public int compare(Map.Entry<String,Integer> c1, Map.Entry<String,Integer> c2) {
+	            return -1 * Integer.compare(c1.getValue(),c2.getValue());
+	        }
+	    };
+	    
+	    HashMap<String, Integer> resultTerms = new HashMap<String, Integer>();
+	    int count = list.size() < 20 ? list.size() : 20;
+	    for(Map.Entry<String,Integer> e: list.subList(0, count)) {
+	    	resultTerms.put(e.getKey(), e.getValue());
+	    }
+	    return resultTerms;
 
 	}
 

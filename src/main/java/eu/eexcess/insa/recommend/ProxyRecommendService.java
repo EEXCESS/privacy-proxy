@@ -20,11 +20,9 @@ public class ProxyRecommendService extends RouteBuilder {
 	final ExtractUserEnvironment extractUserEnv = new ExtractUserEnvironment();
 	final UserProfileEnricherAggregator userContextAggregator = new UserProfileEnricherAggregator();
 	final PrepareRecommendationTracesRequest prepTraces = new PrepareRecommendationTracesRequest();
-	final EconBizQueryMapper prepEconBizQuery = new EconBizQueryMapper ();
 	final MendeleyQueryMapper prepMendeleyQuery = new MendeleyQueryMapper();
 	final MendeleyDocumentQueryMapper prepDocumentSearch = new MendeleyDocumentQueryMapper();
 	final EconBizResultFormater econBizResultFormater = new EconBizResultFormater();
-	final CloseJsonObject closeJson = new CloseJsonObject();
 
 
 	/*

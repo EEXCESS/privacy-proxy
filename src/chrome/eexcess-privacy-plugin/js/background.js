@@ -231,7 +231,8 @@ function send_context(event, tabID, context){
 		},
 		document: {
 			url: context.url,
-			title: context.title
+			title: context.title,
+			content: context.content
 		},
 		geolocation: geolocation
 	};

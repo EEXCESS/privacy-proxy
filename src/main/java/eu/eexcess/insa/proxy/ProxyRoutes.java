@@ -53,7 +53,6 @@ public class ProxyRoutes extends RouteBuilder  {
 	final ExtractUserEnvironment extractUserEnv = new ExtractUserEnvironment();
 	final MendeleyQueryMapper prepMendeleyQuery = new MendeleyQueryMapper();
 	final MendeleyDocumentQueryMapper prepDocumentSearch = new MendeleyDocumentQueryMapper();
-	final CloseJsonObject closeJson = new CloseJsonObject();
 	final EconBizResultFormater econBizResultFormater = new EconBizResultFormater();
 	final MendeleyInitOAuthRequestTokenParams mendeleyInitOAuthParams = new MendeleyInitOAuthRequestTokenParams();
 	final OAuthSigningProcessor signingProcessor = new OAuthSigningProcessor ( ) ;
