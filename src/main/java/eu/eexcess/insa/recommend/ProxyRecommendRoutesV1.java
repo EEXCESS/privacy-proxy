@@ -17,22 +17,20 @@ public class ProxyRecommendRoutesV1 extends RouteBuilder {
 		
 		from("direct:recommendation.v1.route")
 			.removeHeaders("CamelHttp*")
+			.removeHeader("Accept")
 			.process(convertUserProfile)
-			.to("log:recommender-query")
 			.setHeader("Content-Type").constant("application/xml")
-//			.to("http4://digv539.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend")
 			.filter(header("fr_url"))
 				.setHeader(Exchange.HTTP_URI).header("fr_url")
 				.log("Requesting recommendations from: ${in.header.fr_url}")
 			.end()
+			.to("log:recommender-query?showHeaders=true")
 			.to("http4://eexcess.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend")
-			// .to("http4://digv536.joanneum.at/eexcess-partner-zbw-1.0-SNAPSHOT/partner/recommend")
 			.convertBodyTo(String.class)
 			.to("log:recommender-answer")
 			
 			.setHeader("Content-Type").constant("application/json; charset=utf-8")
 			.to("xslt://eu/eexcess/insa/xslt/eexcess.xml2json.xsl");
-//			.to("string-template://templates/stubs/recommendations.dummy.json");
 		;
 	}
 }
