@@ -56,10 +56,12 @@
 			</plugin>
 			<!-- plugin so you can run mvn jetty:run -->
 			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
+				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>7.6.8.v20121106</version>
 				<configuration>
+					<httpConnector>
+						<port>9090</port>
+					</httpConnector>
 					<webAppConfig>
 						<contextPath>/</contextPath>
 					</webAppConfig>

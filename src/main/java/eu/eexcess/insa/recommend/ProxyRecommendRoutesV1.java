@@ -1,19 +1,9 @@
 package eu.eexcess.insa.recommend;
 
-import java.io.InputStream;
-import java.io.StringWriter;
-
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import eu.eexcess.insa.profile.UserProfileJSON2XML;
 
@@ -26,13 +16,16 @@ public class ProxyRecommendRoutesV1 extends RouteBuilder {
 		Processor convertUserProfile = new UserProfileJSON2XML();
 		
 		from("direct:recommendation.v1.route")
-//			.to("string-template://templates/stubs/request.dummy.json")
 			.removeHeaders("CamelHttp*")
 			.process(convertUserProfile)
 			.to("log:recommender-query")
 			.setHeader("Content-Type").constant("application/xml")
 //			.to("http4://digv539.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend")
-			.to("http4://digv536.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend")
+			.filter(header("fr_url"))
+				.setHeader(Exchange.HTTP_URI).header("fr_url")
+				.log("Requesting recommendations from: ${in.header.fr_url}")
+			.end()
+			.to("http4://eexcess.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend")
 			// .to("http4://digv536.joanneum.at/eexcess-partner-zbw-1.0-SNAPSHOT/partner/recommend")
 			.convertBodyTo(String.class)
 			.to("log:recommender-answer")
