@@ -15,15 +15,17 @@
 	<bean id="recommendRoutes" class="eu.eexcess.insa.recommend.ProxyRecommendRoutes" />
 	<bean id="recommendRoutesV1" class="eu.eexcess.insa.recommend.ProxyRecommendRoutesV1" />
 	<bean id="recommendService" class="eu.eexcess.insa.recommend.ProxyRecommendService" />
+	<bean id="upRoutes" class="eu.eexcess.up.ProxyUPRoutes" />
 
     <camelContext xmlns="http://camel.apache.org/schema/spring">
-		<propertyPlaceholder id="properties" location="file:${env:HOME}/conf/privacy-proxy.properties"/>
+		<propertyPlaceholder id="properties" location="classpath:/config.properties.example"/>
 	    
 	    <routeBuilder ref="proxyService" />
 		<routeBuilder ref="recommendService" />
 		<routeBuilder ref="proxyRoutes" />
 		<routeBuilder ref="recommendRoutes" />
 		<routeBuilder ref="recommendRoutesV1" />
+		<routeBuilder ref="upRoutes" />
 
 	    <routeContextRef ref="elasticRoutes" />
 	    

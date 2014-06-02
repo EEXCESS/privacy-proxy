@@ -118,7 +118,7 @@
 		<xsl:variable name="userGiven" select="//json:object[@name='_source' and json:value[@name='source']/text()='eexcess']//json:value[@name='username']/text()"/>
 		<xsl:choose>
 			<xsl:when test="$userGiven"></xsl:when>
-			<xsl:when test="mendeley"
+			<xsl:when test="mendeley"></xsl:when>
 		</xsl:choose>
 						
 	
