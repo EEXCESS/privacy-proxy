@@ -10,21 +10,25 @@ public class ProxyUPRoutes extends RouteBuilder {
 		from(BASE_API + "log/rating")
 			.convertBodyTo(String.class)
 			.setProperty("req", body())
+			.setProperty("origin",header("origin"))
 			.process(new ProxyLogProcessor(InteractionType.RATING));
 		
 		from(BASE_API + "log/rclose")
 		.convertBodyTo(String.class)
 		.setProperty("req", body())
+		.setProperty("origin",header("origin"))
 		.process(new ProxyLogProcessor(InteractionType.RESULT_CLOSE));
 		
 		from(BASE_API + "log/rview")
 		.convertBodyTo(String.class)
 		.setProperty("req", body())
+		.setProperty("origin",header("origin"))
 		.process(new ProxyLogProcessor(InteractionType.RESULT_VIEW));
 		
 		from(BASE_API + "log/show_hide")
 		.convertBodyTo(String.class)
 		.setProperty("req", body())
+		.setProperty("origin",header("origin"))
 		.process(new ProxyLogProcessor(InteractionType.SHOW_HIDE));
 		
 		from(BASE_API + "disambiguate")

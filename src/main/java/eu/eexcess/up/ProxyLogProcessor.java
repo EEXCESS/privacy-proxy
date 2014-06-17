@@ -25,6 +25,7 @@ public class ProxyLogProcessor implements Processor {
 		
 		
 		String req = exchange.getProperty("req").toString();
+		String origin = exchange.getProperty("origin").toString();
 		JsonFactory factory = new JsonFactory();
 		JsonParser jp = factory.createJsonParser(req);
 	    ObjectMapper mapper = new ObjectMapper();
@@ -48,10 +49,10 @@ public class ProxyLogProcessor implements Processor {
 				}
 			}
 		    out += "],\"query\":"+query+"}";
-		    logger.trace("["+type+"] [userID:"+userID+"] "+out);
+		    logger.trace("["+type+"] [userID:"+userID+"] [origin:"+origin+"] "+out);
 			break;	
 		default:
-			logger.trace("["+type+"] [userID:"+userID+"] "+body);	
+			logger.trace("["+type+"] [userID:"+userID+"] [origin:"+origin+"] "+body);	
 			in.setBody(body);
 			break;
 		}

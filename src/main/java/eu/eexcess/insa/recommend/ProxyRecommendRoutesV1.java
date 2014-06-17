@@ -22,6 +22,7 @@ public class ProxyRecommendRoutesV1 extends RouteBuilder {
 			.removeHeader("Accept")
 			.convertBodyTo(String.class)
 			.setProperty("req", body()) // keep query request along the route
+			.setProperty("origin", header("origin"))
 			.process(new ProxyLogProcessor(InteractionType.QUERY)) // log query in interactions
 			.process(convertUserProfile)
 			.setHeader("Content-Type").constant("application/xml")
