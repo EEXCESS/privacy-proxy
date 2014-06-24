@@ -1,5 +1,6 @@
 package eu.eexcess.up;
 
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 
 public class ProxyUPRoutes extends RouteBuilder {
@@ -37,7 +38,7 @@ public class ProxyUPRoutes extends RouteBuilder {
 		
 		from(BASE_API + "log/facetScape")
 		.convertBodyTo(String.class)
-		.to("log:facetScape?level=TRACE");
+		.log(LoggingLevel.TRACE, "facetScape", "[origin:${in.header.origin}] ${in.body}");
 	}
 
 }
