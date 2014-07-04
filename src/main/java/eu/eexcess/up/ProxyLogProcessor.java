@@ -11,6 +11,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public class ProxyLogProcessor {
 	private static final Logger logger = Logger.getLogger(ProxyLogProcessor.class.getName());
+	private static final Logger interactionLogger = Logger.getLogger("interactionLogger");
 
 	public void process(InteractionType type, String origin, String request) {
 		process(type, origin, request, null);
@@ -31,8 +32,7 @@ public class ProxyLogProcessor {
 				jp = factory.createJsonParser(answer);
 				JsonNode rawResult = mapper.readValue(jp, JsonNode.class);
 				JsonNode results = rawResult.path("result");
-				String query = rawReq.path("eexcess-user-profile")
-						.path("context-list").path("context").toString();
+				String query = rawReq.path("contextKeywords").toString();
 				String out = "{\"results\":[";
 				for (int i = 0; i < results.size(); i++) {
 					JsonNode res = results.get(i);
@@ -46,10 +46,10 @@ public class ProxyLogProcessor {
 					}
 				}
 				out += "],\"query\":" + query + "}";
-			    logger.trace("["+type+"] [userID:"+userID+"] [origin:"+origin+"] "+out);
+				interactionLogger.trace("["+type+"] [userID:"+userID+"] [origin:"+origin+"] "+out);
 				break;
 			default:
-				logger.trace("["+type+"] [userID:"+userID+"] [origin:"+origin+"] "+request);	
+				interactionLogger.trace("["+type+"] [userID:"+userID+"] [origin:"+origin+"] "+request);	
 				break;
 			}
 

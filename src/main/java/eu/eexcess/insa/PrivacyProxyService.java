@@ -1,13 +1,6 @@
 package eu.eexcess.insa;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -30,10 +23,8 @@ public class PrivacyProxyService {
 
 	private static final String federatedRecommenderAPI = "http://eexcess-dev.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend";
 	private static final String disambiguationAPI = "http://zaire.dimis.fim.uni-passau.de:8282/code-disambiguationproxy/disambiguation/categorysuggestion";
-	private static final Logger logger = Logger
-			.getLogger(PrivacyProxyService.class.getName());
-	private static final Logger facetScapeLogger = Logger
-			.getLogger("facetScapeLogger");
+	private static final Logger logger = Logger.getLogger(PrivacyProxyService.class.getName());
+	private static final Logger facetScapeLogger = Logger.getLogger("facetScapeLogger");
 	private static final ProxyLogProcessor plp = new ProxyLogProcessor();
 	
 
