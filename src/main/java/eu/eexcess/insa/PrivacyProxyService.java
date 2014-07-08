@@ -1,5 +1,7 @@
 package eu.eexcess.insa;
 
+import java.io.IOException;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -10,6 +12,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -34,25 +42,41 @@ public class PrivacyProxyService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response responseJSON(@HeaderParam("origin") String origin,
 			String input) {
-		// Log the query
-		plp.process(InteractionType.QUERY, origin, input);
-		// Forward the query
-		Client client = Client.create();
-		WebResource webResource = client.resource(federatedRecommenderAPI);
-		ClientResponse response = webResource
-				.accept(MediaType.APPLICATION_JSON).type("application/json")
-				.post(ClientResponse.class, input);
-		String output = response.getEntity(String.class);
 
-		switch (response.getStatus()) {
-		case 200:
-		case 201:
-			plp.process(InteractionType.RESULT, origin, input, output);
-			return Response.status(200).entity(output).build();
-		default:
-			logger.error("[/recommend] [HTTPErrorCode:" + response.getStatus()
-					+ "] [origin:" + origin + "] " + output);
-			return Response.status(500).build();
+		try {
+			// Remove the uuid
+			JsonFactory factory = new JsonFactory();
+			JsonParser jp = factory.createJsonParser(input);
+			ObjectMapper mapper = new ObjectMapper();
+			ObjectNode query = mapper.readValue(jp, ObjectNode.class);
+			query.remove("uuid");
+			// Log the query
+			plp.process(InteractionType.QUERY, origin, input);
+			// Forward the query
+			Client client = Client.create();
+			WebResource webResource = client.resource(federatedRecommenderAPI);
+			ClientResponse response = webResource
+					.accept(MediaType.APPLICATION_JSON)
+					.type("application/json").post(ClientResponse.class, query.toString());
+			String output = response.getEntity(String.class);
+
+			switch (response.getStatus()) {
+			case 200:
+			case 201:
+				plp.process(InteractionType.RESULT, origin, input, output);
+				return Response.status(200).entity(output).build();
+			default:
+				logger.error("[/recommend] [HTTPErrorCode:"
+						+ response.getStatus() + "] [origin:" + origin + "] "
+						+ output);
+				return Response.status(500).build();
+			}
+		} catch (JsonParseException e) {
+			logger.error("[/recommend] [origin:" + origin + "] " + e);
+			return Response.status(500).entity("Unable to parse the JSON").build();
+		} catch (IOException e) {
+			logger.error("[/recommend] [origin:" + origin + "] " + e);
+			return Response.status(500).entity("Unable to parse the JSON").build();
 		}
 	}
 
