@@ -13,11 +13,11 @@ public class ProxyLogProcessor {
 	private static final Logger logger = Logger.getLogger(ProxyLogProcessor.class.getName());
 	private static final Logger interactionLogger = Logger.getLogger("interactionLogger");
 
-	public void process(InteractionType type, String origin, String request) {
-		process(type, origin, request, null);
+	public void process(InteractionType type, String origin, String ip, String request) {
+		process(type, origin, ip, request, null);
 	}
 	
-	public void process(InteractionType type, String origin, String request, String answer) {
+	public void process(InteractionType type, String origin, String ip, String request, String answer) {
 
 		try {
 
@@ -46,10 +46,10 @@ public class ProxyLogProcessor {
 					}
 				}
 				out += "],\"query\":" + query + "}";
-				interactionLogger.trace("["+type+"] [userID:"+userID+"] [origin:"+origin+"] "+out);
+				interactionLogger.trace("["+type+"] [userID:"+userID+"] [origin:"+origin+"] [ip:"+ip+"] "+out);
 				break;
 			default:
-				interactionLogger.trace("["+type+"] [userID:"+userID+"] [origin:"+origin+"] "+request);	
+				interactionLogger.trace("["+type+"] [userID:"+userID+"] [origin:"+origin+"] [ip:"+ip+"]  "+request);	
 				break;
 			}
 

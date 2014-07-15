@@ -7,5 +7,6 @@ public enum InteractionType {
 	RESULT_VIEW,
 	RESULT_CLOSE,
 	VISIT,
-	SHOW_HIDE
+	SHOW_HIDE,
+	QUERY_ACTIVATED
 }
