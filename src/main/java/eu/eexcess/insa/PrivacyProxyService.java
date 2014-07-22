@@ -53,6 +53,7 @@ public class PrivacyProxyService {
 			ObjectMapper mapper = new ObjectMapper();
 			ObjectNode query = mapper.readValue(jp, ObjectNode.class);
 			query.remove("uuid");
+			query.remove("context");
 			// Log the query
 			plp.process(InteractionType.QUERY, origin,  req.getRemoteAddr(), input);
 			// Forward the query
