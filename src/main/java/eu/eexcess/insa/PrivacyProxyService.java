@@ -15,7 +15,6 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -25,43 +24,58 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
+import eu.eexcess.Cst;
+import eu.eexcess.Util;
 import eu.eexcess.up.InteractionType;
 import eu.eexcess.up.ProxyLogProcessor;
 
 @Path("/v1")
 public class PrivacyProxyService {
 
+	private static final String PATH_RECOMMEND = "/recommend";
+	private static final String PATH_LOG = "/log/";
+	private static final String PATH_DISAMBIGUATE = "/disambiguate";
+	private static final String PATH_INTERACTION_TYPE = "{InteractionType}";
+
+	private static final String RATING = "ration";
+	private static final String RESULT_CLOSE = "rclose";
+	private static final String RESULT_VIEW = "rview";
+	private static final String SHOW_HIDE = "show_hide";
+	private static final String FACET_SCAPE = "facetScape";
+	private static final String QUERY_ACTIVATED = "query_activated";
+	
+	private static final String FACET_SCAPE_LOGGER = "facetScapeLogger";
+	
 	private static final String federatedRecommenderAPI = "http://eexcess-dev.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend";
 	private static final String disambiguationAPI = "http://zaire.dimis.fim.uni-passau.de:8282/code-disambiguationproxy/disambiguation/categorysuggestion";
-	private static final Logger logger = Logger
-			.getLogger(PrivacyProxyService.class.getName());
-	private static final Logger facetScapeLogger = Logger
-			.getLogger("facetScapeLogger");
+	private static final Logger logger = Logger.getLogger(PrivacyProxyService.class.getName());
+	private static final Logger facetScapeLogger = Logger.getLogger(FACET_SCAPE_LOGGER);
 	private static final ProxyLogProcessor plp = new ProxyLogProcessor();
 
 	@POST
-	@Path("/recommend")
+	@Path(PATH_RECOMMEND)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response responseJSON(@HeaderParam("origin") String origin,
-			String input, @Context HttpServletRequest req) {
-
+	public Response responseJSON(@HeaderParam(Cst.TAG_ORIGIN) String origin,
+			String input, 
+			@Context HttpServletRequest req) {
+		Response resp = null;
 		try {
 			// Remove the uuid
 			JsonFactory factory = new JsonFactory();
 			JsonParser jp = factory.createJsonParser(input);
 			ObjectMapper mapper = new ObjectMapper();
 			ObjectNode query = mapper.readValue(jp, ObjectNode.class);
-			query.remove("uuid");
-			query.remove("context");
+			query.remove(Cst.TAG_UUID);
+			query.remove(Cst.TAG_CONTEXT);
 			// Log the query
-			plp.process(InteractionType.QUERY, origin,  req.getRemoteAddr(), input);
+			plp.process(InteractionType.QUERY, origin, req.getRemoteAddr(), input);
 			// Forward the query
 			Client client = Client.create();
 			WebResource webResource = client.resource(federatedRecommenderAPI);
 			ClientResponse response = webResource
 					.accept(MediaType.APPLICATION_JSON)
-					.type("application/json")
+					.type(Cst.TYPE_APPLICATION)
 					.post(ClientResponse.class, query.toString());
 			String output = response.getEntity(String.class);
 
@@ -69,57 +83,71 @@ public class PrivacyProxyService {
 			case 200:
 			case 201:
 				plp.process(InteractionType.RESULT, origin, req.getRemoteAddr(), input, output);
-				return Response.status(200).entity(output).build();
+				resp = Response.status(Cst.WS_200).entity(output).build();
+				break;
 			default:
-				logger.error("[/recommend] [HTTPErrorCode:"
-						+ response.getStatus() + "] [origin:" + origin + "] "
-						+ output);
-				return Response.status(500).build();
+				String msg = Util.sBrackets(PATH_RECOMMEND) + Cst.SPACE
+						+ Util.sBracketsColon(Cst.TAG_HTTP_ERR_CODE, response.getStatus()) + Cst.SPACE
+						+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
+						+ output;
+				logger.error(msg);
+				resp = Response.status(Cst.WS_500).build();
+				break;
 			}
 		} catch (JsonParseException e) {
-			logger.error("[/recommend] [origin:" + origin + "] " + e);
-			return Response.status(500).entity("Unable to parse the JSON")
-					.build();
+			String msg = Util.sBrackets(PATH_RECOMMEND) + Cst.SPACE
+					+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE 
+					+ e;
+			logger.error(msg);
+			resp = Response.status(Cst.WS_500).entity(Cst.ERR_MSG_PARSE_JSON).build();
 		} catch (IOException e) {
-			logger.error("[/recommend] [origin:" + origin + "] " + e);
-			return Response.status(500).entity("Unable to parse the JSON")
-					.build();
+			String msg = Util.sBrackets(PATH_RECOMMEND) + Cst.SPACE
+					+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE 
+					+ e;
+			logger.error(msg);
+			resp = Response.status(Cst.WS_500).entity(Cst.ERR_MSG_PARSE_JSON).build();
 		}
+		return resp;
 	}
 
 	@POST
-	@Path("/log/{InteractionType}")
+	@Path(PATH_LOG + PATH_INTERACTION_TYPE)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response log(@PathParam("InteractionType") String interactionType,
-			@HeaderParam("origin") String origin,
+			@HeaderParam(Cst.TAG_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			String input) {
-		
+
+		Response resp = Response.status(Cst.WS_200).build();
 		String ip = req.getRemoteAddr();
 
-		if (interactionType.equals("rating")) {
+		if (interactionType.equals(RATING)) {
 			plp.process(InteractionType.RATING, origin, ip, input);
-		} else if (interactionType.equals("rclose")) {
-			plp.process(InteractionType.RESULT_CLOSE,origin, ip, input);
-		} else if (interactionType.equals("rview")) {
-			plp.process(InteractionType.RESULT_VIEW,origin, ip, input);
-		} else if (interactionType.equals("show_hide")) {
-			plp.process(InteractionType.SHOW_HIDE,origin, ip, input);
-		} else if (interactionType.equals("facetScape")) {
-			facetScapeLogger.trace("[origin:" + origin + "] [ip:"+ip+"] " + input);
-		} else if (interactionType.equals("query_activated")) {
-			plp.process(InteractionType.QUERY_ACTIVATED,origin, ip, input);
+		} else if (interactionType.equals(RESULT_CLOSE)) {
+			plp.process(InteractionType.RESULT_CLOSE, origin, ip, input);
+		} else if (interactionType.equals(RESULT_VIEW)) {
+			plp.process(InteractionType.RESULT_VIEW, origin, ip, input);
+		} else if (interactionType.equals(SHOW_HIDE)) {
+			plp.process(InteractionType.SHOW_HIDE, origin, ip, input);
+		} else if (interactionType.equals(FACET_SCAPE)) {
+			String msg = Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
+					+ Util.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
+					+ input;
+			facetScapeLogger.trace(msg);
+		} else if (interactionType.equals(QUERY_ACTIVATED)) {
+			plp.process(InteractionType.QUERY_ACTIVATED, origin, ip, input);
 		} else {
-			logger.error("[/log/" + interactionType + "] [origin:" + origin
-					+ "] /log/" + interactionType + " not a valid REST API");
-			return Response.status(404).build();
+			String msg = Util.sBrackets(PATH_LOG + interactionType) + Cst.SPACE
+					+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
+					+ PATH_LOG + interactionType + Cst.SPACE + Cst.ERR_MSG_NOT_REST_API;
+			logger.error(msg);
+			resp = Response.status(Cst.WS_404).build();
 		}
-
-		return Response.status(200).build();
+		return resp;
 	}
 
 	@POST
-	@Path("/disambiguate")
+	@Path(PATH_DISAMBIGUATE)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response logDisambiguate(String input) {
@@ -127,18 +155,27 @@ public class PrivacyProxyService {
 		Client client = Client.create();
 		WebResource webResource = client.resource(disambiguationAPI);
 		ClientResponse response = webResource
-				.accept(MediaType.APPLICATION_JSON).type("application/json")
+				.accept(MediaType.APPLICATION_JSON).type(Cst.TYPE_APPLICATION)
 				.post(ClientResponse.class, input);
+
 		String output = response.getEntity(String.class);
 
-		switch (response.getStatus()) {
-		case 200:
-		case 201:
-			return Response.status(200).entity(output).build();
-		default:
-			logger.error("[/disambiguate] [HTTPErrorCode:"
-					+ response.getStatus() + "] " + output);
-			return Response.status(500).build();
+		Response resp;
+		if (response.getStatus() == Cst.WS_200){
+			resp = null; // FIXME
+		} else if (response.getStatus() == Cst.WS_201){
+			resp = Response.status(Cst.WS_200).entity(output).build();
+		} else {
+			String msg = Util.sBrackets(PATH_DISAMBIGUATE) + Cst.SPACE
+					+ Util.sBracketsColon(Cst.TAG_HTTP_ERR_CODE, response.getStatus()) + Cst.SPACE 
+					+ output;
+			logger.error(msg);
+			resp = Response.status(Cst.WS_500).build();
 		}
+		
+		return resp;
 	}
+
+
+
 }
