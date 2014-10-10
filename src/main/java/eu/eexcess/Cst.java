@@ -27,10 +27,12 @@ public class Cst {
 	public static final String TAG_CONTEXT = "context";
 	public static final String TAG_CONTEXT_KEYWORDS = "contextKeywords";
 	public static final String TAG_QUERY = "query";
+	public static final String TAG_QUERY_ID = "queryID";
 	public static final String TAG_RESULT = "result";
 	public static final String TAG_RESULTS = "results";
 	public static final String TAG_FACETS = "facets";
 	public static final String TAG_PROVIDER = "provider";
+	public static final String TAG_PROVIDER_SHORT = "p";
 	public static final String TAG_ORIGIN = "origin";
 	public static final String TAG_HTTP_ERR_CODE = "HTTPErrorCode";
 	public static final String TAG_IP = "ip";

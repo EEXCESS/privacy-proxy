@@ -15,10 +15,12 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
+import org.codehaus.jackson.node.TextNode;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -46,7 +48,7 @@ public class PrivacyProxyService {
 	
 	private static final String FACET_SCAPE_LOGGER = "facetScapeLogger";
 	
-	private static final String federatedRecommenderAPI = "http://eexcess-dev.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend";
+	private static final String federatedRecommenderAPI = "http://eexcess.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend";
 	private static final String disambiguationAPI = "http://zaire.dimis.fim.uni-passau.de:8282/code-disambiguationproxy/disambiguation/categorysuggestion";
 	private static final Logger logger = Logger.getLogger(PrivacyProxyService.class.getName());
 	private static final Logger facetScapeLogger = Logger.getLogger(FACET_SCAPE_LOGGER);
@@ -61,15 +63,23 @@ public class PrivacyProxyService {
 			@Context HttpServletRequest req) {
 		Response resp = null;
 		try {
-			// Remove the uuid
 			JsonFactory factory = new JsonFactory();
 			JsonParser jp = factory.createJsonParser(input);
 			ObjectMapper mapper = new ObjectMapper();
 			ObjectNode query = mapper.readValue(jp, ObjectNode.class);
-			query.remove(Cst.TAG_UUID);
-			query.remove(Cst.TAG_CONTEXT);
+			// check for / add queryID
+			JsonNode queryID = query.path(Cst.TAG_QUERY_ID);
+			if(queryID.isMissingNode()) {
+				String queryHash = "" + query.path(Cst.TAG_CONTEXT_KEYWORDS).toString().hashCode();
+				queryHash += System.currentTimeMillis();
+				queryID = new TextNode(queryHash);
+				query.put(Cst.TAG_QUERY_ID, queryID);
+			}
 			// Log the query
-			plp.process(InteractionType.QUERY, origin, req.getRemoteAddr(), input);
+			plp.process(InteractionType.QUERY, origin, req.getRemoteAddr(), query.toString());
+			// remove UUID
+			input = query.toString();
+			query.remove(Cst.TAG_UUID);
 			// Forward the query
 			Client client = Client.create();
 			WebResource webResource = client.resource(federatedRecommenderAPI);

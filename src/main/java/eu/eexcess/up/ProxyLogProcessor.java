@@ -8,6 +8,8 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
 
 import eu.eexcess.Cst;
 import eu.eexcess.Util;
@@ -40,29 +42,25 @@ public class ProxyLogProcessor {
 				jp = factory.createJsonParser(answer);
 				JsonNode rawResult = mapper.readValue(jp, JsonNode.class);
 				JsonNode results = rawResult.path(Cst.TAG_RESULT);
-				String query = rawReq.path(Cst.TAG_CONTEXT_KEYWORDS).toString();
-
-				String outResultsAux = ""; // Will look like: ["provider":a,"id":b], ["provider":c,"id":d], ..., ["provider":y,"id":z]
-				for (int i = 0 ; i < results.size() ; i++) {
-					JsonNode res = results.get(i);
-					String provider = Util.quote(res.path(Cst.TAG_FACETS).path(Cst.TAG_PROVIDER).asText());
-					String id = Util.quote(res.path(Cst.TAG_ID).asText());
-					String content = Util.keyColonValue(Util.quote(Cst.TAG_PROVIDER), provider) + COMMA
-							+ Util.keyColonValue(Util.quote(Cst.TAG_ID), id);
-					outResultsAux += Util.cBrackets(content);
-					if (i < results.size() - 1) {
-						outResultsAux += COMMA;
-					}
+				
+				ObjectNode out = mapper.createObjectNode(); // Will look like: {"results":<resultArr>], "query":q}
+				
+				ArrayNode resultArr = mapper.createArrayNode(); // Will look like: [{"p":a,"id":b}, {"p":c,"id":d}, ..., {"p":y,"id":z}]
+				for(int i = 0; i < results.size(); i++) {
+					ObjectNode result = mapper.createObjectNode();
+					result.put(Cst.TAG_PROVIDER_SHORT, results.get(i).path(Cst.TAG_FACETS).path(Cst.TAG_PROVIDER));
+					result.put(Cst.TAG_ID, results.get(i).path(Cst.TAG_ID));
+					resultArr.add(result);
 				}
-				String outResults = Util.keyColonValue(Util.quote(Cst.TAG_RESULTS), Util.sBrackets(outResultsAux)); 
-				String outQuery = Util.keyColonValue(Util.quote(Cst.TAG_QUERY), query); 
-				String out = Util.cBrackets(outResults + COMMA + outQuery); // Will look like: {"results":[outResultsAux], "query":q}
+				
+				out.put(Cst.TAG_RESULTS, resultArr);
+				out.put(Cst.TAG_QUERY_ID, rawReq.path(Cst.TAG_QUERY_ID)); 
 
 				msg = Util.sBrackets(type.toString()) + Cst.SPACE
 						+ Util.sBracketsColon(Cst.TAG_USER_ID, userID) + Cst.SPACE
 						+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
 						+ Util.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
-						+ out;
+						+ out.toString();
 				interactionLogger.trace(msg);
 				break;
 			default:
