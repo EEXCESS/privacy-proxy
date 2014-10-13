@@ -49,7 +49,7 @@ public class PrivacyProxyService {
 	private static final String FACET_SCAPE_LOGGER = "facetScapeLogger";
 	
 	private static final String federatedRecommenderAPI = "http://eexcess.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend";
-	private static final String disambiguationAPI = "http://zaire.dimis.fim.uni-passau.de:8282/code-disambiguationproxy/disambiguation/categorysuggestion";
+	private static final String disambiguationAPI = "http://zaire.dimis.fim.uni-passau.de:9393/code-server/disambiguation/categorysuggestion";
 	private static final Logger logger = Logger.getLogger(PrivacyProxyService.class.getName());
 	private static final Logger facetScapeLogger = Logger.getLogger(FACET_SCAPE_LOGGER);
 	private static final ProxyLogProcessor plp = new ProxyLogProcessor();
@@ -171,9 +171,7 @@ public class PrivacyProxyService {
 		String output = response.getEntity(String.class);
 
 		Response resp;
-		if (response.getStatus() == Cst.WS_200){
-			resp = null; // FIXME
-		} else if (response.getStatus() == Cst.WS_201){
+		if (response.getStatus() == Cst.WS_201 || response.getStatus() == Cst.WS_200) {
 			resp = Response.status(Cst.WS_200).entity(output).build();
 		} else {
 			String msg = Util.sBrackets(PATH_DISAMBIGUATE) + Cst.SPACE
