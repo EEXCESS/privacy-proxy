@@ -39,7 +39,7 @@ public class PrivacyProxyService {
 	private static final String PATH_DISAMBIGUATE = "/disambiguate";
 	private static final String PATH_INTERACTION_TYPE = "{InteractionType}";
 
-	private static final String RATING = "ration";
+	private static final String RATING = "rating";
 	private static final String RESULT_CLOSE = "rclose";
 	private static final String RESULT_VIEW = "rview";
 	private static final String SHOW_HIDE = "show_hide";
