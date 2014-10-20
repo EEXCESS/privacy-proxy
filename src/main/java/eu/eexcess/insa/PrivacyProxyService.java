@@ -75,6 +75,14 @@ public class PrivacyProxyService {
 				queryID = new TextNode(queryHash);
 				query.put(Cst.TAG_QUERY_ID, queryID);
 			}
+			if(origin == null) {
+				origin = "empty";
+			}
+			JsonNode originNode = query.path(Cst.TAG_ORIGIN);
+			if(!originNode.isMissingNode()) {
+				origin = originNode.toString();
+				query.remove(Cst.TAG_ORIGIN);
+			}
 			// Log the query
 			plp.process(InteractionType.QUERY, origin, req.getRemoteAddr(), query.toString());
 			// remove UUID
