@@ -44,6 +44,7 @@ public class ProxyLogProcessor {
 				JsonNode results = rawResult.path(Cst.TAG_RESULT);
 				
 				ObjectNode out = mapper.createObjectNode(); // Will look like: {"results":<resultArr>], "query":q}
+				out.put("provider", rawResult.path("provider"));
 				
 				ArrayNode resultArr = mapper.createArrayNode(); // Will look like: [{"p":a,"id":b}, {"p":c,"id":d}, ..., {"p":y,"id":z}]
 				for(int i = 0; i < results.size(); i++) {
