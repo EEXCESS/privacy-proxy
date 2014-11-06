@@ -193,7 +193,6 @@ public class PrivacyProxyService {
 			JsonNode res = mapper.readValue(op, JsonNode.class);
 			ObjectNode root = mapper.createObjectNode();
 			root.put("provider", new TextNode("europeana"));
-			root.put("totalResults", res.path("totalResults").asInt());
 			ArrayNode results = mapper.createArrayNode();
 
 			root.put("result", results);
@@ -233,6 +232,7 @@ public class PrivacyProxyService {
 				r.put("facets", facets);
 				results.add(r);
 			}
+			root.put("totalResults", results.size());
 
 			switch (response.getStatus()) {
 			case 200:
