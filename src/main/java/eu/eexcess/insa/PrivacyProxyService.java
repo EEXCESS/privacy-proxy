@@ -55,7 +55,7 @@ public class PrivacyProxyService {
 	private static final String federatedRecommenderAPI = "http://eexcess.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend";
 	private static final String europeanaAPIprefix = "http://europeana.eu/api//v2/search.json?wskey=HT6JwVWha&query=";
 	private static final String europeanaAPIsuffix = "&start=1&rows=48&profile=standard";
-	private static final String disambiguationAPI = "http://zaire.dimis.fim.uni-passau.de:8383/code-server/disambiguation/categorysuggestion";
+	private static final String disambiguationAPI = "http://zaire.dimis.fim.uni-passau.de:9393/code-server/disambiguation/categorysuggestion";
 	private static final Logger logger = Logger.getLogger(PrivacyProxyService.class.getName());
 	private static final Logger facetScapeLogger = Logger.getLogger(FACET_SCAPE_LOGGER);
 	private static final ProxyLogProcessor plp = new ProxyLogProcessor();
@@ -201,10 +201,14 @@ public class PrivacyProxyService {
 				ObjectNode r = mapper.createObjectNode();
 				r.put("id", result.path("id"));
 				JsonNode title = result.path("title");
-				if(title.isArray()) {
-					r.put("title", title.get(0));
+				if(title.isMissingNode()) {
+					r.put("title", "no title");
 				} else {
-					r.put("title", title);
+					if(title.isArray()) {
+						r.put("title", title.get(0));
+					} else {
+						r.put("title", title);
+					}
 				}
 				r.put("uri", result.path("guid"));
 				r.put("eexcessURI", result.path("guid"));
