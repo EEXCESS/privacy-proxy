@@ -49,10 +49,11 @@ public class PrivacyProxyService {
 	private static final String FACET_SCAPE_LOGGER = "facetScapeLogger";
 	
 	private static final String federatedRecommenderAPI = "http://eexcess-dev.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend";
-	private static final String disambiguationAPI = "http://zaire.dimis.fim.uni-passau.de:8383/code-server/disambiguation/categorysuggestion";
+	private static final String disambiguationAPI = "http://zaire.dimis.fim.uni-passau.de:9393/code-server/disambiguation/categorysuggestion";
 	private static final Logger logger = Logger.getLogger(PrivacyProxyService.class.getName());
 	private static final Logger facetScapeLogger = Logger.getLogger(FACET_SCAPE_LOGGER);
 	private static final ProxyLogProcessor plp = new ProxyLogProcessor();
+	private static final JsonFactory factory = new JsonFactory();
 
 	@POST
 	@Path(PATH_RECOMMEND)
@@ -63,7 +64,6 @@ public class PrivacyProxyService {
 			@Context HttpServletRequest req) {
 		Response resp = null;
 		try {
-			JsonFactory factory = new JsonFactory();
 			JsonParser jp = factory.createJsonParser(input);
 			ObjectMapper mapper = new ObjectMapper();
 			ObjectNode query = mapper.readValue(jp, ObjectNode.class);
