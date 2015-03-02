@@ -53,7 +53,7 @@ public class PrivacyProxyService {
 	private static final String FACET_SCAPE_LOGGER = "facetScapeLogger";
 	
 	private static final String federatedRecommenderAPI = "http://eexcess.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/recommend";
-	private static final String europeanaAPIprefix = "http://europeana.eu/api//v2/search.json?wskey=HT6JwVWha&query=";
+	private static final String europeanaAPIprefix = "http://europeana.eu/api/v2/search.json?wskey=HT6JwVWha&query=";
 	private static final String europeanaAPIsuffix = "&start=1&rows=48&profile=standard";
 	private static final String disambiguationAPI = "http://zaire.dimis.fim.uni-passau.de:9393/code-server/disambiguation/categorysuggestion";
 	private static final Logger logger = Logger.getLogger(PrivacyProxyService.class.getName());
