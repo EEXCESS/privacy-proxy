@@ -6,19 +6,23 @@ The purpose of the privacy proxy is to ensure users privacy in the EEXCESS syste
 ## Installation
 The privacy proxy is developed in Java. Dependencies are handled with Maven (no additional dependencies need to be installed manually). 
 
+To deploy the privacy proxy, a WAR file must be created from the project. If Eclipse is used: File > Export... > Web > WAR file. It can then we deployed on a TomCat server. 
+
 ## Getting started
 At this stage of the project, the privacy proxy: 
-* does 1
-* does 2
+* does not obfuscate queries, as we wanted to start when a stable and effective version of the federated recommender is available. Therefore, quries are simply forwarded to the federated recommender. 
+* logs the queries. 
 
+These functionalities are implemented into two classes. The first one is PrivacyProxyService: 
 ```java
 public class PrivacyProxyService {
   public Response responseJSON(String origin,	String input, HttpServletRequest req) { ... }
 }
-
+```
+The second one is ProxyLogProcessor: 
+```java
 public class ProxyLogProcessor {
   public void process(InteractionType type, String origin, String ip, String request) { ... }
   public void process(InteractionType type, String origin, String ip, String request, String answer) { ... }
 ```
 
-## Settings
