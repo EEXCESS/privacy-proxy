@@ -26,3 +26,4 @@ public class ProxyLogProcessor {
   public void process(InteractionType type, String origin, String ip, String request, String answer) { ... }
 ```
 
+The JAX-WS (Java API for XML Web Services) API is used to create web services. The official documentation is available [here](https://jax-ws.java.net). 
