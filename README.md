@@ -3,10 +3,12 @@
 ## Purpose
 The purpose of the privacy proxy is to ensure users privacy in the EEXCESS system. Each query issued by the clients (e.g., Google Chrome extension, Wordpress plug-in) is sent to the privacy proxy before it is forwarded to the federated recommender. It allows obfuscating or anonymising it when it is required by the user. For instance, if a user does not want to share her location, then the privacy proxy will ensure that this information does not get to the federated recommender. 
 
-## Installation
-The privacy proxy is developed in Java. Dependencies are handled with Maven (no additional dependencies need to be installed manually). 
+## Installation and Deployment
+The privacy proxy is developed in Java. The easiest way to contribute to this project is to use a proper IDE (e.g., [Eclipse](http://eclipse.org/)). Dependencies are handled with Maven (no additional dependencies need to be installed manually). If you are using Eclipse, you can configure the project by doing: 
+* Right-click on the project > Confgure > Convert to Maven Project
+* Right-click on the project > Maven > Update Project...
 
-To deploy the privacy proxy, a WAR file must be created from the project. If Eclipse is used: File > Export... > Web > WAR file. It can then we deployed on a TomCat server. 
+To deploy the privacy proxy, a WAR file must be created from the project. If you are using Eclipse: File > Export... > Web > WAR file. It can then we deployed on a TomCat server. 
 
 ## Getting started
 At this stage of the project, the privacy proxy: 
