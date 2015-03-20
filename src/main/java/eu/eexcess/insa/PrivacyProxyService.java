@@ -18,6 +18,7 @@ import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jackson.node.TextNode;
@@ -138,6 +139,21 @@ public class PrivacyProxyService {
 
 		Response resp = Response.status(Cst.WS_200).build();
 		String ip = req.getRemoteAddr();
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			JsonParser jp = factory.createJsonParser(input);
+			ObjectNode logInput = mapper.readValue(jp, ObjectNode.class);
+			JsonNode originNode = logInput.path(Cst.TAG_ORIGIN);
+			if(!originNode.isMissingNode()) {
+				origin = originNode.toString();
+				logInput.remove(Cst.TAG_ORIGIN);
+			}
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+		}
+		if(origin == null) {
+			origin = "empty";
+		}
 
 		if (interactionType.equals(RATING)) {
 			plp.process(InteractionType.RATING, origin, ip, input);
