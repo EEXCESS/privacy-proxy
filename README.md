@@ -19,17 +19,8 @@ At this stage of the project, the privacy proxy:
 These functionalities are accessible throught services defined in PrivacyProxyService: 
 ```java
 public class PrivacyProxyService {
-  public Response responseJSON(
-    @HeaderParam(Cst.TAG_ORIGIN) String origin,
-		@Context HttpServletRequest req,
-		@Context HttpServletResponse servletResp, 
-		String input) { ... }
-  public Response log(
-    @PathParam("InteractionType") String interactionType,
-		@HeaderParam(Cst.TAG_ORIGIN) String origin,
-		@Context HttpServletRequest req,
-		@Context HttpServletResponse servletResp,
-		String input) { ... }
+  public Response responseJSON(@HeaderParam(Cst.TAG_ORIGIN) String origin, @Context HttpServletRequest req, @Context HttpServletResponse servletResp, String input) { ... }
+  public Response log(@PathParam("InteractionType") String interactionType, @HeaderParam(Cst.TAG_ORIGIN) String origin, @Context HttpServletRequest req, @Context HttpServletResponse servletResp, String input) { ... }
   public Response logDisambiguate(@Context HttpServletResponse servletResp, String input) {
   public Response getRegisteredPartners(@Context HttpServletResponse servletResp) { ... }
 }
