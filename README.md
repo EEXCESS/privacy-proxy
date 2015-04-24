@@ -5,10 +5,11 @@ The purpose of the privacy proxy is to ensure users privacy in the EEXCESS syste
 
 ## Installation and Deployment
 The privacy proxy is developed in Java. The easiest way to contribute to this project is to use a proper IDE (e.g., [Eclipse](http://eclipse.org/)). Dependencies are handled with Maven (no additional dependencies need to be installed manually). If you are using Eclipse, you can configure the project by doing: 
-* Right-click on the project > Confgure > Convert to Maven Project
+* Right-click on the project > Configure > Convert to Maven Project
 * Right-click on the project > Maven > Update Project...
+* Right-click on the project > Properties > Deployment Assembly > Add Maven dependencies (necessary if Tomcat runs in Eclipse). 
 
-To deploy the privacy proxy, a WAR file must be created from the project. If you are using Eclipse: File > Export... > Web > WAR file. It can then we deployed on a TomCat server. 
+To deploy the privacy proxy, a WAR file must be created from the project. If you are using Eclipse, Run > Run As > Maven Build. 
 
 ## Getting started
 At this stage of the project, the privacy proxy: 
