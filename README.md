@@ -16,17 +16,23 @@ At this stage of the project, the privacy proxy:
 * does not obfuscate queries, as we wanted to start when a stable and effective version of the federated recommender is available. Therefore, quries are simply forwarded to the federated recommender. 
 * logs the queries. 
 
-These functionalities are implemented into two classes. The first one is PrivacyProxyService: 
+These functionalities are accessible throught services defined in PrivacyProxyService: 
 ```java
 public class PrivacyProxyService {
-  public Response responseJSON(String origin,	String input, HttpServletRequest req) { ... }
+  public Response responseJSON(
+    @HeaderParam(Cst.TAG_ORIGIN) String origin,
+		@Context HttpServletRequest req,
+		@Context HttpServletResponse servletResp, 
+		String input) { ... }
+  public Response log(
+    @PathParam("InteractionType") String interactionType,
+		@HeaderParam(Cst.TAG_ORIGIN) String origin,
+		@Context HttpServletRequest req,
+		@Context HttpServletResponse servletResp,
+		String input) { ... }
+  public Response logDisambiguate(@Context HttpServletResponse servletResp, String input) {
+  public Response getRegisteredPartners(@Context HttpServletResponse servletResp) { ... }
 }
-```
-The second one is ProxyLogProcessor: 
-```java
-public class ProxyLogProcessor {
-  public void process(InteractionType type, String origin, String ip, String request) { ... }
-  public void process(InteractionType type, String origin, String ip, String request, String answer) { ... }
 ```
 
 The JAX-WS (Java API for XML Web Services) API is used to create web services. The official documentation is available [here](https://jax-ws.java.net). 
