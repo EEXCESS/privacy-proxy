@@ -1,83 +1,61 @@
 package eu.eexcess.up;
 
-import java.io.IOException;
-
-import org.apache.log4j.Logger;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ArrayNode;
-import org.codehaus.jackson.node.ObjectNode;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import eu.eexcess.Cst;
 import eu.eexcess.Util;
 
 public class ProxyLogProcessor {
 
-	private static final String INTERACTION_LOGGER = "interactionLogger";
-	private static final String COMMA = ",";
-
-	private static final Logger logger = Logger.getLogger(ProxyLogProcessor.class.getName());
-	private static final Logger interactionLogger = Logger.getLogger(INTERACTION_LOGGER);
-
-	public void process(InteractionType type, String origin, String ip, String request) {
-		process(type, origin, ip, request, null);
+	public void process(String interactionType, String origin, String ip, String request) {
+		process(interactionType, origin, ip, request, null);
 	}
 
-	public void process(InteractionType type, String origin, String ip, String request, String answer) {
+	public void process(String interactionType, String origin, String ip, String request, String answer) {
 
-		try {
+		String userID = "";
+		String msg; 
 
-			JsonFactory factory = new JsonFactory();
-			JsonParser jp = factory.createJsonParser(request);
-			ObjectMapper mapper = new ObjectMapper();
-			JsonNode rawReq = mapper.readValue(jp, JsonNode.class);
-			String userID = rawReq.path(Cst.TAG_UUID).asText();
-			String msg; 
+		if (interactionType.equals(Cst.RESULT)) {
 
-			switch (type) {
-			case RESULT:
-				jp = factory.createJsonParser(answer);
-				JsonNode rawResult = mapper.readValue(jp, JsonNode.class);
-				JsonNode results = rawResult.path(Cst.TAG_RESULT);
-				
-				ObjectNode out = mapper.createObjectNode(); // Will look like: {"results":<resultArr>], "query":q}
-				
-				ArrayNode resultArr = mapper.createArrayNode(); // Will look like: [{"p":a,"id":b}, {"p":c,"id":d}, ..., {"p":y,"id":z}]
-				for(int i = 0; i < results.size(); i++) {
-					ObjectNode result = mapper.createObjectNode();
-					result.put(Cst.TAG_PROVIDER_SHORT, results.get(i).path(Cst.TAG_FACETS).path(Cst.TAG_PROVIDER));
-					result.put(Cst.TAG_ID, results.get(i).path(Cst.TAG_ID));
-					resultArr.add(result);
-				}
-				
-				out.put(Cst.TAG_RESULTS, resultArr);
-				out.put(Cst.TAG_QUERY_ID, rawReq.path(Cst.TAG_QUERY_ID)); 
-
-				msg = Util.sBrackets(type.toString()) + Cst.SPACE
-						+ Util.sBracketsColon(Cst.TAG_USER_ID, userID) + Cst.SPACE
-						+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
-						+ Util.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
-						+ out.toString();
-				interactionLogger.trace(msg);
-				break;
-			default:
-				msg = Util.sBrackets(type.toString()) + Cst.SPACE
-						+ Util.sBracketsColon(Cst.TAG_USER_ID, userID) + Cst.SPACE
-						+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
-						+ Util.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
-						+ request;
-				interactionLogger.trace(msg);
-				break;
+			JSONObject jsonOutput = new JSONObject(); // Will look like: {"results":<resultArr>], "query":q}
+			JSONObject jsonInputRequest = new JSONObject(request);
+			JSONObject jsonInputAnswer = new JSONObject(answer);
+			if (jsonInputRequest.has(Cst.TAG_UUID)){
+				userID = jsonInputRequest.getString(Cst.TAG_UUID);
 			}
-		} catch (JsonParseException e) {
-			String msg = Util.sBrackets(type.toString()) + Cst.SPACE + Cst.ERR_MSG_PARSE_JSON;
-			logger.error(msg, e);
-		} catch (IOException e) {
-			String msg = Util.sBrackets(type.toString()) + Cst.SPACE + Cst.ERR_MSG_PARSE_JSON;
-			logger.error(msg, e);
+			if (jsonInputAnswer.has(Cst.TAG_RESULT)){
+
+				JSONArray jsonOutputResults = new JSONArray(); // Will look like: [{"p":a,"id":b}, {"p":c,"id":d}, ..., {"p":y,"id":z}]
+				JSONArray jsonInputResults = jsonInputAnswer.getJSONArray(Cst.TAG_RESULT);
+				for (Integer i = 0 ; i < jsonInputResults.length() ; i++){
+					JSONObject jsonInputEntry = jsonInputResults.getJSONObject(i);
+					JSONObject jsonOutputEntry = new JSONObject();
+					jsonOutputEntry.put(Cst.TAG_PROVIDER_SHORT, jsonInputEntry.getJSONObject(Cst.TAG_FACETS).get(Cst.TAG_PROVIDER));
+					jsonOutputEntry.put(Cst.TAG_ID, jsonInputEntry.get(Cst.TAG_ID));
+					jsonOutputResults.put(jsonOutputEntry);
+				}
+
+				jsonOutput.put(Cst.TAG_RESULTS, jsonOutputResults);
+				if (jsonInputRequest.has(Cst.TAG_QUERY_ID)){
+					jsonOutput.put(Cst.TAG_QUERY_ID, jsonInputRequest.getString(Cst.TAG_QUERY_ID));
+				}
+			}
+
+			msg = Util.sBrackets(interactionType) + Cst.SPACE
+					+ Util.sBracketsColon(Cst.TAG_USER_ID, userID) + Cst.SPACE
+					+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
+					+ Util.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
+					+ jsonOutput.toString();
+			Cst.LOGGER_INTERACTION.trace(msg);
+		} else {
+			msg = Util.sBrackets(interactionType) + Cst.SPACE
+					+ Util.sBracketsColon(Cst.TAG_USER_ID, userID) + Cst.SPACE
+					+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
+					+ Util.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
+					+ request;
+			Cst.LOGGER_INTERACTION.trace(msg);
 		}
 
 	}

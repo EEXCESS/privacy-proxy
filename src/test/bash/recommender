@@ -1,0 +1,24 @@
+#!/bin/bash
+
+File="../resources/search-query-1.json"
+
+if [ "$#" -ne 0 ]; then 
+	if [ $1 = "local-eclipse" ]; then # local through Eclipse
+		ServiceURL="http://localhost:8080/eexcess-privacy-proxy/" 
+	else 
+		if [ $1 = "local" ]; then # local manual deployment
+			ServiceURL="http://localhost:8080/eexcess-privacy-proxy-1.0-SNAPSHOT/"
+		else 
+			if [ $1 = "remote-dev" ]; then # development server
+				ServiceURL="http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-SNAPSHOT/"
+			else 
+				ServiceURL=$1 # specific location
+			fi
+		fi
+	fi
+	ServiceURL=`echo $ServiceURL"api/v1/recommend"`
+	echo $ServiceURL
+	#curl -X POST $ServiceURL -d @$File --header "Content-Type: application/json"
+else 
+	echo "Usage resource.sh [local-eclipse | local | remote-dev | <http://your-server/api/]"
+fi
