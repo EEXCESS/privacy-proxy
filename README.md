@@ -5,27 +5,25 @@ The purpose of the privacy proxy is to ensure users privacy in the EEXCESS syste
 
 ## Installation and Deployment
 The privacy proxy is developed in Java. The easiest way to contribute to this project is to use a proper IDE (e.g., [Eclipse](http://eclipse.org/)). Dependencies are handled with Maven (no additional dependencies need to be installed manually). If you are using Eclipse, you can configure the project by doing: 
-* Right-click on the project > Confgure > Convert to Maven Project
+* Right-click on the project > Configure > Convert to Maven Project
 * Right-click on the project > Maven > Update Project...
+* Right-click on the project > Properties > Deployment Assembly > Add Maven dependencies (necessary if Tomcat runs in Eclipse). 
 
-To deploy the privacy proxy, a WAR file must be created from the project. If you are using Eclipse: File > Export... > Web > WAR file. It can then we deployed on a TomCat server. 
+To deploy the privacy proxy, a WAR file must be created from the project. If you are using Eclipse, Run > Run As > Maven Build. 
 
 ## Getting started
 At this stage of the project, the privacy proxy: 
 * does not obfuscate queries, as we wanted to start when a stable and effective version of the federated recommender is available. Therefore, quries are simply forwarded to the federated recommender. 
 * logs the queries. 
 
-These functionalities are implemented into two classes. The first one is PrivacyProxyService: 
+These functionalities are accessible throught services defined in PrivacyProxyService: 
 ```java
 public class PrivacyProxyService {
-  public Response responseJSON(String origin,	String input, HttpServletRequest req) { ... }
+  public Response responseJSON(@HeaderParam(Cst.TAG_ORIGIN) String origin, @Context HttpServletRequest req, @Context HttpServletResponse servletResp, String input) { ... }
+  public Response log(@PathParam("InteractionType") String interactionType, @HeaderParam(Cst.TAG_ORIGIN) String origin, @Context HttpServletRequest req, @Context HttpServletResponse servletResp, String input) { ... }
+  public Response logDisambiguate(@Context HttpServletResponse servletResp, String input) {
+  public Response getRegisteredPartners(@Context HttpServletResponse servletResp) { ... }
 }
-```
-The second one is ProxyLogProcessor: 
-```java
-public class ProxyLogProcessor {
-  public void process(InteractionType type, String origin, String ip, String request) { ... }
-  public void process(InteractionType type, String origin, String ip, String request, String answer) { ... }
 ```
 
 The JAX-WS (Java API for XML Web Services) API is used to create web services. The official documentation is available [here](https://jax-ws.java.net). 
