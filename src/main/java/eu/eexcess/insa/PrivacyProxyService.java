@@ -3,6 +3,7 @@ package eu.eexcess.insa;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -146,7 +147,7 @@ public class PrivacyProxyService {
 		return resp;
 	}
 
-	@POST
+	@GET
 	@Path(Cst.PATH_GET_REGISTERED_PARTNERS)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRegisteredPartners(@Context HttpServletResponse servletResp) {

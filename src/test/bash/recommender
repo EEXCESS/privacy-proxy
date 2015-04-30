@@ -20,5 +20,5 @@ if [ "$#" -ne 0 ]; then
 	echo $ServiceURL
 	#curl -X POST $ServiceURL -d @$File --header "Content-Type: application/json"
 else 
-	echo "Usage resource.sh [local-eclipse | local | remote-dev | <http://your-server/api/]"
+	echo "Usage recommender [local-eclipse | local | remote-dev | <http://your-server/api/]"
 fi
