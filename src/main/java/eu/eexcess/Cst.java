@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import eu.eexcess.up.ProxyLogProcessor;
 
 /**
- * This class contains all the constants that are used in the project. 
+ * This class contains all the constants used in the project. 
  * @author Thomas
  *
  */
@@ -26,13 +26,10 @@ public class Cst {
 	
 	public static final String PARAM_ORIGIN = "origin";
 	
-	// Status
-	public static final Integer WS_200 = 200;
-	public static final Integer WS_201 = 201;
-	public static final Integer WS_404 = 404;
-	public static final Integer WS_500 = 500;
-	
 	// Tags
+	public static final String TAG_HTTP_ERR_CODE = Config.getValue(Config.TAG_HTTP_ERROR_CODE);
+	public static final String TAG_ORIGIN = Config.getValue(Config.TAG_ORIGIN);
+	public static final String TAG_IP = Config.getValue(Config.TAG_IP);
 	public static final String TAG_ID = Config.getValue(Config.TAG_ID);
 	public static final String TAG_UUID = Config.getValue(Config.TAG_UUID);
 	public static final String TAG_USER_ID = Config.getValue(Config.TAG_USER_ID);
@@ -42,12 +39,10 @@ public class Cst {
 	public static final String TAG_QUERY_ID = Config.getValue(Config.TAG_QUERY_ID);
 	public static final String TAG_RESULT = Config.getValue(Config.TAG_RESULT);
 	public static final String TAG_RESULTS = Config.getValue(Config.TAG_RESULTS);
+	public static final String TAG_NB_RESULTS = Config.getValue(Config.TAG_NB_RESULTS);
 	public static final String TAG_FACETS = Config.getValue(Config.TAG_FACETS);
 	public static final String TAG_PROVIDER = Config.getValue(Config.TAG_PROVIDER);
 	public static final String TAG_PROVIDER_SHORT = Config.getValue(Config.TAG_PROVIDER_ABBREVIATION);
-	public static final String TAG_ORIGIN = Config.getValue(Config.TAG_ORIGIN);
-	public static final String TAG_HTTP_ERR_CODE = Config.getValue(Config.TAG_HTTP_ERROR_CODE);
-	public static final String TAG_IP = Config.getValue(Config.TAG_IP);
 	
 	// Access control
 	public static final String ACCESS_CONTROL_KEY = Config.getValue(Config.ACCESS_CONTROL_KEY);
@@ -63,17 +58,18 @@ public class Cst {
 	public static final String QUERY_ACTIVATED = Config.getValue(Config.INTERACTION_TYPE_QUERY_ACTIVATED);
 
 	// Federated recommender
-	private static final String FEDERATED_RECOMMENDER_URL = Config.getValue(Config.RECOMMENDER_URL);
-	private static final String RECOMMENDER_API_URL = FEDERATED_RECOMMENDER_URL + Config.getValue(Config.RECOMMENDER_PATH);
+	public static final String RECOMMENDER_LABEL = Config.getValue(Config.RECOMMENDER_LABEL);
+	private static final String RECOMMENDER_URL = Config.getValue(Config.RECOMMENDER_URL);
+	private static final String RECOMMENDER_API_URL = RECOMMENDER_URL + Config.getValue(Config.RECOMMENDER_PATH);
 	
 	// Disambiguater
-	private static final String DISAMBIGUATION_URL = Config.getValue(Config.DISAMBIGUATER_URL);
-	private static final String DISAMBIGUATION_API_URL = DISAMBIGUATION_URL + Config.getValue(Config.DISAMBIGUATER_PATH);
+	private static final String DISAMBIGUATER_URL = Config.getValue(Config.DISAMBIGUATER_URL);
+	private static final String DISAMBIGUATER_API_URL = DISAMBIGUATER_URL + Config.getValue(Config.DISAMBIGUATER_PATH);
 
 	// Services
 	public static final String SERVICE_RECOMMEND = RECOMMENDER_API_URL + PATH_RECOMMEND;
 	public static final String SERVICE_GET_REGISTERED_PARTNERS = RECOMMENDER_API_URL + PATH_GET_REGISTERED_PARTNERS;
-	public static final String SERVICE_DISAMBIGUATION = DISAMBIGUATION_API_URL + PATH_CATEGORY_SUGGESTION;
+	public static final String SERVICE_DISAMBIGUATION = DISAMBIGUATER_API_URL + PATH_CATEGORY_SUGGESTION;
 
 	// Loggers
 	public static final String PATH_LOG_DIRECTORY = Config.getValue(Config.LOG_DIRECTORY);

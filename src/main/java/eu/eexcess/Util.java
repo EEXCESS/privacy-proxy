@@ -54,6 +54,13 @@ public class Util {
 		return Util.QM + o.toString() + Util.QM;
 	}
 	
+	/**
+	 * 
+	 * @param br1
+	 * @param str
+	 * @param br2
+	 * @return
+	 */
 	static private String brackets(String br1, String str, String br2){
 		return br1 + str + br2;
 	}

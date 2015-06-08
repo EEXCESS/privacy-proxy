@@ -27,14 +27,15 @@ public class Config {
 	public static final String TAG_CONTEXT_KEYWORDS = "tag.contextKeywords";
 	public static final String TAG_QUERY = "tag.query";
 	public static final String TAG_QUERY_ID = "tag.queryId";
-	public static final String TAG_RESULT = "tag.result";
-	public static final String TAG_RESULTS = "tag.results";
 	public static final String TAG_FACETS = "tag.facets";
 	public static final String TAG_PROVIDER = "tag.provider";
 	public static final String TAG_PROVIDER_ABBREVIATION = "tag.provider.abbreviation";
 	public static final String TAG_ORIGIN = "tag.origin";
-	public static final String TAG_HTTP_ERROR_CODE = "tag.HttpErrorCode";
+	public static final String TAG_HTTP_ERROR_CODE = "tag.httpErrorCode";
 	public static final String TAG_IP = "tag.ip";
+	public static final String TAG_RESULT = "tag.result";
+	public static final String TAG_RESULTS = "tag.results";
+	public static final String TAG_NB_RESULTS = "tag.nbResults";
 	
 	public static final String ACCESS_CONTROL_KEY = "accessControl.key";
 	public static final String ACCESS_CONTROL_VALUE = "accessControl.value";
@@ -43,6 +44,7 @@ public class Config {
 
 	public static final String RECOMMENDER_URL = "recommender.url";
 	public static final String RECOMMENDER_PATH = "recommender.path";
+	public static final String RECOMMENDER_LABEL = "recommender.label";
 	
 	public static final String DISAMBIGUATER_URL = "disambiguater.url";
 	public static final String DISAMBIGUATER_PATH = "disambiguater.path";
@@ -57,6 +59,9 @@ public class Config {
 	
 	private static Properties prop = null;
 
+	/**
+	 * 
+	 */
 	public Config(){
 		Config.prop = new Properties();
 		InputStream inputStream = getClass().getClassLoader().getResourceAsStream(Config.PROP_FILE_NAME);
@@ -71,6 +76,11 @@ public class Config {
 		}
 	}
 
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
 	public static String getValue(String key) {
 		String value = null;
 		if (Config.prop == null){

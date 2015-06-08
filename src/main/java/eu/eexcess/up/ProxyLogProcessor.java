@@ -8,10 +8,25 @@ import eu.eexcess.Util;
 
 public class ProxyLogProcessor {
 
+	/**
+	 * 
+	 * @param interactionType
+	 * @param origin
+	 * @param ip
+	 * @param request
+	 */
 	public void process(String interactionType, String origin, String ip, String request) {
 		process(interactionType, origin, ip, request, null);
 	}
 
+	/**
+	 * 
+	 * @param interactionType
+	 * @param origin
+	 * @param ip
+	 * @param request
+	 * @param answer
+	 */
 	public void process(String interactionType, String origin, String ip, String request, String answer) {
 
 		String userID = "";
