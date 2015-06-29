@@ -28,7 +28,7 @@ import eu.eexcess.insa.peas.Dictionary;
 import eu.eexcess.insa.peas.QueryEngine;
 
 /**
- * 
+ * TODO
  * @author Thomas Cerqueus
  * @version 2.0
  */
@@ -72,10 +72,11 @@ public class PrivacyProxyService {
 
 	/**
 	 * TODO
-	 * @param origin
-	 * @param req
-	 * @param servletResp
-	 * @return
+	 * @param origin Origin of the query. 
+	 * @param req HTTP request. 
+	 * @param servletResp TODO
+	 * @return TODO
+	 * @see QueryEngine
 	 */
 	@OPTIONS
 	@Path(Cst.PATH_RECOMMEND)
