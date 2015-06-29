@@ -19,6 +19,10 @@ public class Cst {
 	// Services
 	public static final String VERSION = "/v1";
 	public static final String PATH_RECOMMEND = "/recommend";
+	public static final String PATH_GET_DETAILS = "/getDetails";
+	public static final String PATH_GET_CLIQUES = "/getCliques";
+	public static final String PATH_GET_CO_OCCURRENCE_GRAPH = "/getCoOccurrenceGraph";
+	public static final String PATH_GET_DICTIONARY = "/getDictionary";
 	public static final String PATH_LOG = "/log/{InteractionType}";
 	public static final String PATH_DISAMBIGUATE = "/disambiguate";
 	public static final String PATH_GET_REGISTERED_PARTNERS = "/getRegisteredPartners";
@@ -27,35 +31,44 @@ public class Cst {
 	public static final String PARAM_ORIGIN = "origin";
 	
 	// Tags
-	public static final String TAG_HTTP_ERR_CODE = Config.getValue(Config.TAG_HTTP_ERROR_CODE);
-	public static final String TAG_ORIGIN = Config.getValue(Config.TAG_ORIGIN);
-	public static final String TAG_IP = Config.getValue(Config.TAG_IP);
-	public static final String TAG_ID = Config.getValue(Config.TAG_ID);
-	public static final String TAG_UUID = Config.getValue(Config.TAG_UUID);
-	public static final String TAG_USER_ID = Config.getValue(Config.TAG_USER_ID);
-	public static final String TAG_CONTEXT = Config.getValue(Config.TAG_CONTEXT);
-	public static final String TAG_CONTEXT_KEYWORDS = Config.getValue(Config.TAG_CONTEXT_KEYWORDS);
-	public static final String TAG_QUERY = Config.getValue(Config.TAG_QUERY);
-	public static final String TAG_QUERY_ID = Config.getValue(Config.TAG_QUERY_ID);
-	public static final String TAG_RESULT = Config.getValue(Config.TAG_RESULT);
-	public static final String TAG_RESULTS = Config.getValue(Config.TAG_RESULTS);
-	public static final String TAG_NB_RESULTS = Config.getValue(Config.TAG_NB_RESULTS);
-	public static final String TAG_FACETS = Config.getValue(Config.TAG_FACETS);
-	public static final String TAG_PROVIDER = Config.getValue(Config.TAG_PROVIDER);
-	public static final String TAG_PROVIDER_SHORT = Config.getValue(Config.TAG_PROVIDER_ABBREVIATION);
+	public static final String TAG_HTTP_ERR_CODE = "HTTPErrorCode";
+	public static final String TAG_ORIGIN = "origin";
+	public static final String TAG_IP = "ip";
+	public static final String TAG_ID = "id";
+	public static final String TAG_UUID = "uuid";
+	public static final String TAG_USER_ID = "userID";
+	public static final String TAG_CONTEXT = "context";
+	public static final String TAG_CONTEXT_KEYWORDS = "contextKeywords";
+	public static final String TAG_QUERY = "query";
+	public static final String TAG_QUERY_ID = "queryID";
+	public static final String TAG_RESULT = "result";
+	public static final String TAG_RESULTS = "results";
+	public static final String TAG_NB_RESULTS = "totalResults";
+	public static final String TAG_FACETS = "facets";
+	public static final String TAG_PROVIDER = "provider";
+	public static final String TAG_PROVIDER_SHORT = "p";
 	
 	// Access control
-	public static final String ACCESS_CONTROL_KEY = Config.getValue(Config.ACCESS_CONTROL_KEY);
-	public static final String ACCESS_CONTROL_VALUE = Config.getValue(Config.ACCESS_CONTROL_VALUE);
-
+	public static final String ACCESS_CONTROL_ORIGIN_KEY = "Access-Control-Allow-Origin";
+	public static final String ACCESS_CONTROL_ORIGIN_VALUE = "*";
+	public static final String ACCESS_CONTROL_ALLOW_KEY = "Access-Control-Allow-Methods";
+	public static final String ACCESS_CONTROL_ALLOW_POST = "POST";
+	public static final String ACCESS_CONTROL_ALLOW_GET = "GET";
+	public static final String ACCESS_CONTROL_ALLOW_OPTIONS = "OPTIONS";
+	
 	// Interaction types
-	public static final String RATING = Config.getValue(Config.INTERACTION_TYPE_RATING);
-	public static final String RESULT = Config.getValue(Config.INTERACTION_TYPE_RESULT);
-	public static final String RESULT_CLOSE = Config.getValue(Config.INTERACTION_TYPE_RESULT_CLOSE);
-	public static final String RESULT_VIEW = Config.getValue(Config.INTERACTION_TYPE_RESULT_VIEW);
-	public static final String SHOW_HIDE = Config.getValue(Config.INTERACTION_TYPE_SHOW_HIDE);
-	public static final String FACET_SCAPE = Config.getValue(Config.INTERACTION_TYPE_FACET_SCAPE);
-	public static final String QUERY_ACTIVATED = Config.getValue(Config.INTERACTION_TYPE_QUERY_ACTIVATED);
+	public static final String RATING = "rating";
+	public static final String RESULT = "result";
+	public static final String RESULT_CLOSE = "rclose";
+	public static final String RESULT_VIEW = "rview";
+	public static final String SHOW_HIDE = "show_hide";
+	public static final String FACET_SCAPE = "facetScape";
+	public static final String QUERY_ACTIVATED = "query_activated";
+	
+	// Dictionary and Co-occurence graph
+	public static final String TAG_TERM = "term";
+	public static final String TAG_FREQUENCIES = "frequencies";
+	public static final String TAG_FREQUENCY = "frequency";
 
 	// Federated recommender
 	public static final String RECOMMENDER_LABEL = Config.getValue(Config.RECOMMENDER_LABEL);
@@ -68,6 +81,7 @@ public class Cst {
 
 	// Services
 	public static final String SERVICE_RECOMMEND = RECOMMENDER_API_URL + PATH_RECOMMEND;
+	public static final String SERVICE_GET_DETAILS = RECOMMENDER_API_URL + PATH_GET_DETAILS;
 	public static final String SERVICE_GET_REGISTERED_PARTNERS = RECOMMENDER_API_URL + PATH_GET_REGISTERED_PARTNERS;
 	public static final String SERVICE_DISAMBIGUATION = DISAMBIGUATER_API_URL + PATH_CATEGORY_SUGGESTION;
 
@@ -79,5 +93,7 @@ public class Cst {
 	
 	// Log processor
 	public static final ProxyLogProcessor LOG_PROCESSOR = new ProxyLogProcessor();
+	
+	// JSON 
 	
 }

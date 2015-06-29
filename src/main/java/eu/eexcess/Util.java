@@ -3,7 +3,7 @@ package eu.eexcess;
 /**
  * This class contains a few useful methods. 
  * @author Thomas
- *
+ * TODO Javadoc
  */
 public class Util {
 	
@@ -28,7 +28,7 @@ public class Util {
 	}
 	
 	/**
-	 * @param obj An object
+	 * @param o An object
 	 * @return A string representing the object framed by curly brackets: {o}
 	 */
 	static public String cBrackets(Object o){

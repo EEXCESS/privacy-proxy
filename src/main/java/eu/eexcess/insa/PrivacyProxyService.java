@@ -21,9 +21,11 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-import eu.eexcess.Config;
 import eu.eexcess.Cst;
-import eu.eexcess.Util;
+//import eu.eexcess.Util;
+import eu.eexcess.insa.peas.CoOccurrenceGraph;
+import eu.eexcess.insa.peas.Dictionary;
+import eu.eexcess.insa.peas.QueryEngine;
 
 /**
  * 
@@ -59,12 +61,12 @@ public class PrivacyProxyService {
 		
 		QueryEngine engine = new QueryEngine();
 		query = engine.alterQuery(origin, query);
-		if (engine.isDisjunctiveQuery(query)){
-			resp = engine.processDisjunctiveQuery(origin, req, query);
+		if (engine.isObfuscatedQuery(query)){
+			resp = engine.processObfuscatedQuery(origin, req, query);
 		} else {
 			resp = engine.processQuery(origin, req, query);
 		}
-		servletResp.setHeader(Config.getValue(Cst.ACCESS_CONTROL_KEY), Config.getValue(Cst.ACCESS_CONTROL_VALUE));
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
 		return resp;
 	}
 
@@ -82,9 +84,48 @@ public class PrivacyProxyService {
 	public Response getRecommendations(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ALLOW_KEY, Cst.ACCESS_CONTROL_ALLOW_POST);
+		return Response.ok().build();
+	}
+	
+	@POST
+	@Path(Cst.PATH_GET_DETAILS)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getDetails(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+			@Context HttpServletRequest req,
+			@Context HttpServletResponse servletResp, 
+			String detailsStr) {
 
+		JSONObject detailsQuery = new JSONObject(detailsStr);
+		
+		if (origin == null) { origin = Cst.EMPTY_ORIGIN; }
+		
+		QueryEngine engine = new QueryEngine();
+		Response resp = engine.processDetailsQuery(origin, req, detailsQuery);
+		
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		return resp;
+	}
+	
+	/**
+	 * TODO
+	 * @param origin
+	 * @param req
+	 * @param servletResp
+	 * @return
+	 */
+	@OPTIONS
+	@Path(Cst.PATH_GET_DETAILS)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getDetails(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+			@Context HttpServletRequest req,
+			@Context HttpServletResponse servletResp) {
 		Response resp = Response.ok().build();
-		servletResp.setHeader(Config.getValue(Cst.ACCESS_CONTROL_KEY), Config.getValue(Cst.ACCESS_CONTROL_VALUE));
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ALLOW_KEY, Cst.ACCESS_CONTROL_ALLOW_POST);
 		return resp;
 	}
 
@@ -107,29 +148,51 @@ public class PrivacyProxyService {
 			String input) {
 
 		Response resp = Response.ok().build();
-		String ip = req.getRemoteAddr();
+		/*
+//		String ip = req.getRemoteAddr();
 
 		if (interactionType.equals(Cst.RATING) || 
 				interactionType.equals(Cst.RESULT_CLOSE) || 
 				interactionType.equals(Cst.RESULT_VIEW) ||
 				interactionType.equals(Cst.SHOW_HIDE) ||
 				interactionType.equals(Cst.QUERY_ACTIVATED)){
-			Cst.LOG_PROCESSOR.process(interactionType, origin, ip, input);
+			//Cst.LOG_PROCESSOR.process(interactionType, origin, ip, input);
 		} else if (interactionType.equals(Cst.FACET_SCAPE)) {
-			String msg = Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
-					+ Util.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
-					+ input;
-			Cst.LOGGER_FACET_SCAPE.trace(msg);
+//			String msg = Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
+//					+ Util.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
+//					+ input;
+//			Cst.LOGGER_FACET_SCAPE.trace(msg);
 		} else {
-			String msg = Util.sBrackets(Cst.PATH_LOG_DIRECTORY + interactionType) + Cst.SPACE
-					+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
-					+ Cst.PATH_LOG_DIRECTORY + interactionType + Cst.SPACE + Cst.ERR_MSG_NOT_REST_API;
-			Cst.LOGGER_PRIVACY_PROXY.error(msg);
+//			String msg = Util.sBrackets(Cst.PATH_LOG_DIRECTORY + interactionType) + Cst.SPACE
+//					+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
+//					+ Cst.PATH_LOG_DIRECTORY + interactionType + Cst.SPACE + Cst.ERR_MSG_NOT_REST_API;
+//			Cst.LOGGER_PRIVACY_PROXY.error(msg);
 			resp = Response.status(Response.Status.NOT_FOUND).build();
 		}
-
-		servletResp.setHeader(Config.getValue(Cst.ACCESS_CONTROL_KEY), Config.getValue(Cst.ACCESS_CONTROL_VALUE));
+		*/
+		
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
 		return resp;
+	}
+	
+	/**
+	 * TODO
+	 * @param interactionType
+	 * @param origin
+	 * @param req
+	 * @param servletResp
+	 * @return
+	 */
+	@OPTIONS
+	@Path(Cst.PATH_LOG)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response log(@PathParam("InteractionType") String interactionType,
+			@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+			@Context HttpServletRequest req,
+			@Context HttpServletResponse servletResp) {
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ALLOW_KEY, Cst.ACCESS_CONTROL_ALLOW_POST);
+		return Response.ok().build();
 	}
 
 	/**
@@ -156,16 +219,30 @@ public class PrivacyProxyService {
 		if (response.getStatus() == Response.Status.CREATED.getStatusCode() || response.getStatus() == Response.Status.OK.getStatusCode()) {
 			resp = Response.ok().entity(output).build();
 		} else {
-			String msg = Util.sBrackets(Cst.PATH_DISAMBIGUATE) + Cst.SPACE
-					+ Util.sBracketsColon(Cst.TAG_HTTP_ERR_CODE, response.getStatus()) + Cst.SPACE 
-					+ output;
-			Cst.LOGGER_PRIVACY_PROXY.error(msg);
+//			String msg = Util.sBrackets(Cst.PATH_DISAMBIGUATE) + Cst.SPACE
+//					+ Util.sBracketsColon(Cst.TAG_HTTP_ERR_CODE, response.getStatus()) + Cst.SPACE 
+//					+ output;
+//			Cst.LOGGER_PRIVACY_PROXY.error(msg);
 			resp = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
-		servletResp.setHeader(Config.getValue(Cst.ACCESS_CONTROL_KEY), Config.getValue(Cst.ACCESS_CONTROL_VALUE));
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
 		return resp;
 	}
 
+	/**
+	 * TODO
+	 * @param servletResp
+	 * @return
+	 */
+	@OPTIONS
+	@Path(Cst.PATH_DISAMBIGUATE)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response logDisambiguate(@Context HttpServletResponse servletResp) {
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ALLOW_KEY, Cst.ACCESS_CONTROL_ALLOW_POST);
+		return Response.ok().build();
+	}
 	
 	/**
 	 * TODO
@@ -188,8 +265,91 @@ public class PrivacyProxyService {
 			response = Response.status(status).build();
 		}
 
-		servletResp.setHeader(Config.getValue(Cst.ACCESS_CONTROL_KEY), Config.getValue(Cst.ACCESS_CONTROL_VALUE));
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
 		return response;
 	}
-
+	
+	@GET
+	@Path(Cst.PATH_GET_CLIQUES)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getCliques(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+			@Context HttpServletRequest req,
+			@Context HttpServletResponse servletResp) {
+		
+		Response resp = null;
+		
+		String clique1 = "["
+				+ "{"
+					+ "\"term\":\"a\","
+					+ "\"frequencies\":["
+						+ "{"
+							+ "\"term\":\"b\", "
+							+ "\"frequency\":1"
+						+ "}"
+					+ "]"
+				+ "}"
+			+ "]";
+		String clique2 = "["
+				+ "{"
+					+ "\"term\":\"c\","
+					+ "\"frequencies\":["
+						+ "{"
+							+ "\"term\":\"d\", "
+							+ "\"frequency\":2"
+						+ "},"
+						+ "{"
+							+ "\"term\":\"e\", "
+							+ "\"frequency\":3"
+						+ "}"
+					+ "]"
+				+ "},"
+				+ "{"
+					+ "\"term\":\"d\","
+					+ "\"frequencies\":["
+						+ "{"
+							+ "\"term\":\"e\", "
+							+ "\"frequency\":4"
+						+ "}"
+					+ "]"
+				+ "}"
+			+ "]";
+		String cliques = "[" + clique1 + ", " + clique2 + "]";
+		resp = Response.ok().entity(cliques).build();
+		
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		return resp;
+	}
+	
+	@GET
+	@Path(Cst.PATH_GET_CO_OCCURRENCE_GRAPH)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getCoOccurrenceGraph(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+			@Context HttpServletRequest req,
+			@Context HttpServletResponse servletResp) {
+		
+		CoOccurrenceGraph graph = new CoOccurrenceGraph();
+		String output = graph.toJsonString();
+		
+		Response resp = Response.ok().entity(output).build();
+		
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		return resp;
+	}
+	
+	@GET
+	@Path(Cst.PATH_GET_DICTIONARY)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getDictionary(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+			@Context HttpServletRequest req,
+			@Context HttpServletResponse servletResp) {
+		
+		Dictionary dictionary = new Dictionary();
+		String output = dictionary.toJsonString();
+		
+		Response resp = Response.ok().entity(output).build();
+		
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		return resp;
+	}
+	
 }

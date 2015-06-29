@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$#" -ne 0 ]; then 
+if [ "$#" -eq 1 ]; then 
 	if [ $1 = "local-eclipse" ]; then # local through Eclipse
 		ServiceURL="http://localhost:8080/eexcess-privacy-proxy/" 
 	else 
@@ -17,5 +17,5 @@ if [ "$#" -ne 0 ]; then
 	ServiceURL=`echo $ServiceURL"api/v1/getRegisteredPartners"`
 	curl -X GET $ServiceURL
 else 
-	echo "Usage getRegisteredPartners [local-eclipse | local | remote-dev | <http://your-server/api/]"
+	echo "Usage 'getRegisteredPartners local-eclipse|local|remote-dev|<http://your-server/api/'"
 fi
