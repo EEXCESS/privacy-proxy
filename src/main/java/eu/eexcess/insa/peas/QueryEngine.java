@@ -16,21 +16,20 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 import eu.eexcess.Cst;
+import eu.eexcess.insa.QueryFormats;
 
 /**
- * Two formats of queries are handled in this component: 
- * <ul>
- * 	<li>QF1: allows to represent queries of the form q = (t1 t2). This format is the only one handled by the federated recommender.</li>
- * 	<li>QF2: allows to represent composed queries of the form q = [(t1 t2), (t3 t4), (t5 t6)]. </li> 
- * </ul>
- * Two formats of results are handled in this component: 
+ * Three formats of queries are handled in this component (see {@link eu.eexcess.insa.QueryFormats}): QF1, QF2 and QF3.  
+ * Three formats of results are handled in this component: 
  * <ul>
  * 	<li>RF1: represents a result of the form r = [r1, r2, r3]. This format is the one returned by the federated recommender.</li>
  *  <li>RF2: represents a result of the form r = [[r1, r2, r3], [r4, r5, r6], [r7, r8, r9]]. </li>
+ *  <li>RF3: represents a result of the form r = [R1, R2, R3]. Each R is the detailed information of a resoruce. </li>
  * </ul>
- * Queries of format QF1 executed with {@code processQuery} (respectively QF2 executed with {@code processObfuscatedQuery}) will return a result of format RF1 (respectively RF2). 
+ * Queries of format QF1, QF2 and QF3 respectively return a result of format RF1, RF2 and RF3. 
  * @author Thomas Cerqueus
  * @version 2.0
+ * @see eu.eexcess.insa.QueryFormats
  */
 public class QueryEngine {
 
@@ -75,48 +74,51 @@ public class QueryEngine {
 	}
 
 	/**
-	 * Process a query of format QF1. The query is sent to the federated recommender. 
+	 * Processes a query of format QF1, QF2 or QF3.  
 	 * @param origin Origin of the query. 
 	 * @param req HTTP request. 
-	 * @param query Query of format QF1. 
-	 * @return Result containing a set of recommendations. The format is RF1. 
+	 * @param query Any type of query: QF1, QF2, or details query. 
+	 * @param type Type of the query to be processed
+	 * @return Result of format RF1, RF2 or RF3 (depending on the format of the query). 
 	 */
-	public Response processQuery(String origin, HttpServletRequest req, JSONObject query){ 
-		Response resp;
-		Client client = Client.create();
-		WebResource webResource = client.resource(Cst.SERVICE_RECOMMEND);
-		ClientResponse response = webResource
-				.accept(MediaType.APPLICATION_JSON)
-				.type(MediaType.APPLICATION_JSON)
-				.post(ClientResponse.class, query.toString());
-		String output = response.getEntity(String.class);
-		Integer status = response.getStatus();
+	public Response processQuery(String origin, HttpServletRequest req, JSONObject query, QueryFormats type){
+		Response resp = Response.status(Status.BAD_REQUEST).build();
+		if (type.equals(QueryFormats.QF2)){
+			resp = processObfuscatedQuery(origin, req, query);
+		} else if (type.equals(QueryFormats.QF1) || type.equals(QueryFormats.QF3)){
+			String serviceUrl = Cst.SERVICE_RECOMMEND;
+			if (type.equals(QueryFormats.QF3)){
+				serviceUrl = Cst.SERVICE_GET_DETAILS;
+			} 
+			Client client = Client.create();
+			WebResource webResource = client.resource(serviceUrl);
+			ClientResponse response = webResource
+					.accept(MediaType.APPLICATION_JSON)
+					.type(MediaType.APPLICATION_JSON)
+					.post(ClientResponse.class, query.toString());
+			String output = response.getEntity(String.class);
+			Integer status = response.getStatus();
 
-//		String msg = Util.sBrackets(Cst.PATH_RECOMMEND) + Cst.SPACE
-//				+ Util.sBracketsColon(Cst.TAG_HTTP_ERR_CODE, response.getStatus()) + Cst.SPACE
-//				+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE + output;
-		if (status.equals(Response.Status.OK.getStatusCode())){
-//			Cst.LOGGER_PRIVACY_PROXY.error(msg);
-			resp = Response.ok().entity(output).build();
-		} else if (status.equals(Response.Status.CREATED.getStatusCode())){
-//			Cst.LOG_PROCESSOR.process(Cst.RESULT, origin, req.getRemoteAddr(), query.toString(), output);
-			resp = Response.status(response.getStatus()).entity(output).build();
-		} else {
-//			Cst.LOGGER_PRIVACY_PROXY.error(msg);
-			resp = Response.status(response.getStatus()).build();
+			if (status.equals(Response.Status.OK.getStatusCode())){
+				resp = Response.ok().entity(output).build();
+			} else if (status.equals(Response.Status.CREATED.getStatusCode())){
+				resp = Response.status(response.getStatus()).entity(output).build();
+			} else {
+				resp = Response.status(response.getStatus()).build();
+			}
 		}
 		return resp;
 	}
 
 	/**
-	 * Process a query of format QF2. The query is split into multiple queries (of format QF1) that are sent to the federated recommender. 
+	 * Processes a query of format QF2. The query is split into multiple queries (of format QF1) that are sent to the federated recommender. 
 	 * @param origin Origin of the query. 
 	 * @param req HTTP request. 
 	 * @param query Obfuscated query (i.e., query of format QF2). 
-	 * @return Result containing an list of set of recommendations. The format is RF2. 
+	 * @return Result containing a list of set of recommendations. The format is RF2. 
 	 */
-	public Response processObfuscatedQuery(String origin, HttpServletRequest req, JSONObject query){
-		Response resp = null;
+	private Response processObfuscatedQuery(String origin, HttpServletRequest req, JSONObject query){
+		Response resp = Response.status(Response.Status.BAD_REQUEST).build();
 		if (query.has(Cst.TAG_CONTEXT_KEYWORDS)){
 			JSONArray queryArray = query.getJSONArray(Cst.TAG_CONTEXT_KEYWORDS);
 			Boolean oneSuccess = false; // Determines if at least one query was processed successfully
@@ -130,7 +132,7 @@ public class QueryEngine {
 					clonedQuery.put(Cst.TAG_ID, clonedQuery.get(Cst.TAG_ID) + i.toString());
 				}
 				clonedQuery.put(Cst.TAG_CONTEXT_KEYWORDS, queryArrayEntry);
-				Response respClonedQuery = processQuery(origin, req, clonedQuery);
+				Response respClonedQuery = processQuery(origin, req, clonedQuery, QueryFormats.QF1);
 				Boolean success = (respClonedQuery.getStatus() == Response.Status.OK.getStatusCode());
 				oneSuccess = oneSuccess || success;
 				JSONObject result = new JSONObject();
@@ -147,43 +149,7 @@ public class QueryEngine {
 			} else {
 				resp = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
-		} else {
-			resp = Response.status(Response.Status.BAD_REQUEST).build();
-		}
-		return resp;
-	}
-
-	/**
-	 * TODO
-	 * @param origin
-	 * @param req
-	 * @param detailsQuery
-	 * @return
-	 */
-	// XXX This method is very similar to processQuery
-	public Response processDetailsQuery(String origin, HttpServletRequest req, JSONObject detailsQuery){ 
-		Response resp = null;
-		Client client = Client.create();
-		WebResource webResource = client.resource(Cst.SERVICE_GET_DETAILS);
-		ClientResponse response = webResource
-				.accept(MediaType.APPLICATION_JSON)
-				.type(MediaType.APPLICATION_JSON)
-				.post(ClientResponse.class, detailsQuery.toString());
-		String output = response.getEntity(String.class);
-		Integer status = response.getStatus();
-//		String msg = Util.sBrackets(Cst.PATH_GET_DETAILS) + Cst.SPACE
-//				+ Util.sBracketsColon(Cst.TAG_HTTP_ERR_CODE, response.getStatus()) + Cst.SPACE
-//				+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE + output;
-		if (status.equals(Response.Status.OK.getStatusCode())){
-//			Cst.LOGGER_PRIVACY_PROXY.error(msg);
-			resp = Response.ok().entity(output).build();
-		} else if (status.equals(Response.Status.CREATED.getStatusCode())){
-//			Cst.LOG_PROCESSOR.process(Cst.RESULT, origin, req.getRemoteAddr(), detailsQuery.toString(), output);
-			resp = Response.status(response.getStatus()).entity(output).build();
-		} else {
-//			Cst.LOGGER_PRIVACY_PROXY.error(msg);
-			resp = Response.status(response.getStatus()).build();
-		}
+		} 
 		return resp;
 	}
 

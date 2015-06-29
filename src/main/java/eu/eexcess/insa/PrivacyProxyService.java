@@ -62,9 +62,9 @@ public class PrivacyProxyService {
 		QueryEngine engine = new QueryEngine();
 		query = engine.alterQuery(origin, query);
 		if (engine.isObfuscatedQuery(query)){
-			resp = engine.processObfuscatedQuery(origin, req, query);
+			resp = engine.processQuery(origin, req, query, QueryFormats.QF2);
 		} else {
-			resp = engine.processQuery(origin, req, query);
+			resp = engine.processQuery(origin, req, query, QueryFormats.QF1);
 		}
 		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
 		return resp;
@@ -103,7 +103,7 @@ public class PrivacyProxyService {
 		if (origin == null) { origin = Cst.EMPTY_ORIGIN; }
 		
 		QueryEngine engine = new QueryEngine();
-		Response resp = engine.processDetailsQuery(origin, req, detailsQuery);
+		Response resp = engine.processQuery(origin, req, detailsQuery, QueryFormats.QF3);
 		
 		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
 		return resp;
