@@ -4,12 +4,17 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.eexcess.Cst;
-import eu.eexcess.Util;
+import eu.eexcess.JsonUtil;
 
+/**
+ * TODO
+ * @author Thomas Cerqueus
+ *
+ */
 public class ProxyLogProcessor {
 
 	/**
-	 * 
+	 * TODO
 	 * @param interactionType
 	 * @param origin
 	 * @param ip
@@ -20,7 +25,7 @@ public class ProxyLogProcessor {
 	}
 
 	/**
-	 * 
+	 * TODO
 	 * @param interactionType
 	 * @param origin
 	 * @param ip
@@ -58,17 +63,17 @@ public class ProxyLogProcessor {
 				}
 			}
 
-			msg = Util.sBrackets(interactionType) + Cst.SPACE
-					+ Util.sBracketsColon(Cst.TAG_USER_ID, userID) + Cst.SPACE
-					+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
-					+ Util.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
+			msg = JsonUtil.sBrackets(interactionType) + Cst.SPACE
+					+ JsonUtil.sBrackets(JsonUtil.keyColonValue(Cst.TAG_USER_ID, userID)) + Cst.SPACE
+					+ JsonUtil.sBrackets(JsonUtil.keyColonValue(Cst.TAG_ORIGIN, origin)) + Cst.SPACE
+					+ JsonUtil.sBrackets(JsonUtil.keyColonValue(Cst.TAG_IP, ip)) + Cst.SPACE
 					+ jsonOutput.toString();
 			Cst.LOGGER_INTERACTION.trace(msg);
 		} else {
-			msg = Util.sBrackets(interactionType) + Cst.SPACE
-					+ Util.sBracketsColon(Cst.TAG_USER_ID, userID) + Cst.SPACE
-					+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
-					+ Util.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
+			msg = JsonUtil.sBrackets(interactionType) + Cst.SPACE
+					+ JsonUtil.sBrackets(JsonUtil.keyColonValue(Cst.TAG_USER_ID, userID)) + Cst.SPACE
+					+ JsonUtil.sBrackets(JsonUtil.keyColonValue(Cst.TAG_ORIGIN, origin)) + Cst.SPACE
+					+ JsonUtil.sBrackets(JsonUtil.keyColonValue(Cst.TAG_IP, ip)) + Cst.SPACE
 					+ request;
 			Cst.LOGGER_INTERACTION.trace(msg);
 		}

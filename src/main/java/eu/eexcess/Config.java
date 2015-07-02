@@ -12,7 +12,7 @@ import java.util.Properties;
 public class Config {
 	
 	public static final String LOG_DIRECTORY = "proxy.service.log.directory";
-
+	
 	public static final String RECOMMENDER_URL = "recommender.url";
 	public static final String RECOMMENDER_PATH = "recommender.path";
 	public static final String RECOMMENDER_LABEL = "recommender.label";
@@ -26,7 +26,8 @@ public class Config {
 	public static final String LOGGER_FACET_SCAPE = "logging.interaction";
 	
 	public static final String DICTIONARY_LOCATION = "dictionary.location";
-	public static final String GROUP_PROFILE_LOCATION = "groupProfile.location";
+	public static final String HISTORY_LOCATION = "history.location";
+	public static final String CLIQUES_CACHE_LOCATION = "cliques.cache.location";
 	
 	// Configuration file
 	private static final String PROP_FILE_NAME = "config.properties";
@@ -51,9 +52,9 @@ public class Config {
 	}
 
 	/**
-	 * 
-	 * @param key
-	 * @return
+	 * TODO
+	 * @param key Key of the variable. 
+	 * @return Value corresponding to the key.  
 	 */
 	public static String getValue(String key) {
 		String value = null;

@@ -1,5 +1,7 @@
 package eu.eexcess.insa;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -22,13 +24,15 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 import eu.eexcess.Cst;
+import eu.eexcess.JsonUtil;
+import eu.eexcess.insa.peas.Clique;
 //import eu.eexcess.Util;
 import eu.eexcess.insa.peas.CoOccurrenceGraph;
 import eu.eexcess.insa.peas.Dictionary;
 import eu.eexcess.insa.peas.QueryEngine;
 
 /**
- * TODO
+ * This class defines all the services offered by the Privacy Proxy. 
  * @author Thomas Cerqueus
  * @version 2.0
  */
@@ -39,7 +43,7 @@ public class PrivacyProxyService {
 	 * Service providing recommendations for a query. 
 	 * @param origin Origin of the query. 
 	 * @param req HTTP request. 
-	 * @param servletResp TODO
+	 * @param servletResp HTTP response. 
 	 * @param queryStr Query of format QF1 or QF2 (both are supported). 
 	 * @return Result containing a set of recommendations. The format is RF1 (respectively RF2) if the format of the query is QF1 (respectively QF2). 
 	 * @see QueryEngine
@@ -71,11 +75,12 @@ public class PrivacyProxyService {
 	}
 
 	/**
-	 * TODO
+	 * Default service providing recommendations for a query. 
+	 * It does not do anything else than returning the header. 
 	 * @param origin Origin of the query. 
 	 * @param req HTTP request. 
-	 * @param servletResp TODO
-	 * @return TODO
+	 * @param servletResp HTTP response. 
+	 * @return An empty response with status OK. 
 	 * @see QueryEngine
 	 */
 	@OPTIONS
@@ -90,6 +95,14 @@ public class PrivacyProxyService {
 		return Response.ok().build();
 	}
 	
+	/**
+	 * Service providing detailed information of a set of resources. 
+	 * @param origin Origin of the query. 
+	 * @param req HTTP request. 
+	 * @param servletResp HTTP response. 
+	 * @param detailsStr
+	 * @return TODO
+	 */
 	@POST
 	@Path(Cst.PATH_GET_DETAILS)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -111,11 +124,12 @@ public class PrivacyProxyService {
 	}
 	
 	/**
-	 * TODO
-	 * @param origin
-	 * @param req
-	 * @param servletResp
-	 * @return
+	 * Default service providing detailed information of a set of resources. 
+	 * It does not do anything else than returning the header. 
+	 * @param origin Origin of the query. 
+	 * @param req HTTP request. 
+	 * @param servletResp HTTP response. 
+	 * @return An empty response with status OK. 
 	 */
 	@OPTIONS
 	@Path(Cst.PATH_GET_DETAILS)
@@ -131,13 +145,14 @@ public class PrivacyProxyService {
 	}
 
 	/**
-	 * TODO
+	 * XXX Not sure this service is used. 
+	 * Service logging interactions. 
 	 * @param interactionType
-	 * @param origin
-	 * @param req
-	 * @param servletResp
-	 * @param input
-	 * @return
+	 * @param origin Origin of the query. 
+	 * @param req HTTP request. 
+	 * @param servletResp HTTP response. 
+	 * @param input XXX Not sure this parameter is used. 
+	 * @return TODO
 	 */
 	@POST
 	@Path(Cst.PATH_LOG)
@@ -177,12 +192,14 @@ public class PrivacyProxyService {
 	}
 	
 	/**
-	 * TODO
-	 * @param interactionType
-	 * @param origin
-	 * @param req
-	 * @param servletResp
-	 * @return
+	 * XXX Not sure this service is used. 
+	 * Default service logging interactions. 
+	 * It does not do anything else than returning the header. 
+	 * @param interactionType  
+	 * @param origin Origin of the query. 
+	 * @param req HTTP request. 
+	 * @param servletResp HTTP response. 
+	 * @return An empty response with status OK. 
 	 */
 	@OPTIONS
 	@Path(Cst.PATH_LOG)
@@ -197,10 +214,11 @@ public class PrivacyProxyService {
 	}
 
 	/**
-	 * TODO
-	 * @param servletResp
-	 * @param input
-	 * @return
+	 * XXX Not sure this service is used. 
+	 * Service logging disambiguation calls. 
+	 * @param servletResp HTTP response. 
+	 * @param input XXX Don't know what this parameter is supposed to contain. 
+	 * @return TODO
 	 */
 	@POST
 	@Path(Cst.PATH_DISAMBIGUATE)
@@ -231,9 +249,11 @@ public class PrivacyProxyService {
 	}
 
 	/**
-	 * TODO
-	 * @param servletResp
-	 * @return
+	 * XXX Not sure this service is used. 
+	 * Default service logging disambiguation calls. 
+	 * It does not do anything else than returning the header. 
+	 * @param servletResp HTTP response. 
+	 * @return An empty response with status OK. 
 	 */
 	@OPTIONS
 	@Path(Cst.PATH_DISAMBIGUATE)
@@ -246,9 +266,11 @@ public class PrivacyProxyService {
 	}
 	
 	/**
-	 * TODO
-	 * @param servletResp
-	 * @return
+	 * Service returning the list of registered partners. 
+	 * This service only forwards the query to the federated recommender, 
+	 * and returns the result. 
+	 * @param servletResp HTTP response. 
+	 * @return The list of partners registered on the federated recommender. 
 	 */
 	@GET
 	@Path(Cst.PATH_GET_REGISTERED_PARTNERS)
@@ -270,6 +292,42 @@ public class PrivacyProxyService {
 		return response;
 	}
 	
+	/**
+	 * Service providing access to the co-occurrence graph. 
+	 * The co-occurence graph is supposed to be up-to-date at any time (no caching).   
+	 * @param origin Origin of the query. 
+	 * @param req HTTP request. 
+	 * @param servletResp HTTP response. 
+	 * @return A co-occurrence graph. 
+	 * @see eu.eexcess.insa.peas.CoOccurrenceGraph
+	 */
+	@GET
+	@Path(Cst.PATH_GET_CO_OCCURRENCE_GRAPH)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getCoOccurrenceGraph(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+			@Context HttpServletRequest req,
+			@Context HttpServletResponse servletResp) {
+		
+		CoOccurrenceGraph graph = new CoOccurrenceGraph();
+		String output = graph.toJsonString();
+		
+		Response resp = Response.ok().entity(output).build();
+		
+		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		return resp;
+	}
+	
+	/**
+	 * Services providing the set of cliques contained in the co-occurrence graph. 
+	 * Each clique is a graph. 
+	 * As the computation of cliques is very time-consuming, a cached version is returned. 
+	 * The frequency at which the cache is updated is not fixed (yet): every day, every hour, etc.  
+	 * @param origin Origin of the query. 
+	 * @param req HTTP request. 
+	 * @param servletResp HTTP response. 
+	 * @return A set of cliques. 
+	 * @see eu.eexcess.insa.peas.Clique
+	 */
 	@GET
 	@Path(Cst.PATH_GET_CLIQUES)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -279,7 +337,7 @@ public class PrivacyProxyService {
 		
 		Response resp = null;
 		
-		String clique1 = "["
+		/*String clique1 = "["
 				+ "{"
 					+ "\"term\":\"a\","
 					+ "\"frequencies\":["
@@ -314,29 +372,33 @@ public class PrivacyProxyService {
 					+ "]"
 				+ "}"
 			+ "]";
-		String cliques = "[" + clique1 + ", " + clique2 + "]";
-		resp = Response.ok().entity(cliques).build();
-		
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
-		return resp;
-	}
-	
-	@GET
-	@Path(Cst.PATH_GET_CO_OCCURRENCE_GRAPH)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getCoOccurrenceGraph(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
-			@Context HttpServletRequest req,
-			@Context HttpServletResponse servletResp) {
-		
+		String cliques = "[" + clique1 + ", " + clique2 + "]";*/
 		CoOccurrenceGraph graph = new CoOccurrenceGraph();
-		String output = graph.toJsonString();
-		
-		Response resp = Response.ok().entity(output).build();
+		List<Clique> cliques = graph.getMaximalCliques();
+		String jsonCliques = "";
+		for (Clique clique : cliques){
+			jsonCliques += clique.toJsonString() + JsonUtil.CS;
+		}
+		if (jsonCliques.endsWith(JsonUtil.CS)){
+			jsonCliques = jsonCliques.substring(0, jsonCliques.length() - JsonUtil.CS.length());
+		}
+		jsonCliques = JsonUtil.sBrackets(jsonCliques);
+		System.out.println(jsonCliques);
+		resp = Response.ok().entity(jsonCliques).build();
 		
 		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
 		return resp;
 	}
 	
+	/**
+	 * Service providing a dictionary. 
+	 * The dictionary is expected to be static so every call will return the exact same result. 
+	 * The number of entries is not very large (~4000 entries).  
+	 * @param origin Origin of the query. 
+	 * @param req HTTP request. 
+	 * @param servletResp HTTP response. 
+	 * @return A set of words. 
+	 */
 	@GET
 	@Path(Cst.PATH_GET_DICTIONARY)
 	@Produces(MediaType.APPLICATION_JSON)
