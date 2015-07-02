@@ -74,11 +74,4 @@ public class CoOccurrenceGraph extends Graph {
 		}
 	}
 	
-	public static void main(String[] args) {
-		
-		CoOccurrenceGraph g = new CoOccurrenceGraph();
-		g.extractMaximalCliques();
-		
-	}
-	
 }

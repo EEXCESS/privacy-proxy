@@ -69,6 +69,8 @@ public class Cst {
 	public static final String TAG_TERM = "term";
 	public static final String TAG_FREQUENCIES = "frequencies";
 	public static final String TAG_FREQUENCY = "frequency";
+	public static final String TAG_DOCUMENT_BADGE = "documentBadge";
+	public static final String TAG_DETAIL = "detail";
 
 	// Federated recommender
 	public static final String RECOMMENDER_LABEL = Config.getValue(Config.RECOMMENDER_LABEL);

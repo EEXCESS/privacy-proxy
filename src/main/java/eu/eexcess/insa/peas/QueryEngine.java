@@ -170,6 +170,23 @@ public class QueryEngine {
 				.type(MediaType.APPLICATION_JSON)
 				.post(ClientResponse.class, detailsQuery.toString());
 		String output = response.getEntity(String.class);
+		
+		// The following lines ensure that the "detail" attribute is well-formed. 
+		// Ideally it should not be here. 
+		JSONObject tempResponse = new JSONObject(output);
+		if (tempResponse.has(Cst.TAG_DOCUMENT_BADGE)){
+			JSONArray tempBadges = tempResponse.getJSONArray(Cst.TAG_DOCUMENT_BADGE);
+			for (int i = 0; i < tempBadges.length(); i++){
+				JSONObject tempBadge = tempBadges.getJSONObject(i);	
+				if (tempBadge.has(Cst.TAG_DETAIL)){ 
+					String tempDetail = tempBadge.getString(Cst.TAG_DETAIL); 
+					JSONObject newDetail = new JSONObject(tempDetail); 
+					tempBadge.put(Cst.TAG_DETAIL, newDetail); 
+				}
+			}
+		}
+		output = tempResponse.toString();
+		
 		Integer status = response.getStatus();
 //		String msg = Util.sBrackets(Cst.PATH_GET_DETAILS) + Cst.SPACE
 //				+ Util.sBracketsColon(Cst.TAG_HTTP_ERR_CODE, response.getStatus()) + Cst.SPACE
