@@ -49,12 +49,15 @@ public class Cst {
 	public static final String TAG_PROVIDER_SHORT = "p";
 	
 	// Access control
-	public static final String ACCESS_CONTROL_ORIGIN_KEY = "Access-Control-Allow-Origin";
-	public static final String ACCESS_CONTROL_ORIGIN_VALUE = "*";
-	public static final String ACCESS_CONTROL_ALLOW_KEY = "Access-Control-Allow-Methods";
-	public static final String ACCESS_CONTROL_ALLOW_POST = "POST";
-	public static final String ACCESS_CONTROL_ALLOW_GET = "GET";
-	public static final String ACCESS_CONTROL_ALLOW_OPTIONS = "OPTIONS";
+	private static final String ACA = "Access-Control-Allow-";
+	public static final String ACA_ORIGIN_KEY = ACA + "Origin";
+	public static final String ACA_ORIGIN_VALUE = "*";
+	public static final String ACA_METHODS_KEY = ACA + "Methods";
+	public static final String ACA_POST = "POST";
+	public static final String ACA_GET = "GET";
+	public static final String ACA_OPTIONS = "OPTIONS";
+	public static final String ACA_HEADERS_KEY = ACA + "Headers";
+	public static final String ACA_HEADERS_VALUE = "Origin, Content-Type, Accept";
 	
 	// Interaction types
 	public static final String RATING = "rating";

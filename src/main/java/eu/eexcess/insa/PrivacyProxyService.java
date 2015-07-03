@@ -66,7 +66,8 @@ public class PrivacyProxyService {
 		} else {
 			resp = engine.processQuery(origin, req, query);
 		}
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
 
@@ -84,8 +85,9 @@ public class PrivacyProxyService {
 	public Response getRecommendations(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ALLOW_KEY, Cst.ACCESS_CONTROL_ALLOW_POST);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return Response.ok().build();
 	}
 	
@@ -105,7 +107,8 @@ public class PrivacyProxyService {
 		QueryEngine engine = new QueryEngine();
 		Response resp = engine.processDetailsQuery(origin, req, detailsQuery);
 		
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
 	
@@ -124,8 +127,9 @@ public class PrivacyProxyService {
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
 		Response resp = Response.ok().build();
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ALLOW_KEY, Cst.ACCESS_CONTROL_ALLOW_POST);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return resp;
 	}
 
@@ -171,7 +175,8 @@ public class PrivacyProxyService {
 		}
 		*/
 		
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
 	
@@ -190,8 +195,9 @@ public class PrivacyProxyService {
 			@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ALLOW_KEY, Cst.ACCESS_CONTROL_ALLOW_POST);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return Response.ok().build();
 	}
 
@@ -225,7 +231,8 @@ public class PrivacyProxyService {
 //			Cst.LOGGER_PRIVACY_PROXY.error(msg);
 			resp = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
 
@@ -239,8 +246,9 @@ public class PrivacyProxyService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response logDisambiguate(@Context HttpServletResponse servletResp) {
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ALLOW_KEY, Cst.ACCESS_CONTROL_ALLOW_POST);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return Response.ok().build();
 	}
 	
@@ -265,7 +273,8 @@ public class PrivacyProxyService {
 			response = Response.status(status).build();
 		}
 
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return response;
 	}
 	
@@ -316,7 +325,8 @@ public class PrivacyProxyService {
 		String cliques = "[" + clique1 + ", " + clique2 + "]";
 		resp = Response.ok().entity(cliques).build();
 		
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
 	
@@ -332,7 +342,8 @@ public class PrivacyProxyService {
 		
 		Response resp = Response.ok().entity(output).build();
 		
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
 	
@@ -348,7 +359,8 @@ public class PrivacyProxyService {
 		
 		Response resp = Response.ok().entity(output).build();
 		
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
 	
