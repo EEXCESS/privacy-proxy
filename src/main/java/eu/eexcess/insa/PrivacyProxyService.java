@@ -383,7 +383,6 @@ public class PrivacyProxyService {
 			jsonCliques = jsonCliques.substring(0, jsonCliques.length() - JsonUtil.CS.length());
 		}
 		jsonCliques = JsonUtil.sBrackets(jsonCliques);
-		System.out.println(jsonCliques);
 		resp = Response.ok().entity(jsonCliques).build();
 		
 		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);

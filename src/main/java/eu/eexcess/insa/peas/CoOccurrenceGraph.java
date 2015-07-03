@@ -112,7 +112,6 @@ public class CoOccurrenceGraph extends WeightedGraph {
 			listMaximalCliques = super.getMaximalCliques();
 			writeCliquesCache(f, listMaximalCliques);
 		}
-		System.out.println(listMaximalCliques.size());
 		return listMaximalCliques;
 	}
 
@@ -145,8 +144,7 @@ public class CoOccurrenceGraph extends WeightedGraph {
 			while ((currentLine = bufferReader.readLine()) != null) {
 				jsonString += currentLine;
 			}
-			JSONObject cache = new JSONObject(jsonString);
-			JSONArray cliques = cache.getJSONArray(Cst.TAG_CLIQUES);
+			JSONArray cliques = new JSONArray(jsonString);
 			for (int i = 0 ; i < cliques.length() ; i++){
 				listCliques.add(JsonToClique(cliques.getJSONArray(i)));
 			}

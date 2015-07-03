@@ -63,9 +63,9 @@ public abstract class WeightedGraph extends SimpleWeightedGraph<String, DefaultW
 		DefaultWeightedEdge edge = this.getEdge(vertex1, vertex2);
 		if (!this.containsEdge(edge)){
 			this.addEdge(vertex1, vertex2);
-		} else {
-			this.setEdgeWeight(edge, weight);
+			edge = this.getEdge(vertex1, vertex2);
 		} 
+		this.setEdgeWeight(edge, weight); 
 	}
 	
 	/**
@@ -141,6 +141,9 @@ public abstract class WeightedGraph extends SimpleWeightedGraph<String, DefaultW
             		double weight = 0;
             		if (edge != null){
             			weight = this.getEdgeWeight(edge);
+            		}
+            		if (weight != 1){
+            			System.out.println(vertex1 + " -- " + vertex2 + ": " + weight);
             		}
             		clique.addEdge(vertex1, vertex2, weight);
             	}
