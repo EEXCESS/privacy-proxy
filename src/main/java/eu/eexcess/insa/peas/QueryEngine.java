@@ -149,7 +149,60 @@ public class QueryEngine {
 			} else {
 				resp = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
-		} 
+		} else {
+			resp = Response.status(Response.Status.BAD_REQUEST).build();
+		}
+		return resp;
+	}
+
+	/**
+	 * TODO
+	 * @param origin
+	 * @param req
+	 * @param detailsQuery
+	 * @return
+	 */
+	// XXX This method is very similar to processQuery
+	public Response processDetailsQuery(String origin, HttpServletRequest req, JSONObject detailsQuery){ 
+		Response resp = null;
+		Client client = Client.create();
+		WebResource webResource = client.resource(Cst.SERVICE_GET_DETAILS);
+		ClientResponse response = webResource
+				.accept(MediaType.APPLICATION_JSON)
+				.type(MediaType.APPLICATION_JSON)
+				.post(ClientResponse.class, detailsQuery.toString());
+		String output = response.getEntity(String.class);
+		
+		// The following lines ensure that the "detail" attribute is well-formed. 
+		// Ideally it should not be here. 
+		JSONObject tempResponse = new JSONObject(output);
+		if (tempResponse.has(Cst.TAG_DOCUMENT_BADGE)){
+			JSONArray tempBadges = tempResponse.getJSONArray(Cst.TAG_DOCUMENT_BADGE);
+			for (int i = 0; i < tempBadges.length(); i++){
+				JSONObject tempBadge = tempBadges.getJSONObject(i);	
+				if (tempBadge.has(Cst.TAG_DETAIL)){ 
+					String tempDetail = tempBadge.getString(Cst.TAG_DETAIL); 
+					JSONObject newDetail = new JSONObject(tempDetail); 
+					tempBadge.put(Cst.TAG_DETAIL, newDetail); 
+				}
+			}
+		}
+		output = tempResponse.toString();
+		
+		Integer status = response.getStatus();
+//		String msg = Util.sBrackets(Cst.PATH_GET_DETAILS) + Cst.SPACE
+//				+ Util.sBracketsColon(Cst.TAG_HTTP_ERR_CODE, response.getStatus()) + Cst.SPACE
+//				+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE + output;
+		if (status.equals(Response.Status.OK.getStatusCode())){
+//			Cst.LOGGER_PRIVACY_PROXY.error(msg);
+			resp = Response.ok().entity(output).build();
+		} else if (status.equals(Response.Status.CREATED.getStatusCode())){
+//			Cst.LOG_PROCESSOR.process(Cst.RESULT, origin, req.getRemoteAddr(), detailsQuery.toString(), output);
+			resp = Response.status(response.getStatus()).entity(output).build();
+		} else {
+//			Cst.LOGGER_PRIVACY_PROXY.error(msg);
+			resp = Response.status(response.getStatus()).build();
+		}
 		return resp;
 	}
 

@@ -70,7 +70,8 @@ public class PrivacyProxyService {
 		} else {
 			resp = engine.processQuery(origin, req, query, QueryFormats.QF1);
 		}
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
 
@@ -90,8 +91,9 @@ public class PrivacyProxyService {
 	public Response getRecommendations(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ALLOW_KEY, Cst.ACCESS_CONTROL_ALLOW_POST);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return Response.ok().build();
 	}
 	
@@ -119,7 +121,8 @@ public class PrivacyProxyService {
 		QueryEngine engine = new QueryEngine();
 		Response resp = engine.processQuery(origin, req, detailsQuery, QueryFormats.QF3);
 		
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
 	
@@ -139,8 +142,9 @@ public class PrivacyProxyService {
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
 		Response resp = Response.ok().build();
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ALLOW_KEY, Cst.ACCESS_CONTROL_ALLOW_POST);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return resp;
 	}
 
@@ -187,7 +191,8 @@ public class PrivacyProxyService {
 		}
 		*/
 		
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
 	
@@ -208,8 +213,9 @@ public class PrivacyProxyService {
 			@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ALLOW_KEY, Cst.ACCESS_CONTROL_ALLOW_POST);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return Response.ok().build();
 	}
 
@@ -244,7 +250,8 @@ public class PrivacyProxyService {
 //			Cst.LOGGER_PRIVACY_PROXY.error(msg);
 			resp = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
 
@@ -260,8 +267,9 @@ public class PrivacyProxyService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response logDisambiguate(@Context HttpServletResponse servletResp) {
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ALLOW_KEY, Cst.ACCESS_CONTROL_ALLOW_POST);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return Response.ok().build();
 	}
 	
@@ -288,7 +296,8 @@ public class PrivacyProxyService {
 			response = Response.status(status).build();
 		}
 
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return response;
 	}
 	
@@ -313,7 +322,7 @@ public class PrivacyProxyService {
 		
 		Response resp = Response.ok().entity(output).build();
 		
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		return resp;
 	}
 	
@@ -373,6 +382,22 @@ public class PrivacyProxyService {
 				+ "}"
 			+ "]";
 		String cliques = "[" + clique1 + ", " + clique2 + "]";*/
+
+		resp = Response.ok().build();
+		
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		return resp;
+	}
+	
+/*	@GET
+	@Path(Cst.PATH_GET_CO_OCCURRENCE_GRAPH)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getCoOccurrenceGraph(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+			@Context HttpServletRequest req,
+			@Context HttpServletResponse servletResp) {
+		
+>>>>>>> master
 		CoOccurrenceGraph graph = new CoOccurrenceGraph();
 		List<Clique> cliques = graph.getMaximalCliques();
 		String jsonCliques = "";
@@ -385,9 +410,10 @@ public class PrivacyProxyService {
 		jsonCliques = JsonUtil.sBrackets(jsonCliques);
 		resp = Response.ok().entity(jsonCliques).build();
 		
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
-	}
+	}*/
 	
 	/**
 	 * Service providing a dictionary. 
@@ -410,7 +436,8 @@ public class PrivacyProxyService {
 		
 		Response resp = Response.ok().entity(output).build();
 		
-		servletResp.setHeader(Cst.ACCESS_CONTROL_ORIGIN_KEY, Cst.ACCESS_CONTROL_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
 	
