@@ -346,58 +346,6 @@ public class PrivacyProxyService {
 		
 		Response resp = null;
 		
-		/*String clique1 = "["
-				+ "{"
-					+ "\"term\":\"a\","
-					+ "\"frequencies\":["
-						+ "{"
-							+ "\"term\":\"b\", "
-							+ "\"frequency\":1"
-						+ "}"
-					+ "]"
-				+ "}"
-			+ "]";
-		String clique2 = "["
-				+ "{"
-					+ "\"term\":\"c\","
-					+ "\"frequencies\":["
-						+ "{"
-							+ "\"term\":\"d\", "
-							+ "\"frequency\":2"
-						+ "},"
-						+ "{"
-							+ "\"term\":\"e\", "
-							+ "\"frequency\":3"
-						+ "}"
-					+ "]"
-				+ "},"
-				+ "{"
-					+ "\"term\":\"d\","
-					+ "\"frequencies\":["
-						+ "{"
-							+ "\"term\":\"e\", "
-							+ "\"frequency\":4"
-						+ "}"
-					+ "]"
-				+ "}"
-			+ "]";
-		String cliques = "[" + clique1 + ", " + clique2 + "]";*/
-
-		resp = Response.ok().build();
-		
-		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
-		return resp;
-	}
-	
-/*	@GET
-	@Path(Cst.PATH_GET_CO_OCCURRENCE_GRAPH)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getCoOccurrenceGraph(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
-			@Context HttpServletRequest req,
-			@Context HttpServletResponse servletResp) {
-		
->>>>>>> master
 		CoOccurrenceGraph graph = new CoOccurrenceGraph();
 		List<Clique> cliques = graph.getMaximalCliques();
 		String jsonCliques = "";
@@ -413,7 +361,7 @@ public class PrivacyProxyService {
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
-	}*/
+	}
 	
 	/**
 	 * Service providing a dictionary. 
