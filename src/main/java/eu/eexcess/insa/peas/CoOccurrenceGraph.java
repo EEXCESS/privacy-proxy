@@ -1,174 +1,181 @@
 package eu.eexcess.insa.peas;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
+import org.jgrapht.alg.BronKerboschCliqueFinder;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import eu.eexcess.Config;
 import eu.eexcess.Cst;
 import eu.eexcess.JsonUtil;
 
 /**
- * A co-occurrence graph is a weighted graph. 
- * Vertices are words, and edges represent the usage frequency between two words. 
- * This implementation is somehow limited to the format used in the AOL dataset. 
- * Each line of the file looks like: {@code 6205206	443567	breathing wheezing	0}. 
- * The fields correspond to the query ID, the user ID, a list of keywords, and a tag (not relevant here).  
+ * A weighted graph is a set of vertices linked with weighted edges. 
+ * Basic methods are added to the extended class. 
  * @author Thomas Cerqueus
  *
  */
-public class CoOccurrenceGraph extends WeightedGraph {
+public abstract class CoOccurrenceGraph extends SimpleWeightedGraph<String, DefaultWeightedEdge> {
 
 	private static final long serialVersionUID = 1L;
-	private static final String COLUMN_SEPARATOR = "\t";
-	private static final String KEYWORDS_SEPARATOR = " ";
-	private static final String MATCHING_CRITERION = "^\\w{3,}$"; // Words with at least 3 characters
 
 	/**
 	 * Default constructor. 
-	 * It creates the group profile from the history file defined in the configuration file.  
 	 */
 	public CoOccurrenceGraph(){
-		super();
-		String path = Config.getValue(Config.HISTORY_LOCATION);
-		init(path);
+		super(DefaultWeightedEdge.class);
 	}
-
+	
 	/**
-	 * Constructor. Creates the group profile from {@code path}. 
-	 * @param path Location of the history file.  
+	 * TODO
+	 * @param jsonGraph
 	 */
-	public CoOccurrenceGraph(String path){
-		super();
-		init(path);
+	public CoOccurrenceGraph(JSONArray jsonGraph) {
+		super(DefaultWeightedEdge.class);
+		instanciateFromJson(jsonGraph);
 	}
-
-	private void init(String path){
-		if (!path.startsWith(File.separator)){
-			path = File.separator + path;
-		}
-		try {
-			InputStream in = getClass().getResourceAsStream(path); 
-			BufferedReader bufferReader = new BufferedReader(new InputStreamReader(in));
-			String currentLine;
-			while ((currentLine = bufferReader.readLine()) != null) {
-				// That's where the class gets AOL-like specific: 
-				String[] arrayLine = currentLine.split(COLUMN_SEPARATOR);
-				String query = arrayLine[2];
-				String[] keywords = query.split(KEYWORDS_SEPARATOR);
-				List<String> filteredKeywords = new ArrayList<String>();
-				// Filtering the keywords
-				for (int i = 0 ; i < keywords.length ; i++){
-					if (keywords[i].matches(MATCHING_CRITERION)){ 
-						filteredKeywords.add(keywords[i].toLowerCase());
-					}
-				}
-				if (filteredKeywords.size() > 1){
-					// Add the keywords to the graph
-					for (int i = 0 ; i < filteredKeywords.size() ; i++){
-						for (int j = (i+1) ; j < filteredKeywords.size() ; j++){
-							String w1 = filteredKeywords.get(i);
-							String w2 = filteredKeywords.get(j);
-							if (!w1.equals(w2)){
-								this.incrementWeight(w1, w2);
-							}
-						}
-					}
-				}
-			}
-			bufferReader.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
+	
 	/**
-	 * Uses a cache to save computation time and resources. 
-	 * @return A list of maximal cliques. 
+	 * 
+	 * @param jsonGraph
 	 */
-	public List<Clique> getMaximalCliques(){
-		List<Clique> listMaximalCliques = new ArrayList<Clique>();
-		String cacheLocation = Config.getValue(Config.CLIQUES_CACHE_LOCATION);
-		File f = new File(cacheLocation);
-		Boolean inCache = f.exists();
-		if (inCache){
-			// If the cliques are cached, we just have to load the content of the cache
-			listMaximalCliques = readCliquesCache(f);
-		} else {
-			// If the cliques are not cached, we have to do the computation and cache the result
-			listMaximalCliques = super.getMaximalCliques();
-			writeCliquesCache(f, listMaximalCliques);
-		}
-		return listMaximalCliques;
-	}
-
-	private void writeCliquesCache(File f, List<Clique> listMaximalCliques) {
-		String jsonCliques = "";
-		for (Clique clique : listMaximalCliques){
-			jsonCliques += clique.toJsonString() + JsonUtil.CS;
-		}
-		if (jsonCliques.endsWith(JsonUtil.CS)){
-			jsonCliques = jsonCliques.substring(0, jsonCliques.length() - JsonUtil.CS.length());
-		}
-		jsonCliques = JsonUtil.sBrackets(jsonCliques);
-		try {
-			f.createNewFile();
-			FileWriter fw = new FileWriter(f.getAbsoluteFile());
-			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(jsonCliques);
-			bw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private List<Clique> readCliquesCache(File f) {
-		List<Clique> listCliques = new ArrayList<Clique>();
-		try {
-			BufferedReader bufferReader = new BufferedReader(new FileReader(f));
-			String jsonString = ""; 
-			String currentLine;
-			while ((currentLine = bufferReader.readLine()) != null) {
-				jsonString += currentLine;
-			}
-			JSONArray cliques = new JSONArray(jsonString);
-			for (int i = 0 ; i < cliques.length() ; i++){
-				listCliques.add(JsonToClique(cliques.getJSONArray(i)));
-			}
-			bufferReader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return listCliques;
-	}
-
-	private Clique JsonToClique(JSONArray jsonClique) {
-		Clique clique = new Clique();
-		for (int i = 0 ; i < jsonClique.length() ; i++){
-			JSONObject entry = jsonClique.getJSONObject(i);
+	public void instanciateFromJson(JSONArray jsonGraph) {
+		for (int i = 0 ; i < jsonGraph.length() ; i++){
+			JSONObject entry = jsonGraph.getJSONObject(i);
 			String term1 = entry.getString(Cst.TAG_TERM);
 			JSONArray frequencyEntries = entry.getJSONArray(Cst.TAG_FREQUENCIES);
 			for (int j = 0 ; j < frequencyEntries.length() ; j++){
 				JSONObject frequencyEntry = frequencyEntries.getJSONObject(j);
 				String term2 =  frequencyEntry.getString(Cst.TAG_TERM);
 				Double frequency = frequencyEntry.getDouble(Cst.TAG_FREQUENCY);
-				clique.addEdge(term1, term2, frequency);
+				this.addEdge(term1, term2, frequency);
 			}
 		}
-		return clique;
 	}
-
+	
+	/**
+	 * Increments by 1 the weight between {@code vertex1} and {@code vertex2}. 
+	 * Vertices are created if they don't already exist in the graph. 
+	 * It creates an edge if it didn't existed previously. 
+	 * @param vertex1 Label of a vertex. 
+	 * @param vertex2 Label of another vertex. 
+	 */
+	public void incrementWeight(String vertex1, String vertex2){
+		
+		double weight = 0;
+		if (this.getEdge(vertex1, vertex2) != null){
+			weight = this.getEdgeWeight(this.getEdge(vertex1, vertex2));
+		}
+		addEdge(vertex1, vertex2, weight + 1);
+	}
+	
+	/**
+	 * Creates an edge between two vertices with a given weight. 
+	 * Vertices are created if they don't already exist in the graph. 
+	 * @param vertex1 A vertex. 
+	 * @param vertex2 Another vertex. 
+	 * @param weight The weight between the two vertices. 
+	 */
+	public void addEdge(String vertex1, String vertex2, double weight){
+		if (!this.containsVertex(vertex1)){
+			this.addVertex(vertex1);
+		}
+		if (!this.containsVertex(vertex2)){
+			this.addVertex(vertex2);
+		}
+		DefaultWeightedEdge edge = this.getEdge(vertex1, vertex2);
+		if (!this.containsEdge(edge)){
+			this.addEdge(vertex1, vertex2);
+			edge = this.getEdge(vertex1, vertex2);
+		} 
+		this.setEdgeWeight(edge, weight); 
+	}
+	
+	/**
+	 * Converts a weighted graph into a JSON string. 
+	 * The result look like: [
+	 * 		{"term": "t1", "frequencies": [{"term": "t2", "frequency": 2}, ..., {"term": "tN", "frequency": 2}]}, 
+	 * 		..., 
+	 * 		{"term": "tX", "frequencies": [{"term": "tY", "frequency": 5}, ..., {"term": "tZ", "frequency": 3}]}
+	 * ]
+	 * To limit the size of the string, the frequency between tX and tY is considered if and only if tX < tY. 
+	 * @return A JSON string representing the weighted graph. 
+	 */
+	public String toJsonString(){
+		String res = "";
+		for (String vertex : this.vertexSet()){
+			String term = JsonUtil.keyColonValue(JsonUtil.quote(Cst.TAG_TERM), JsonUtil.quote(vertex));
+			String arrayFrequencies = "";
+			Set<DefaultWeightedEdge> associatedEdges = this.edgesOf(vertex);
+			Boolean found = false;
+			for (DefaultWeightedEdge associatedEdge : associatedEdges){
+				String src = this.getEdgeSource(associatedEdge);
+				String trg = this.getEdgeTarget(associatedEdge);
+				if (trg.equals(vertex)){
+					trg = src;
+					src = vertex;
+				}
+				if (src.compareTo(trg) < 0){
+					arrayFrequencies += JsonUtil.cBrackets(JsonUtil.keyColonValue(JsonUtil.quote(Cst.TAG_TERM), JsonUtil.quote(trg)) + JsonUtil.CS + 
+							JsonUtil.keyColonValue(JsonUtil.quote(Cst.TAG_FREQUENCY), this.getEdgeWeight(associatedEdge))) + JsonUtil.CS;
+					found = true;
+				}
+			}
+			if (found){
+				if (arrayFrequencies.endsWith(JsonUtil.CS)){
+					// To remove the last comma introduced in the loop
+					arrayFrequencies = arrayFrequencies.substring(0, arrayFrequencies.length() - JsonUtil.CS.length()); 
+				}
+				arrayFrequencies = JsonUtil.sBrackets(arrayFrequencies);
+				String frequencies = JsonUtil.keyColonValue(JsonUtil.quote(Cst.TAG_FREQUENCIES), arrayFrequencies);
+				res += JsonUtil.cBrackets(term + JsonUtil.CS + frequencies) + JsonUtil.CS;
+			}
+		}
+		if (res.endsWith(JsonUtil.CS)){
+			// To remove the last comma introduced in the loop
+			res = res.substring(0, res.length() - JsonUtil.CS.length()); 
+		}
+		res = JsonUtil.sBrackets(res);
+		return res;			
+	}
+	
+	/**
+	 * Computes all the maximal cliques contained in the weighted graph.
+	 * Weights are not used in the algorithm, but they are kept in the cliques.  
+	 * @return A list of maximal cliques. 
+	 */
+	public List<Clique> getMaximalCliques(){
+		List<Clique> listMaximalCliques = new ArrayList<Clique>();
+		BronKerboschCliqueFinder<String, DefaultWeightedEdge> finder = new BronKerboschCliqueFinder<String, DefaultWeightedEdge>(this);
+		Collection<Set<String>> maximalCliques = finder.getAllMaximalCliques();
+		for (Set<String> cliqueVertices : maximalCliques) {
+			Clique clique = new Clique();
+            List<String> cliqueVerticesList = new ArrayList<String>(cliqueVertices);
+            for (Integer i = 0 ; i < cliqueVerticesList.size() ; i++){
+            	String vertex1 = cliqueVerticesList.get(i);
+            	for (Integer j = i+1 ; j < cliqueVerticesList.size() ; j++){
+            		String vertex2 = cliqueVerticesList.get(j);
+            		DefaultWeightedEdge edge = null;
+            		if (this.containsEdge(vertex1, vertex2)){
+            			edge = this.getEdge(vertex1, vertex2);
+            		} else if (this.containsEdge(vertex2, vertex1)){
+            			edge = this.getEdge(vertex2, vertex1);
+            		}
+            		double weight = 0;
+            		if (edge != null){
+            			weight = this.getEdgeWeight(edge);
+            		}
+            		clique.addEdge(vertex1, vertex2, weight);
+            	}
+            }
+            listMaximalCliques.add(clique);
+        }
+		return listMaximalCliques;
+	}
+	
 }

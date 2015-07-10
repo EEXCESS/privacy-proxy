@@ -25,9 +25,14 @@ public class Config {
 	public static final String LOGGER_INTERACTION = "logging.interaction";
 	public static final String LOGGER_FACET_SCAPE = "logging.interaction";
 	
-	public static final String DICTIONARY_LOCATION = "dictionary.location";
-	public static final String HISTORY_LOCATION = "history.location";
-	public static final String CLIQUES_CACHE_LOCATION = "cliques.cache.location";
+	public static final String DATA_DIRECTORY = "data.directory";
+	public static final String CACHE_DIRECTORY = "cache.directory";
+	
+	public static final String INIT_QUERY_LOG = "init.queryLog";
+	
+	public static final String QUERY_LOG = "data.queryLog";
+	public static final String CO_OCCURRENCE_GRAPH_FILE = "cache.coOccurrenceGraph";
+	public static final String CLIQUES_FILE = "cache.cliques";
 	
 	// Configuration file
 	private static final String PROP_FILE_NAME = "config.properties";

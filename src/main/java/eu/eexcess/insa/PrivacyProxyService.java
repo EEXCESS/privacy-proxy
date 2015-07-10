@@ -1,5 +1,11 @@
 package eu.eexcess.insa;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,12 +29,12 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
+import eu.eexcess.Config;
 import eu.eexcess.Cst;
 import eu.eexcess.JsonUtil;
 import eu.eexcess.insa.peas.Clique;
 //import eu.eexcess.Util;
-import eu.eexcess.insa.peas.CoOccurrenceGraph;
-import eu.eexcess.insa.peas.Dictionary;
+import eu.eexcess.insa.peas.CachableCoOccurrenceGraph;
 import eu.eexcess.insa.peas.QueryEngine;
 
 /**
@@ -39,6 +45,47 @@ import eu.eexcess.insa.peas.QueryEngine;
 @Path(Cst.VERSION)
 public class PrivacyProxyService {
 
+	public static final String ROOT = System.getProperty("catalina.base");
+	
+	private static String queryLogLocation;
+	private static String cacheCoOccurrenceGraphLocation;
+	private static String cacheCliquesLocation;
+	
+	public PrivacyProxyService(){
+		if ((queryLogLocation == null) || (cacheCoOccurrenceGraphLocation == null) || (cacheCliquesLocation == null)){ 
+			
+			// Creation of the cache repository
+			String cacheDirectoryLocation = ROOT + Config.getValue(Config.CACHE_DIRECTORY);
+			File cacheDirectory = new File(cacheDirectoryLocation);
+			if (!cacheDirectory.exists()){
+				cacheDirectory.mkdir();
+			}
+			
+			// Creation of the data repository
+			String dataDirectoryLocation = ROOT + Config.getValue(Config.DATA_DIRECTORY);
+			File dataDirectory = new File(dataDirectoryLocation);
+			if (!dataDirectory.exists()){
+				dataDirectory.mkdir();
+			}
+			
+			// Initialization of the query log
+			queryLogLocation = dataDirectoryLocation + Config.getValue(Config.QUERY_LOG); 
+			File queryLog = new File(queryLogLocation);
+			if (!queryLog.exists()){
+				try {
+					queryLog.createNewFile();
+					// Initialization from a fake query log to have content to start with
+					InputStream inStream = getClass().getResourceAsStream(File.separator + Config.getValue(Config.INIT_QUERY_LOG)); 
+					Files.copy(inStream, Paths.get(queryLogLocation), StandardCopyOption.REPLACE_EXISTING);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			cacheCoOccurrenceGraphLocation = cacheDirectoryLocation + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
+			cacheCliquesLocation = cacheDirectoryLocation + Config.getValue(Config.CLIQUES_FILE);
+		}
+	}
+	
 	/**
 	 * Service providing recommendations for a query. 
 	 * @param origin Origin of the query. 
@@ -308,7 +355,7 @@ public class PrivacyProxyService {
 	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @return A co-occurrence graph. 
-	 * @see eu.eexcess.insa.peas.CoOccurrenceGraph
+	 * @see eu.eexcess.insa.peas.CachableCoOccurrenceGraph
 	 */
 	@GET
 	@Path(Cst.PATH_GET_CO_OCCURRENCE_GRAPH)
@@ -317,7 +364,7 @@ public class PrivacyProxyService {
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
 		
-		CoOccurrenceGraph graph = new CoOccurrenceGraph();
+		CachableCoOccurrenceGraph graph = new CachableCoOccurrenceGraph(queryLogLocation, cacheCoOccurrenceGraphLocation);
 		String output = graph.toJsonString();
 		
 		Response resp = Response.ok().entity(output).build();
@@ -346,8 +393,8 @@ public class PrivacyProxyService {
 		
 		Response resp = null;
 		
-		CoOccurrenceGraph graph = new CoOccurrenceGraph();
-		List<Clique> cliques = graph.getMaximalCliques();
+		CachableCoOccurrenceGraph graph = new CachableCoOccurrenceGraph(queryLogLocation, cacheCoOccurrenceGraphLocation);
+		List<Clique> cliques = graph.getMaximalCliques(cacheCliquesLocation);
 		String jsonCliques = "";
 		for (Clique clique : cliques){
 			jsonCliques += clique.toJsonString() + JsonUtil.CS;
@@ -362,31 +409,5 @@ public class PrivacyProxyService {
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
-	
-	/**
-	 * Service providing a dictionary. 
-	 * The dictionary is expected to be static so every call will return the exact same result. 
-	 * The number of entries is not very large (~4000 entries).  
-	 * @param origin Origin of the query. 
-	 * @param req HTTP request. 
-	 * @param servletResp HTTP response. 
-	 * @return A set of words. 
-	 */
-	@GET
-	@Path(Cst.PATH_GET_DICTIONARY)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getDictionary(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
-			@Context HttpServletRequest req,
-			@Context HttpServletResponse servletResp) {
-		
-		Dictionary dictionary = new Dictionary();
-		String output = dictionary.toJsonString();
-		
-		Response resp = Response.ok().entity(output).build();
-		
-		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
-		return resp;
-	}
-	
+
 }
