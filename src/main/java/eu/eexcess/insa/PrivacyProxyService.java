@@ -1,11 +1,13 @@
 package eu.eexcess.insa;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,9 +34,8 @@ import com.sun.jersey.api.client.WebResource;
 import eu.eexcess.Config;
 import eu.eexcess.Cst;
 import eu.eexcess.JsonUtil;
-import eu.eexcess.insa.peas.Clique;
-//import eu.eexcess.Util;
 import eu.eexcess.insa.peas.CachableCoOccurrenceGraph;
+import eu.eexcess.insa.peas.Clique;
 import eu.eexcess.insa.peas.QueryEngine;
 
 /**
@@ -51,15 +52,8 @@ public class PrivacyProxyService {
 	private static String cacheCoOccurrenceGraphLocation;
 	private static String cacheCliquesLocation;
 	
-	public PrivacyProxyService(){
-		if ((queryLogLocation == null) || (cacheCoOccurrenceGraphLocation == null) || (cacheCliquesLocation == null)){ 
-			
-			// Creation of the cache repository
-			String cacheDirectoryLocation = ROOT + Config.getValue(Config.CACHE_DIRECTORY);
-			File cacheDirectory = new File(cacheDirectoryLocation);
-			if (!cacheDirectory.exists()){
-				cacheDirectory.mkdir();
-			}
+	public PrivacyProxyService() throws FileNotFoundException{
+		if (queryLogLocation == null){ 
 			
 			// Creation of the data repository
 			String dataDirectoryLocation = ROOT + Config.getValue(Config.DATA_DIRECTORY);
@@ -70,16 +64,31 @@ public class PrivacyProxyService {
 			
 			// Initialization of the query log
 			queryLogLocation = dataDirectoryLocation + Config.getValue(Config.QUERY_LOG); 
-			File queryLog = new File(queryLogLocation);
-			if (!queryLog.exists()){
-				try {
-					queryLog.createNewFile();
-					// Initialization from a fake query log to have content to start with
-					InputStream inStream = getClass().getResourceAsStream(File.separator + Config.getValue(Config.INIT_QUERY_LOG)); 
-					Files.copy(inStream, Paths.get(queryLogLocation), StandardCopyOption.REPLACE_EXISTING);
-				} catch (IOException e) {
-					e.printStackTrace();
+			try {
+				// Initialization from a fake query log to have content to start with
+				InputStream inputStream = getClass().getResourceAsStream(File.separator + Config.getValue(Config.INIT_QUERY_LOG));
+				File outputFile = new File(queryLogLocation);
+				if (!outputFile.exists()){
+					BufferedReader bufferReader = new BufferedReader(new InputStreamReader(inputStream));
+					FileWriter writer = new FileWriter(outputFile);
+					BufferedWriter bufferWriter = new BufferedWriter(writer);
+					String currentLine;
+					while ((currentLine = bufferReader.readLine()) != null) {
+						bufferWriter.write(currentLine + "\n");
+					}
+					bufferWriter.close();
+					bufferReader.close();
 				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} 
+		}
+		if ((cacheCoOccurrenceGraphLocation == null) || (cacheCliquesLocation == null)){ 
+			// Creation of the cache repository
+			String cacheDirectoryLocation = ROOT + Config.getValue(Config.CACHE_DIRECTORY);
+			File cacheDirectory = new File(cacheDirectoryLocation);
+			if (!cacheDirectory.exists()){
+				cacheDirectory.mkdir();
 			}
 			cacheCoOccurrenceGraphLocation = cacheDirectoryLocation + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
 			cacheCliquesLocation = cacheDirectoryLocation + Config.getValue(Config.CLIQUES_FILE);
