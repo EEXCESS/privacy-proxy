@@ -3,7 +3,6 @@ package eu.eexcess.insa;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,32 +51,41 @@ public class PrivacyProxyService {
 	private static String cacheCoOccurrenceGraphLocation;
 	private static String cacheCliquesLocation;
 	
-	public PrivacyProxyService() throws FileNotFoundException{
+	public PrivacyProxyService(){
 		if (queryLogLocation == null){ 
 			
 			// Creation of the data repository
 			String dataDirectoryLocation = ROOT + Config.getValue(Config.DATA_DIRECTORY);
 			File dataDirectory = new File(dataDirectoryLocation);
 			if (!dataDirectory.exists()){
+				System.out.println("1. " + dataDirectory + " did not exist");
 				dataDirectory.mkdir();
+			} else {
+				System.out.println("1. " + dataDirectory + " existed");
 			}
 			
 			// Initialization of the query log
 			queryLogLocation = dataDirectoryLocation + Config.getValue(Config.QUERY_LOG); 
 			try {
 				// Initialization from a fake query log to have content to start with
-				InputStream inputStream = getClass().getResourceAsStream(File.separator + Config.getValue(Config.INIT_QUERY_LOG));
+				InputStream inputStream = getClass().getResourceAsStream(File.separator + Config.getValue(Config.INIT_QUERY_LOG)); // XXX Null pointer exception here
 				File outputFile = new File(queryLogLocation);
 				if (!outputFile.exists()){
+					System.out.println("2a. " + outputFile + " did not exist");
 					BufferedReader bufferReader = new BufferedReader(new InputStreamReader(inputStream));
 					FileWriter writer = new FileWriter(outputFile);
 					BufferedWriter bufferWriter = new BufferedWriter(writer);
 					String currentLine;
+					Integer cnt = 0;
 					while ((currentLine = bufferReader.readLine()) != null) {
 						bufferWriter.write(currentLine + "\n");
+						cnt++;
 					}
+					System.out.println("2b. " + cnt + " lines copied");
 					bufferWriter.close();
 					bufferReader.close();
+				} else {
+					System.out.println("2. " + outputFile + " existed");
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -88,7 +96,10 @@ public class PrivacyProxyService {
 			String cacheDirectoryLocation = ROOT + Config.getValue(Config.CACHE_DIRECTORY);
 			File cacheDirectory = new File(cacheDirectoryLocation);
 			if (!cacheDirectory.exists()){
+				System.out.println("3. " + cacheDirectory + " did not exist");
 				cacheDirectory.mkdir();
+			} else {
+				System.out.println("3. " + cacheDirectory + " existed");
 			}
 			cacheCoOccurrenceGraphLocation = cacheDirectoryLocation + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
 			cacheCliquesLocation = cacheDirectoryLocation + Config.getValue(Config.CLIQUES_FILE);
