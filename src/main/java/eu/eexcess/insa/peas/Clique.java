@@ -5,6 +5,7 @@ import org.json.JSONArray;
 /**
  * A clique is represented as a weighted graph. 
  * @author Thomas Cerqueus
+ * @version 1.0
  */
 public class Clique extends CoOccurrenceGraph {
 
@@ -18,8 +19,8 @@ public class Clique extends CoOccurrenceGraph {
 	}
 	
 	/**
-	 * TODO
-	 * @param jsonGraph
+	 * Instantiates a clique from a JSON object.  
+	 * @param jsonGraph Representation of a clique in JSON. 
 	 */
 	public Clique(JSONArray jsonGraph){
 		super(jsonGraph);

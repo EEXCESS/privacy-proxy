@@ -9,26 +9,37 @@ import java.util.Date;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.eexcess.Config;
 import eu.eexcess.Cst;
 
-public class UpdateQueryLogThread extends Thread {
+/**
+ * This class is used to add a query in the log without interrupting the processing of the query. 
+ * @author Thomas Cerqueus
+ * @version 1.0
+ */
+public class QueryLogThread extends Thread {
 	
-	protected static final String LINE_BREAK = "\n"; 
-	
-	protected String queryLogLocation;
+	protected static String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
 	protected JSONObject query;
 	
+	/**
+	 * Default constructor. 
+	 */
+	public QueryLogThread(){}
 	
 	/**
-	 * 
-	 * @param queryLogLocation
-	 * @param query Query of format QF1. 
+	 * Triggers the logging of a query. 
+	 * @param query Query to be logged. 
 	 */
-	public UpdateQueryLogThread(String queryLogLocation, JSONObject query){
-		this.queryLogLocation = queryLogLocation;
-		this.query = query;
+	public void log(JSONObject query) {
+		this.query = query;	
+		super.start();
 	}
 	
+	/**
+	 * Logs the query in the file. The query is added at the end with a timestamp. 
+	 */
+	@Override
 	public void run() {
 		Date currentDate = new Date();
 		Long timestamp = currentDate.getTime();
@@ -50,7 +61,7 @@ public class UpdateQueryLogThread extends Thread {
 			FileWriter writer = new FileWriter(queryLogLocation, true);
 			BufferedWriter buffer = new BufferedWriter(writer);
 			PrintWriter print = new PrintWriter(buffer);
-			print.write(timestamp + Cst.COLUMN_SEPARATOR + queryString + LINE_BREAK);
+			print.write(timestamp + Cst.COLUMN_SEPARATOR + queryString + Cst.LINE_BREAK);
 			print.close();
 			buffer.close();
 			writer.close();

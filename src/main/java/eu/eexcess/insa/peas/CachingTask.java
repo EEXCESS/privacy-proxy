@@ -16,43 +16,56 @@ import eu.eexcess.Cst;
 import eu.eexcess.JsonUtil;
 
 /**
- * 
+ * This class is used to put the co-occurrence graph and the maximal cliques in cache. 
+ * They are computed from the query log. 
  * @author Thomas Cerqueus
  * @version 1.0
  */
 public class CachingTask extends TimerTask {
 	
+	// Query log
 	protected String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
+	// Co-occurrence graph cache
 	protected String cacheCoOccurrenceGraphLocation = Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
+	protected String tmpCacheCoOccurrenceGraphLocation = Config.getValue(Config.CACHE_DIRECTORY) + Cst.TMP_FILE_PREFIX + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
+	// Maximal cliques cache
 	protected String cacheMaximalCliquesLocation = Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CLIQUES_FILE);
+	protected String tmpCacheMaximalCliquesLocation = Config.getValue(Config.CACHE_DIRECTORY) + Cst.TMP_FILE_PREFIX + Config.getValue(Config.CLIQUES_FILE);
 	
+	/**
+	 * Default constructor. 
+	 */
 	public CachingTask(){}
 	
+	/**
+	 * Performs the caching of the co-occurrence graph and the maximal cliques. 
+	 * This method does not have to be called explicitly, as a scheduler is supposed to do it. 
+	 */
 	@Override
 	public void run(){
 		File queryLog = new File(queryLogLocation);
-		Boolean cogDeleted = false;
-		Boolean mcsDeleted = false;
-		// TODO Use renaming instead of delete + create
 		if (queryLog.exists()){
 			// Computes co-occurrence graph
 			CoOccurrenceGraph graph = getCoOccurrenceGraphFromQueryLog(queryLog);
 			// Computes the maximal cliques from the co-occurrence graph
 			List<Clique> cliques = graph.getMaximalCliques();
-			// Deletes the existing co-occurrence graph cache
-			File cacheCoOccurrenceGraph = new File(cacheCoOccurrenceGraphLocation);
-			cogDeleted = cacheCoOccurrenceGraph.delete();
 			// Stores the new co-occurrence graph cache
+			File cacheCoOccurrenceGraph = new File(tmpCacheCoOccurrenceGraphLocation);
 			cacheCoOccurrenceGraph(graph, cacheCoOccurrenceGraph);
-			// Deletes the existing maximal cliques cache
-			File cacheMaximalCliques = new File(cacheMaximalCliquesLocation);
-			mcsDeleted = cacheMaximalCliques.delete();
+			cacheCoOccurrenceGraph.renameTo(new File(cacheCoOccurrenceGraphLocation));
 			// Stores the new maximal cliques cache
+			File cacheMaximalCliques = new File(tmpCacheMaximalCliquesLocation);
 			cacheMaximalCliques(cliques, cacheMaximalCliques);
+			cacheMaximalCliques.renameTo(new File(cacheMaximalCliquesLocation));
 		}
-		System.out.println("Caches updated [cog: " + cogDeleted +", mcs: " + mcsDeleted + "]"); // XXX Remove this line
+		System.out.println(this.getClass() + " " + this.hashCode());
 	}
 	
+	/**
+	 * Extracts the co-occurrence graph from the query log.  
+	 * @param queryLog File containing the query log. 
+	 * @return A co-occurrence graph. 
+	 */
 	private CoOccurrenceGraph getCoOccurrenceGraphFromQueryLog(File queryLog) {
 		CoOccurrenceGraph graph = new CoOccurrenceGraph();
 		try {
@@ -93,12 +106,17 @@ public class CachingTask extends TimerTask {
 		return graph;
 	}
 	
-	private void cacheCoOccurrenceGraph(CoOccurrenceGraph graph, File f) {
+	/**
+	 * Puts a co-occurrence graph in cache. 
+	 * @param graph The co-occurrence graph to be cached. 
+	 * @param file The file in which the graph must be cached. 
+	 */
+	private void cacheCoOccurrenceGraph(CoOccurrenceGraph graph, File file) {
 		try {
-			if (!f.exists()){
-				f.createNewFile();
+			if (!file.exists()){
+				file.createNewFile();
 			}
-			FileWriter fw = new FileWriter(f.getAbsoluteFile());
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write(graph.toJsonString());
 			bw.close();
@@ -107,7 +125,12 @@ public class CachingTask extends TimerTask {
 		}
 	}
 	
-	private void cacheMaximalCliques(List<Clique> listMaximalCliques, File f){
+	/**
+	 * Puts a list of cliques in cache. 
+	 * @param listMaximalCliques The list of cliques to be cached. 
+	 * @param file The file in which the cliques must be cached. 
+	 */
+	private void cacheMaximalCliques(List<Clique> listMaximalCliques, File file){
 		String jsonCliques = "";
 		for (Clique clique : listMaximalCliques){
 			jsonCliques += clique.toJsonString() + JsonUtil.CS;
@@ -117,10 +140,10 @@ public class CachingTask extends TimerTask {
 		}
 		jsonCliques = JsonUtil.sBrackets(jsonCliques);
 		try {
-			if (!f.exists()){
-				f.createNewFile();
+			if (!file.exists()){
+				file.createNewFile();
 			}
-			FileWriter fw = new FileWriter(f.getAbsoluteFile());
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write(jsonCliques);
 			bw.close();

@@ -15,7 +15,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-import eu.eexcess.Config;
 import eu.eexcess.Cst;
 import eu.eexcess.insa.QueryFormats;
 
@@ -36,11 +35,13 @@ public class QueryEngine {
 
 	private static volatile QueryEngine instance = null;
 	
-	protected String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
-	
 	/** Default constructor. */
 	private QueryEngine(){}
 	
+	/**
+	 * Method used in the implementation of the Singleton pattern. 
+	 * @return an instance of {@code QueryLog}. 
+	 */
 	public static QueryEngine getInstance(){
 		if (instance == null){
 			instance = new QueryEngine();
@@ -95,16 +96,17 @@ public class QueryEngine {
 	 */
 	public Response processQuery(String origin, HttpServletRequest req, JSONObject query, QueryFormats type){
 		Response resp = Response.status(Status.BAD_REQUEST).build();
+		if (type.equals(QueryFormats.QF1) || type.equals(QueryFormats.QF2)) {
+			QueryLogThread thread = new QueryLogThread();
+			thread.log(query);
+		}
 		if (type.equals(QueryFormats.QF2)){
 			resp = processObfuscatedQuery(origin, req, query);
 		} else if (type.equals(QueryFormats.QF1) || type.equals(QueryFormats.QF3)){
 			String serviceUrl = Cst.SERVICE_RECOMMEND;
 			if (type.equals(QueryFormats.QF3)){
 				serviceUrl = Cst.SERVICE_GET_DETAILS;
-			} else {
-				UpdateQueryLogThread thread = new UpdateQueryLogThread(queryLogLocation, query);
-				thread.start();
-			}
+			} 
 			Client client = Client.create();
 			WebResource webResource = client.resource(serviceUrl);
 			ClientResponse response = webResource
@@ -175,9 +177,8 @@ public class QueryEngine {
 	}
 	
 	/**
-	 * TODO
 	 * This method ensures that the "detail" attribute is well-formed. 
-	 * Ideally it should not be here. 
+	 * Ideally it should not be here (it should be done on the federated recommender). 
 	 * @param jsonString
 	 * @return
 	 */

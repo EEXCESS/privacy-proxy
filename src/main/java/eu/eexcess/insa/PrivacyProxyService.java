@@ -84,7 +84,7 @@ public class PrivacyProxyService {
 	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @param queryStr Query of format QF1 or QF2 (both are supported). 
-	 * @return Result containing a set of recommendations. The format is RF1 (respectively RF2) if the format of the query is QF1 (respectively QF2). 
+	 * @return A set of recommendations. The format is RF1 (respectively RF2) if the format of the query is QF1 (respectively QF2). 
 	 * @see QueryEngine
 	 */
 	@POST
@@ -142,7 +142,7 @@ public class PrivacyProxyService {
 	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @param detailsStr
-	 * @return TODO
+	 * @return A set of detailed results (aka document badges). 
 	 */
 	@POST
 	@Path(Cst.PATH_GET_DETAILS)
@@ -208,24 +208,24 @@ public class PrivacyProxyService {
 
 		Response resp = Response.ok().build();
 		/*
-//		String ip = req.getRemoteAddr();
+		String ip = req.getRemoteAddr();
 
 		if (interactionType.equals(Cst.RATING) || 
 				interactionType.equals(Cst.RESULT_CLOSE) || 
 				interactionType.equals(Cst.RESULT_VIEW) ||
 				interactionType.equals(Cst.SHOW_HIDE) ||
 				interactionType.equals(Cst.QUERY_ACTIVATED)){
-			//Cst.LOG_PROCESSOR.process(interactionType, origin, ip, input);
+			Cst.LOG_PROCESSOR.process(interactionType, origin, ip, input);
 		} else if (interactionType.equals(Cst.FACET_SCAPE)) {
-//			String msg = Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
-//					+ Util.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
-//					+ input;
-//			Cst.LOGGER_FACET_SCAPE.trace(msg);
+			String msg = JsonUtil.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
+					+ JsonUtil.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
+					+ input;
+			Cst.LOGGER_FACET_SCAPE.trace(msg);
 		} else {
-//			String msg = Util.sBrackets(Cst.PATH_LOG_DIRECTORY + interactionType) + Cst.SPACE
-//					+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
-//					+ Cst.PATH_LOG_DIRECTORY + interactionType + Cst.SPACE + Cst.ERR_MSG_NOT_REST_API;
-//			Cst.LOGGER_PRIVACY_PROXY.error(msg);
+			String msg = JsonUtil.sBrackets(Cst.PATH_LOG_DIRECTORY + interactionType) + Cst.SPACE
+					+ JsonUtil.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
+					+ Cst.PATH_LOG_DIRECTORY + interactionType + Cst.SPACE + Cst.ERR_MSG_NOT_REST_API;
+			Cst.LOGGER_PRIVACY_PROXY.error(msg);
 			resp = Response.status(Response.Status.NOT_FOUND).build();
 		}
 		*/
@@ -236,7 +236,6 @@ public class PrivacyProxyService {
 	}
 	
 	/**
-	 * XXX Not sure this service is used. 
 	 * Default service logging interactions. 
 	 * It does not do anything else than returning the header. 
 	 * @param interactionType  
@@ -263,7 +262,7 @@ public class PrivacyProxyService {
 	 * Service logging disambiguation calls. 
 	 * @param servletResp HTTP response. 
 	 * @param input XXX Don't know what this parameter is supposed to contain. 
-	 * @return TODO
+	 * @return XXX Don't know what this method is supposed to return. 
 	 */
 	@POST
 	@Path(Cst.PATH_DISAMBIGUATE)

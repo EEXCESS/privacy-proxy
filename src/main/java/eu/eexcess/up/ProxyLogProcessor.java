@@ -8,7 +8,7 @@ import eu.eexcess.JsonUtil;
 
 /**
  * TODO
- * @author Thomas Cerqueus
+ * @author ???
  *
  */
 public class ProxyLogProcessor {

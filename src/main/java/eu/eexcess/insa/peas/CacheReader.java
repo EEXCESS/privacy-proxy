@@ -13,7 +13,8 @@ import org.json.JSONArray;
 import eu.eexcess.Config;
 
 /**
- * 
+ * This class is used to read caches. It allows reading the co-occurrence graph cache and the maximal cliques graph. 
+ * The locations of cache files are given in the configuration file. 
  * @author Thomas Cerqueus
  * @version 2.0
  */
@@ -24,8 +25,15 @@ public class CacheReader {
 	protected String cacheCoOccurrenceGraphLocation = Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
 	protected String cacheMaximalCliquesLocation = Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CLIQUES_FILE);
 	
+	/**
+	 * Default constructor. 
+	 */
 	private CacheReader(){}
 	
+	/**
+	 * Method used in the implementation of the Singleton pattern. 
+	 * @return An instance of {@code CacheReader}.
+	 */
 	public static CacheReader getInstance(){
 		if (instance == null){
 			instance = new CacheReader();
@@ -33,6 +41,11 @@ public class CacheReader {
 		return instance;
 	}
 	
+	/**
+	 * Reads the cache and returns the co-occurrence graph. 
+	 * The graph is empty if the cache does not exist yet. 
+	 * @return A co-occurrence graph. 
+	 */
 	public CoOccurrenceGraph getCoOccurrenceGraph() {
 		CoOccurrenceGraph graph = new CoOccurrenceGraph();
 		try {
@@ -47,7 +60,7 @@ public class CacheReader {
 				}
 				bufferReader.close();
 				JSONArray jsonGraph = new JSONArray(jsonString);
-				graph.instanciateFromJson(jsonGraph);
+				graph  = new CoOccurrenceGraph(jsonGraph);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -57,6 +70,11 @@ public class CacheReader {
 		return graph;
 	}
 
+	/**
+	 * Reads the cache and returns a list of maximal cliques. 
+	 * The list is empty if the cache does not exist yet. 
+	 * @return A list of cliques. 
+	 */
 	public List<Clique> getMaximalCliques() {
 		List<Clique> listCliques = new ArrayList<Clique>();
 		File file = new File(cacheMaximalCliquesLocation);

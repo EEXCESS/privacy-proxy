@@ -12,18 +12,26 @@ import java.util.TimerTask;
 import eu.eexcess.Config;
 import eu.eexcess.Cst;
 
+/**
+ * This class is used to flush out the query log. 
+ * The goal is to prevent it from becoming too voluminous and unexploitable. 
+ * @author Thomas Cerqueus
+ * @version 1.0
+ */
 public class QueryLogFlushOutTask extends TimerTask {
-
-	private final String tempFilePrefix = "tmp-";
 	
 	protected String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
-	protected String tempQueryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + tempFilePrefix + Config.getValue(Config.QUERY_LOG);
+	protected String tmpQueryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Cst.TMP_FILE_PREFIX + Config.getValue(Config.QUERY_LOG);
 	protected Long window = Long.valueOf(Config.getValue(Config.QUERY_LOG_WINDOW));
 
+	/**
+	 * Flushes out the query log and keeps only the queries sent in the time window (. 
+	 * This method does not have to be called explicitly, as a scheduler is supposed to do it. 
+	 */
 	@Override
 	public void run() {
 		File log = new File(queryLogLocation);
-		File tmpLog = new File(tempQueryLogLocation);
+		File tmpLog = new File(tmpQueryLogLocation);
 		Long now = new Date().getTime();
 		Integer cntKept = 0;
 		Integer cntDeleted = 0;
@@ -48,7 +56,7 @@ public class QueryLogFlushOutTask extends TimerTask {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Query log flushed out [kept: " + cntKept + ", deleted: " + cntDeleted + "]");// XXX Remove this line
+		System.out.println(this.getClass() + " " + this.hashCode());
 	}
 
 }

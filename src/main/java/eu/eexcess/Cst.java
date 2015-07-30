@@ -105,4 +105,6 @@ public class Cst {
 	public static final String MATCHING_CRITERION = "^\\w{3,}$"; // Words with at least 3 characters
 	public static final String LINE_BREAK = System.getProperty("line.separator"); 
 	
+	public static final String TMP_FILE_PREFIX = "tmp-";
+	
 }

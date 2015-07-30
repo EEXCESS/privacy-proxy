@@ -20,7 +20,7 @@ import eu.eexcess.JsonUtil;
  * Each line of the file looks like: {@code timestamp	breathing wheezing}. 
  * The fields correspond to the date the query was stored in the query log, and the list of keywords.  
  * @author Thomas Cerqueus
- *
+ * @version 1.0
  */
 public class CoOccurrenceGraph extends SimpleWeightedGraph<String, DefaultWeightedEdge> {
 
@@ -34,19 +34,11 @@ public class CoOccurrenceGraph extends SimpleWeightedGraph<String, DefaultWeight
 	}
 	
 	/**
-	 * 
-	 * @param jsonGraph
+	 * Instantiates a co-occurrence graph from a JSON object.  
+	 * @param jsonGraph Representation of a co-occurrence graph in JSON. 
 	 */
 	public CoOccurrenceGraph(JSONArray jsonGraph) {
 		super(DefaultWeightedEdge.class);
-		instanciateFromJson(jsonGraph);
-	}
-	
-	/**
-	 * 
-	 * @param jsonGraph
-	 */
-	public void instanciateFromJson(JSONArray jsonGraph) {
 		for (int i = 0 ; i < jsonGraph.length() ; i++){
 			JSONObject entry = jsonGraph.getJSONObject(i);
 			String term1 = entry.getString(Cst.TAG_TERM);
