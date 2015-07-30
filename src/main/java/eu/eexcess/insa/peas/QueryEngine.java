@@ -179,8 +179,8 @@ public class QueryEngine {
 	/**
 	 * This method ensures that the "detail" attribute is well-formed. 
 	 * Ideally it should not be here (it should be done on the federated recommender). 
-	 * @param jsonString
-	 * @return
+	 * @param jsonString The JSON string to be corrected. 
+	 * @return A JSON string. 
 	 */
 	protected String correctDetailField(String jsonString){ 
 		JSONObject tempResponse = new JSONObject(jsonString);
