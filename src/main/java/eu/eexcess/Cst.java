@@ -18,15 +18,14 @@ public class Cst {
 	
 	// Services
 	public static final String VERSION = "/v1";
+	public static final String PATH_GET_REGISTERED_PARTNERS = "/getRegisteredPartners";
 	public static final String PATH_RECOMMEND = "/recommend";
 	public static final String PATH_GET_DETAILS = "/getDetails";
-	public static final String PATH_GET_CLIQUES = "/getCliques";
-	public static final String PATH_GET_CO_OCCURRENCE_GRAPH = "/getCoOccurrenceGraph";
-	public static final String PATH_GET_DICTIONARY = "/getDictionary";
 	public static final String PATH_LOG = "/log/{InteractionType}";
 	public static final String PATH_DISAMBIGUATE = "/disambiguate";
-	public static final String PATH_GET_REGISTERED_PARTNERS = "/getRegisteredPartners";
-	public static final String PATH_CATEGORY_SUGGESTION = "/categorysuggestion";
+	//public static final String PATH_CATEGORY_SUGGESTION = "/categorysuggestion";
+	public static final String PATH_GET_CLIQUES = "/getMaximalCliques";
+	public static final String PATH_GET_CO_OCCURRENCE_GRAPH = "/getCoOccurrenceGraph";
 	
 	public static final String PARAM_ORIGIN = "origin";
 	
@@ -47,6 +46,7 @@ public class Cst {
 	public static final String TAG_FACETS = "facets";
 	public static final String TAG_PROVIDER = "provider";
 	public static final String TAG_PROVIDER_SHORT = "p";
+	public static final String TAG_QUERY_TEXT = "text";
 	
 	// Access control
 	private static final String ACA = "Access-Control-Allow-";
@@ -88,7 +88,7 @@ public class Cst {
 	public static final String SERVICE_RECOMMEND = RECOMMENDER_API_URL + PATH_RECOMMEND;
 	public static final String SERVICE_GET_DETAILS = RECOMMENDER_API_URL + PATH_GET_DETAILS;
 	public static final String SERVICE_GET_REGISTERED_PARTNERS = RECOMMENDER_API_URL + PATH_GET_REGISTERED_PARTNERS;
-	public static final String SERVICE_DISAMBIGUATION = DISAMBIGUATER_API_URL + PATH_CATEGORY_SUGGESTION;
+	public static final String SERVICE_DISAMBIGUATION = DISAMBIGUATER_API_URL + "/categorysuggestion";
 
 	// Loggers
 	public static final String PATH_LOG_DIRECTORY = Config.getValue(Config.LOG_DIRECTORY);
@@ -99,6 +99,10 @@ public class Cst {
 	// Log processor
 	public static final ProxyLogProcessor LOG_PROCESSOR = new ProxyLogProcessor();
 	
-	// JSON 
+	// 
+	public static final String COLUMN_SEPARATOR = "\t";
+	public static final String KEYWORDS_SEPARATOR = Cst.SPACE;
+	public static final String MATCHING_CRITERION = "^\\w{3,}$"; // Words with at least 3 characters
+	public static final String LINE_BREAK = System.getProperty("line.separator"); 
 	
 }

@@ -1,12 +1,5 @@
 package eu.eexcess.insa;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,9 +26,11 @@ import com.sun.jersey.api.client.WebResource;
 import eu.eexcess.Config;
 import eu.eexcess.Cst;
 import eu.eexcess.JsonUtil;
-import eu.eexcess.insa.peas.CachableCoOccurrenceGraph;
+import eu.eexcess.insa.peas.CacheReader;
 import eu.eexcess.insa.peas.Clique;
+import eu.eexcess.insa.peas.CoOccurrenceGraph;
 import eu.eexcess.insa.peas.QueryEngine;
+import eu.eexcess.insa.peas.Scheduler;
 
 /**
  * This class defines all the services offered by the Privacy Proxy. 
@@ -44,68 +39,45 @@ import eu.eexcess.insa.peas.QueryEngine;
  */
 @Path(Cst.VERSION)
 public class PrivacyProxyService {
-
-	public static final String ROOT = System.getProperty("catalina.base");
 	
-	private static String queryLogLocation;
-	private static String cacheCoOccurrenceGraphLocation;
-	private static String cacheCliquesLocation;
+	protected String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
 	
+	/**
+	 * Initialization of the Privacy Proxy. 
+	 */
 	public PrivacyProxyService(){
-		if (queryLogLocation == null){ 
-			
-			// Creation of the data repository
-			String dataDirectoryLocation = ROOT + Config.getValue(Config.DATA_DIRECTORY);
-			File dataDirectory = new File(dataDirectoryLocation);
-			if (!dataDirectory.exists()){
-				System.out.println("1. " + dataDirectory + " did not exist");
-				dataDirectory.mkdir();
-			} else {
-				System.out.println("1. " + dataDirectory + " existed");
-			}
-			
-			// Initialization of the query log
-			queryLogLocation = dataDirectoryLocation + Config.getValue(Config.QUERY_LOG); 
-			try {
-				// Initialization from a fake query log to have content to start with
-				InputStream inputStream = getClass().getResourceAsStream(File.separator + Config.getValue(Config.INIT_QUERY_LOG)); // XXX Null pointer exception here
-				File outputFile = new File(queryLogLocation);
-				if (!outputFile.exists()){
-					System.out.println("2a. " + outputFile + " did not exist");
-					BufferedReader bufferReader = new BufferedReader(new InputStreamReader(inputStream));
-					FileWriter writer = new FileWriter(outputFile);
-					BufferedWriter bufferWriter = new BufferedWriter(writer);
-					String currentLine;
-					Integer cnt = 0;
-					while ((currentLine = bufferReader.readLine()) != null) {
-						bufferWriter.write(currentLine + "\n");
-						cnt++;
-					}
-					System.out.println("2b. " + cnt + " lines copied");
-					bufferWriter.close();
-					bufferReader.close();
-				} else {
-					System.out.println("2. " + outputFile + " existed");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} 
-		}
-		if ((cacheCoOccurrenceGraphLocation == null) || (cacheCliquesLocation == null)){ 
-			// Creation of the cache repository
-			String cacheDirectoryLocation = ROOT + Config.getValue(Config.CACHE_DIRECTORY);
-			File cacheDirectory = new File(cacheDirectoryLocation);
-			if (!cacheDirectory.exists()){
-				System.out.println("3. " + cacheDirectory + " did not exist");
-				cacheDirectory.mkdir();
-			} else {
-				System.out.println("3. " + cacheDirectory + " existed");
-			}
-			cacheCoOccurrenceGraphLocation = cacheDirectoryLocation + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
-			cacheCliquesLocation = cacheDirectoryLocation + Config.getValue(Config.CLIQUES_FILE);
-		}
+		Scheduler.addCachesTasks();
+		Scheduler.flushOutQueryLogTask();
 	}
 	
+	/**
+	 * Service returning the list of registered partners. 
+	 * This service only forwards the query to the federated recommender, 
+	 * and returns the result. 
+	 * @param servletResp HTTP response. 
+	 * @return The list of partners registered on the federated recommender. 
+	 */
+	@GET
+	@Path(Cst.PATH_GET_REGISTERED_PARTNERS)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getRegisteredPartners(@Context HttpServletResponse servletResp) {
+		Response response;
+		Client client = Client.create();
+		WebResource webResource = client.resource(Cst.SERVICE_GET_REGISTERED_PARTNERS);
+		ClientResponse r = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		int status = r.getStatus();
+		if (status == Response.Status.OK.getStatusCode()){
+			String output = r.getEntity(String.class);
+			response = Response.ok().entity(output).build();
+		} else {
+			response = Response.status(status).build();
+		}
+	
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		return response;
+	}
+
 	/**
 	 * Service providing recommendations for a query. 
 	 * @param origin Origin of the query. 
@@ -123,14 +95,14 @@ public class PrivacyProxyService {
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp, 
 			String queryStr) {
-
+		
 		Response resp;
 		
 		JSONObject query = new JSONObject(queryStr);
 		
 		if (origin == null) { origin = Cst.EMPTY_ORIGIN; }
 		
-		QueryEngine engine = new QueryEngine();
+		QueryEngine engine = QueryEngine.getInstance();
 		query = engine.alterQuery(origin, query);
 		if (engine.isObfuscatedQuery(query)){
 			resp = engine.processQuery(origin, req, query, QueryFormats.QF2);
@@ -185,7 +157,7 @@ public class PrivacyProxyService {
 		
 		if (origin == null) { origin = Cst.EMPTY_ORIGIN; }
 		
-		QueryEngine engine = new QueryEngine();
+		QueryEngine engine = QueryEngine.getInstance();
 		Response resp = engine.processQuery(origin, req, detailsQuery, QueryFormats.QF3);
 		
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
@@ -297,10 +269,11 @@ public class PrivacyProxyService {
 	@Path(Cst.PATH_DISAMBIGUATE)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response logDisambiguate(@Context HttpServletResponse servletResp, String input) {
+	public Response disambiguate(@Context HttpServletResponse servletResp, String input) {
 		// Forward the query
 		Client client = Client.create();
 		WebResource webResource = client.resource(Cst.SERVICE_DISAMBIGUATION);
+		System.out.println(Cst.SERVICE_DISAMBIGUATION);
 		ClientResponse response = webResource
 				.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
 				.post(ClientResponse.class, input);
@@ -333,7 +306,7 @@ public class PrivacyProxyService {
 	@Path(Cst.PATH_DISAMBIGUATE)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response logDisambiguate(@Context HttpServletResponse servletResp) {
+	public Response disambiguate(@Context HttpServletResponse servletResp) {
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
@@ -341,41 +314,13 @@ public class PrivacyProxyService {
 	}
 	
 	/**
-	 * Service returning the list of registered partners. 
-	 * This service only forwards the query to the federated recommender, 
-	 * and returns the result. 
-	 * @param servletResp HTTP response. 
-	 * @return The list of partners registered on the federated recommender. 
-	 */
-	@GET
-	@Path(Cst.PATH_GET_REGISTERED_PARTNERS)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getRegisteredPartners(@Context HttpServletResponse servletResp) {
-		Response response;
-		Client client = Client.create();
-		WebResource webResource = client.resource(Cst.SERVICE_GET_REGISTERED_PARTNERS);
-		ClientResponse r = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-		int status = r.getStatus();
-		if (status == Response.Status.OK.getStatusCode()){
-			String output = r.getEntity(String.class);
-			response = Response.ok().entity(output).build();
-		} else {
-			response = Response.status(status).build();
-		}
-
-		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
-		return response;
-	}
-	
-	/**
 	 * Service providing access to the co-occurrence graph. 
-	 * The co-occurence graph is supposed to be up-to-date at any time (no caching).   
+	 * The co-occurrence graph is supposed to be up-to-date at any time (no caching).   
 	 * @param origin Origin of the query. 
 	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @return A co-occurrence graph. 
-	 * @see eu.eexcess.insa.peas.CachableCoOccurrenceGraph
+	 * @see eu.eexcess.insa.peas.CacheReader
 	 */
 	@GET
 	@Path(Cst.PATH_GET_CO_OCCURRENCE_GRAPH)
@@ -384,7 +329,8 @@ public class PrivacyProxyService {
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
 		
-		CachableCoOccurrenceGraph graph = new CachableCoOccurrenceGraph(queryLogLocation, cacheCoOccurrenceGraphLocation);
+		CacheReader cacheReader = CacheReader.getInstance();
+		CoOccurrenceGraph graph = cacheReader.getCoOccurrenceGraph();
 		String output = graph.toJsonString();
 		
 		Response resp = Response.ok().entity(output).build();
@@ -407,14 +353,13 @@ public class PrivacyProxyService {
 	@GET
 	@Path(Cst.PATH_GET_CLIQUES)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getCliques(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+	public Response getMaximalCliques(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
 		
 		Response resp = null;
-		
-		CachableCoOccurrenceGraph graph = new CachableCoOccurrenceGraph(queryLogLocation, cacheCoOccurrenceGraphLocation);
-		List<Clique> cliques = graph.getMaximalCliques(cacheCliquesLocation);
+		CacheReader cacheReader = CacheReader.getInstance();
+		List<Clique> cliques = cacheReader.getMaximalCliques();
 		String jsonCliques = "";
 		for (Clique clique : cliques){
 			jsonCliques += clique.toJsonString() + JsonUtil.CS;

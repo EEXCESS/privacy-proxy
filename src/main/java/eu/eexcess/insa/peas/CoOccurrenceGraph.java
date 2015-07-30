@@ -15,12 +15,14 @@ import eu.eexcess.Cst;
 import eu.eexcess.JsonUtil;
 
 /**
- * A weighted graph is a set of vertices linked with weighted edges. 
- * Basic methods are added to the extended class. 
+ * A co-occurrence graph is a weighted graph. 
+ * Vertices are words, and edges represent the usage frequency between two words. 
+ * Each line of the file looks like: {@code timestamp	breathing wheezing}. 
+ * The fields correspond to the date the query was stored in the query log, and the list of keywords.  
  * @author Thomas Cerqueus
  *
  */
-public abstract class CoOccurrenceGraph extends SimpleWeightedGraph<String, DefaultWeightedEdge> {
+public class CoOccurrenceGraph extends SimpleWeightedGraph<String, DefaultWeightedEdge> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -32,7 +34,7 @@ public abstract class CoOccurrenceGraph extends SimpleWeightedGraph<String, Defa
 	}
 	
 	/**
-	 * TODO
+	 * 
 	 * @param jsonGraph
 	 */
 	public CoOccurrenceGraph(JSONArray jsonGraph) {
@@ -149,7 +151,7 @@ public abstract class CoOccurrenceGraph extends SimpleWeightedGraph<String, Defa
 	 * Weights are not used in the algorithm, but they are kept in the cliques.  
 	 * @return A list of maximal cliques. 
 	 */
-	public List<Clique> getMaximalCliques(){
+	protected List<Clique> getMaximalCliques(){
 		List<Clique> listMaximalCliques = new ArrayList<Clique>();
 		BronKerboschCliqueFinder<String, DefaultWeightedEdge> finder = new BronKerboschCliqueFinder<String, DefaultWeightedEdge>(this);
 		Collection<Set<String>> maximalCliques = finder.getAllMaximalCliques();

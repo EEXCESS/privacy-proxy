@@ -15,6 +15,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
+import eu.eexcess.Config;
 import eu.eexcess.Cst;
 import eu.eexcess.insa.QueryFormats;
 
@@ -33,8 +34,19 @@ import eu.eexcess.insa.QueryFormats;
  */
 public class QueryEngine {
 
+	private static volatile QueryEngine instance = null;
+	
+	protected String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
+	
 	/** Default constructor. */
-	public QueryEngine(){}
+	private QueryEngine(){}
+	
+	public static QueryEngine getInstance(){
+		if (instance == null){
+			instance = new QueryEngine();
+		}
+		return instance;
+	}
 
 	/**
 	 * Alters the query to generate a query identifier (if needed), 
@@ -89,7 +101,10 @@ public class QueryEngine {
 			String serviceUrl = Cst.SERVICE_RECOMMEND;
 			if (type.equals(QueryFormats.QF3)){
 				serviceUrl = Cst.SERVICE_GET_DETAILS;
-			} 
+			} else {
+				UpdateQueryLogThread thread = new UpdateQueryLogThread(queryLogLocation, query);
+				thread.start();
+			}
 			Client client = Client.create();
 			WebResource webResource = client.resource(serviceUrl);
 			ClientResponse response = webResource

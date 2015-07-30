@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ "$#" -eq 1 ]; then 
+	if [ $1 = "local-eclipse" ]; then # local through Eclipse
+		ServiceURL="http://localhost:8080/eexcess-privacy-proxy/" 
+	else 
+		if [ $1 = "local" ]; then # local manual deployment
+			ServiceURL="http://localhost:8080/eexcess-privacy-proxy-1.0-SNAPSHOT/"
+		else 
+			if [ $1 = "remote-dev" ]; then # development server
+				ServiceURL="http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-SNAPSHOT/"
+			else 
+				ServiceURL=$1 # specific location
+			fi
+		fi
+	fi
+	ServiceURL=`echo $ServiceURL"api/v1/getMaximalCliques"`
+	curl -X GET $ServiceURL
+else 
+	echo "Usage 'getMaximalCliques local-eclipse|local|remote-dev|<http://your-server/api/'"
+fi
