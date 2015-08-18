@@ -6,13 +6,12 @@ import eu.eexcess.up.ProxyLogProcessor;
 
 /**
  * This class contains all the constants used in the project. 
- * @author Thomas
+ * @author Thomas Cerqueus
  *
  */
 public class Cst {
 	
 	// Errors
-	public static final String ERR_MSG_NOT_REST_API = "not a valid REST API";
 	public static final String SPACE = " ";
 	public static final String EMPTY_ORIGIN = "empty";
 	
@@ -30,7 +29,6 @@ public class Cst {
 	public static final String PARAM_ORIGIN = "origin";
 	
 	// Tags
-	public static final String TAG_HTTP_ERR_CODE = "HTTPErrorCode";
 	public static final String TAG_ORIGIN = "origin";
 	public static final String TAG_IP = "ip";
 	public static final String TAG_ID = "id";
@@ -47,6 +45,8 @@ public class Cst {
 	public static final String TAG_PROVIDER = "provider";
 	public static final String TAG_PROVIDER_SHORT = "p";
 	public static final String TAG_QUERY_TEXT = "text";
+	public static final String TAG_DOCUMENT_BADGE = "documentBadge";
+	public static final String TAG_DETAIL = "detail";
 	
 	// Access control
 	private static final String ACA = "Access-Control-Allow-";
@@ -72,8 +72,6 @@ public class Cst {
 	public static final String TAG_TERM = "term";
 	public static final String TAG_FREQUENCIES = "frequencies";
 	public static final String TAG_FREQUENCY = "frequency";
-	public static final String TAG_DOCUMENT_BADGE = "documentBadge";
-	public static final String TAG_DETAIL = "detail";
 
 	// Federated recommender
 	public static final String RECOMMENDER_LABEL = Config.getValue(Config.RECOMMENDER_LABEL);
