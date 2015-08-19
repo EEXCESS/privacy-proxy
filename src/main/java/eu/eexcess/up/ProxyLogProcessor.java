@@ -7,30 +7,31 @@ import eu.eexcess.Cst;
 import eu.eexcess.JsonUtil;
 
 /**
- * TODO
- * @author ???
- *
+ * This classes is used to process log. 
+ * Basically, each entry of a log is a JSON string. 
+ * @author Thomas Cerqueus
+ * @version 1.0
  */
 public class ProxyLogProcessor {
 
 	/**
-	 * TODO
-	 * @param interactionType
-	 * @param origin
-	 * @param ip
-	 * @param request
+	 * Logs an interaction. 
+	 * @param interactionType Type of the interaction. 
+	 * @param origin Origin of the request. 
+	 * @param ip IP address of the client. 
+	 * @param request Request received by the proxy. 
 	 */
 	public void process(String interactionType, String origin, String ip, String request) {
 		process(interactionType, origin, ip, request, null);
 	}
 
 	/**
-	 * TODO
-	 * @param interactionType
-	 * @param origin
-	 * @param ip
-	 * @param request
-	 * @param answer
+	 * Logs an interaction. 
+	 * @param interactionType Type of the interaction. 
+	 * @param origin Origin of the request. 
+	 * @param ip IP address of the client. 
+	 * @param request Request received by the proxy. 
+	 * @param answer Answer send to the client. 
 	 */
 	public void process(String interactionType, String origin, String ip, String request, String answer) {
 
