@@ -21,7 +21,6 @@ public class Cst {
 	// Services
 	public static final String VERSION = "/v1";
 	public static final String PATH_GET_REGISTERED_PARTNERS = "/getRegisteredPartners";
-	public static final String PATH_GET_PARTNER_FAVICON = "/getPartnerFavIcon";
 	public static final String PATH_RECOMMEND = "/recommend";
 	public static final String PATH_GET_DETAILS = "/getDetails";
 	public static final String PATH_LOG = "/log/{InteractionType}";
@@ -91,7 +90,6 @@ public class Cst {
 	public static final String SERVICE_GET_DETAILS = RECOMMENDER_API_URL + PATH_GET_DETAILS;
 	public static final String SERVICE_GET_REGISTERED_PARTNERS = RECOMMENDER_API_URL + PATH_GET_REGISTERED_PARTNERS;
 	public static final String SERVICE_DISAMBIGUATION = DISAMBIGUATER_API_URL + "/categorysuggestion";
-	public static final String SERVICE_GET_PARTNER_FAVICON = RECOMMENDER_API_URL + PATH_GET_PARTNER_FAVICON;
 	
 	// Loggers
 	public static final String PATH_LOG_DIRECTORY = Config.getValue(Config.LOG_DIRECTORY);
