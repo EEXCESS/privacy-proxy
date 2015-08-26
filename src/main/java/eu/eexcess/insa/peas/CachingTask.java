@@ -24,13 +24,13 @@ import eu.eexcess.JsonUtil;
 public class CachingTask extends TimerTask {
 	
 	// Query log
-	protected String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
+	protected String queryLogLocation = Cst.CATALINA_BASE + Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
 	// Co-occurrence graph cache
-	protected String cacheCoOccurrenceGraphLocation = Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
-	protected String tmpCacheCoOccurrenceGraphLocation = Config.getValue(Config.CACHE_DIRECTORY) + Cst.TMP_FILE_PREFIX + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
+	protected String cacheCoOccurrenceGraphLocation = Cst.CATALINA_BASE + Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
+	protected String tmpCacheCoOccurrenceGraphLocation = Cst.CATALINA_BASE + Config.getValue(Config.CACHE_DIRECTORY) + Cst.TMP_FILE_PREFIX + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
 	// Maximal cliques cache
-	protected String cacheMaximalCliquesLocation = Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CLIQUES_FILE);
-	protected String tmpCacheMaximalCliquesLocation = Config.getValue(Config.CACHE_DIRECTORY) + Cst.TMP_FILE_PREFIX + Config.getValue(Config.CLIQUES_FILE);
+	protected String cacheMaximalCliquesLocation = Cst.CATALINA_BASE + Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CLIQUES_FILE);
+	protected String tmpCacheMaximalCliquesLocation = Cst.CATALINA_BASE + Config.getValue(Config.CACHE_DIRECTORY) + Cst.TMP_FILE_PREFIX + Config.getValue(Config.CLIQUES_FILE);
 	
 	/**
 	 * Default constructor. 

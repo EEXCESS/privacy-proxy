@@ -19,7 +19,7 @@ import eu.eexcess.Cst;
  */
 public class QueryLogThread extends Thread {
 	
-	protected static String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
+	protected static String queryLogLocation = Cst.CATALINA_BASE + Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
 	protected JSONObject query;
 	
 	/**
@@ -37,17 +37,17 @@ public class QueryLogThread extends Thread {
 	}
 	
 	/**
-	 * Logs the query in the file. The query is added at the end with a timestamp. 
+	 * Logs the query (format QF1) in the file. 
+	 * The query is added at the end of the log and is associated with a time stamp. 
 	 */
 	@Override
 	public void run() {
-		Date currentDate = new Date();
-		Long timestamp = currentDate.getTime();
-		String queryString = "";
 		if (query.has(Cst.TAG_CONTEXT_KEYWORDS)){
+			Date currentDate = new Date();
+			String queryString = currentDate.getTime() + Cst.COLUMN_SEPARATOR;
 			JSONArray queryArray = query.getJSONArray(Cst.TAG_CONTEXT_KEYWORDS);
 			for (int i = 0 ; i < queryArray.length() ; i++){
-				JSONObject queryTerm = queryArray.getJSONObject(i);
+				JSONObject queryTerm =  queryArray.getJSONObject(i);
 				if (queryTerm.has(Cst.TAG_QUERY_TEXT)){
 					queryString += queryTerm.getString(Cst.TAG_QUERY_TEXT);
 					if (i < (queryArray.length() - 1)){
@@ -56,17 +56,18 @@ public class QueryLogThread extends Thread {
 				}
 				
 			}
-		}
-		try {
-			FileWriter writer = new FileWriter(queryLogLocation, true);
-			BufferedWriter buffer = new BufferedWriter(writer);
-			PrintWriter print = new PrintWriter(buffer);
-			print.write(timestamp + Cst.COLUMN_SEPARATOR + queryString + Cst.LINE_BREAK);
-			print.close();
-			buffer.close();
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+			queryString += Cst.LINE_BREAK;
+			try {
+				FileWriter writer = new FileWriter(queryLogLocation, true);
+				BufferedWriter buffer = new BufferedWriter(writer);
+				PrintWriter print = new PrintWriter(buffer);
+				print.write(queryString);
+				print.close();
+				buffer.close();
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

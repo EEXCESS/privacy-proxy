@@ -20,8 +20,8 @@ import eu.eexcess.Cst;
  */
 public class QueryLogFlushOutTask extends TimerTask {
 	
-	protected String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
-	protected String tmpQueryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Cst.TMP_FILE_PREFIX + Config.getValue(Config.QUERY_LOG);
+	protected String queryLogLocation = Cst.CATALINA_BASE + Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
+	protected String tmpQueryLogLocation = Cst.CATALINA_BASE + Config.getValue(Config.DATA_DIRECTORY) + Cst.TMP_FILE_PREFIX + Config.getValue(Config.QUERY_LOG);
 	protected Long window = Long.valueOf(Config.getValue(Config.QUERY_LOG_WINDOW));
 
 	/**

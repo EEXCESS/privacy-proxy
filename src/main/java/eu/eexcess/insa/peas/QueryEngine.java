@@ -96,10 +96,10 @@ public class QueryEngine {
 	 */
 	public Response processQuery(String origin, HttpServletRequest req, JSONObject query, QueryFormats type){
 		Response resp = Response.status(Status.BAD_REQUEST).build();
-		if (type.equals(QueryFormats.QF1) || type.equals(QueryFormats.QF2)) {
+		if (type.equals(QueryFormats.QF1)) {
 			QueryLogThread thread = new QueryLogThread();
 			thread.log(query);
-		}
+		} 
 		if (type.equals(QueryFormats.QF2)){
 			resp = processObfuscatedQuery(origin, req, query);
 		} else if (type.equals(QueryFormats.QF1) || type.equals(QueryFormats.QF3)){

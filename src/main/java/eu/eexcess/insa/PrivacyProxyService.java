@@ -1,5 +1,6 @@
 package eu.eexcess.insa;
 
+import java.io.File;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -368,6 +369,29 @@ public class PrivacyProxyService {
 		}
 		jsonCliques = JsonUtil.sBrackets(jsonCliques);
 		resp = Response.ok().entity(jsonCliques).build();
+		
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		return resp;
+	}
+	
+	@GET
+	@Path("queryLog")
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response getQueryLog(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+			@Context HttpServletRequest req,
+			@Context HttpServletResponse servletResp) {
+		
+		Response resp = null;
+		String base = System.getProperty("catalina.base");
+		String folder = Config.getValue(Config.DATA_DIRECTORY);
+		
+		String queryLogLocation = base + folder + Config.getValue(Config.QUERY_LOG);
+		File queryLog = new File(queryLogLocation);
+		String content = queryLogLocation + " exists: " + queryLog.exists() + "\n";
+		
+		
+		resp = Response.ok().entity(content).build();
 		
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);

@@ -11,6 +11,7 @@ import java.util.List;
 import org.json.JSONArray;
 
 import eu.eexcess.Config;
+import eu.eexcess.Cst;
 
 /**
  * This class is used to read caches. It allows reading the co-occurrence graph cache and the maximal cliques graph. 
@@ -22,8 +23,8 @@ public class CacheReader {
 
 	private static volatile CacheReader instance = null;
 	
-	protected String cacheCoOccurrenceGraphLocation = Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
-	protected String cacheMaximalCliquesLocation = Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CLIQUES_FILE);
+	protected String cacheCoOccurrenceGraphLocation = Cst.CATALINA_BASE + Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
+	protected String cacheMaximalCliquesLocation = Cst.CATALINA_BASE + Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CLIQUES_FILE);
 	
 	/**
 	 * Default constructor. 
