@@ -1,0 +1,25 @@
+#!/bin/bash
+
+source ./common
+
+if [ "$#" -eq 1 ]; then 
+
+	R1=`./queryLog $1 GET`
+	R2=`./getRegisteredPartners $1 GET`
+	R3=`./recommend $1 POST ../resources/query-QF1.json`
+	R4=`./recommend $1 POST ../resources/query-QF2.json`
+	R5=`./getDetails $1 POST ../resources/query-QF3.json`
+	R6=`./getCoOccurrenceGraph $1 GET`
+	R7=`./getMaximalCliques $1 GET`
+
+	printVerdict "queryLog" $R1
+	printVerdict "getRegisteredPartners" $R2
+	printVerdict "recommend QF1" $R3
+	printVerdict "recommend QF2" $R4
+	printVerdict "getDetails" $R5
+	printVerdict "getCoOccurrenceGraph" $R6
+	printVerdict "getMaximalCliques" $R7
+
+else 
+	echo "Usage 'runTests local-eclipse|local|remote-dev|remote-dev-test|<http://your-server/'"
+fi
