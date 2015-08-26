@@ -1,0 +1,10 @@
+{
+	"numResults":3,
+	"contextKeywords":[{
+		"text":"graz",
+		"weight":0.1
+	},{
+		"text":"vienna", 
+		"weight":0.1
+	}]
+}

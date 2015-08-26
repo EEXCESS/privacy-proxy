@@ -6,7 +6,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Implements the Singleton design pattern. 
+ * This class is the configuration file manager. 
+ * It implements the Singleton design pattern. 
  * @author Thomas Cerqueus
  */
 public class Config {
@@ -25,9 +26,16 @@ public class Config {
 	public static final String LOGGER_INTERACTION = "logging.interaction";
 	public static final String LOGGER_FACET_SCAPE = "logging.interaction";
 	
-	public static final String DICTIONARY_LOCATION = "dictionary.location";
-	public static final String HISTORY_LOCATION = "history.location";
-	public static final String CLIQUES_CACHE_LOCATION = "cliques.cache.location";
+	public static final String DATA_DIRECTORY = "data.directory";
+	public static final String CACHE_DIRECTORY = "cache.directory";
+	
+	
+	public static final String QUERY_LOG = "data.queryLog";
+	public static final String QUERY_LOG_DELAY = "data.queryLog.delay";
+	public static final String QUERY_LOG_WINDOW = "data.queryLog.window";
+	public static final String CO_OCCURRENCE_GRAPH_FILE = "cache.coOccurrenceGraph";
+	public static final String CLIQUES_FILE = "cache.cliques";
+	public static final String CACHE_DELAY = "cache.delay";
 	
 	// Configuration file
 	private static final String PROP_FILE_NAME = "config.properties";
@@ -35,7 +43,7 @@ public class Config {
 	private static Properties prop = null;
 
 	/**
-	 * 
+	 * Initialization of the configuration file manager. 
 	 */
 	public Config(){
 		Config.prop = new Properties();
@@ -52,7 +60,7 @@ public class Config {
 	}
 
 	/**
-	 * TODO
+	 * Retrieves the value associate with a given key. 
 	 * @param key Key of the variable. 
 	 * @return Value corresponding to the key.  
 	 */

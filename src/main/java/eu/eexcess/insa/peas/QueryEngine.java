@@ -33,8 +33,21 @@ import eu.eexcess.insa.QueryFormats;
  */
 public class QueryEngine {
 
+	private static volatile QueryEngine instance = null;
+	
 	/** Default constructor. */
-	public QueryEngine(){}
+	private QueryEngine(){}
+	
+	/**
+	 * Method used in the implementation of the Singleton pattern. 
+	 * @return an instance of {@code QueryLog}. 
+	 */
+	public static QueryEngine getInstance(){
+		if (instance == null){
+			instance = new QueryEngine();
+		}
+		return instance;
+	}
 
 	/**
 	 * Alters the query to generate a query identifier (if needed), 
@@ -83,6 +96,10 @@ public class QueryEngine {
 	 */
 	public Response processQuery(String origin, HttpServletRequest req, JSONObject query, QueryFormats type){
 		Response resp = Response.status(Status.BAD_REQUEST).build();
+		if (type.equals(QueryFormats.QF1)) {
+			QueryLogThread thread = new QueryLogThread();
+			thread.log(query);
+		} 
 		if (type.equals(QueryFormats.QF2)){
 			resp = processObfuscatedQuery(origin, req, query);
 		} else if (type.equals(QueryFormats.QF1) || type.equals(QueryFormats.QF3)){
@@ -98,6 +115,7 @@ public class QueryEngine {
 					.post(ClientResponse.class, query.toString());
 			String output = response.getEntity(String.class);
 			if (type.equals(QueryFormats.QF3)){
+				// Not sure why it's needed on the privacy proxy
 				output = correctDetailField(output);
 			}
 			Integer status = response.getStatus();
@@ -157,13 +175,20 @@ public class QueryEngine {
 		}
 		return resp;
 	}
-
+	
 	/**
+<<<<<<< HEAD
 	 * TODO
 	 * This method ensures that the "detail" attribute is well-formed. 
 	 * Ideally it should not be here. 
 	 * @param jsonString
 	 * @return
+=======
+	 * This method ensures that the "detail" attribute is well-formed. 
+	 * Ideally it should not be here (it should be done on the federated recommender). 
+	 * @param jsonString The JSON string to be corrected. 
+	 * @return A JSON string. 
+>>>>>>> dev
 	 */
 	protected String correctDetailField(String jsonString){ 
 		JSONObject tempResponse = new JSONObject(jsonString);

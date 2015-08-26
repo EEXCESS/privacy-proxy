@@ -6,32 +6,33 @@ import eu.eexcess.up.ProxyLogProcessor;
 
 /**
  * This class contains all the constants used in the project. 
- * @author Thomas
+ * @author Thomas Cerqueus
  *
  */
 public class Cst {
 	
+	// Path
+	public static final String CATALINA_BASE = System.getProperty("catalina.base");
+	
 	// Errors
-	public static final String ERR_MSG_NOT_REST_API = "not a valid REST API";
 	public static final String SPACE = " ";
 	public static final String EMPTY_ORIGIN = "empty";
 	
 	// Services
 	public static final String VERSION = "/v1";
+	public static final String PATH_GET_REGISTERED_PARTNERS = "/getRegisteredPartners";
+	public static final String PATH_GET_PARTNER_FAVICON = "/getPartnerFavIcon";
 	public static final String PATH_RECOMMEND = "/recommend";
 	public static final String PATH_GET_DETAILS = "/getDetails";
-	public static final String PATH_GET_CLIQUES = "/getCliques";
-	public static final String PATH_GET_CO_OCCURRENCE_GRAPH = "/getCoOccurrenceGraph";
-	public static final String PATH_GET_DICTIONARY = "/getDictionary";
 	public static final String PATH_LOG = "/log/{InteractionType}";
 	public static final String PATH_DISAMBIGUATE = "/disambiguate";
-	public static final String PATH_GET_REGISTERED_PARTNERS = "/getRegisteredPartners";
-	public static final String PATH_CATEGORY_SUGGESTION = "/categorysuggestion";
+	//public static final String PATH_CATEGORY_SUGGESTION = "/categorysuggestion";
+	public static final String PATH_GET_CLIQUES = "/getMaximalCliques";
+	public static final String PATH_GET_CO_OCCURRENCE_GRAPH = "/getCoOccurrenceGraph";
 	
 	public static final String PARAM_ORIGIN = "origin";
 	
 	// Tags
-	public static final String TAG_HTTP_ERR_CODE = "HTTPErrorCode";
 	public static final String TAG_ORIGIN = "origin";
 	public static final String TAG_IP = "ip";
 	public static final String TAG_ID = "id";
@@ -47,6 +48,9 @@ public class Cst {
 	public static final String TAG_FACETS = "facets";
 	public static final String TAG_PROVIDER = "provider";
 	public static final String TAG_PROVIDER_SHORT = "p";
+	public static final String TAG_QUERY_TEXT = "text";
+	public static final String TAG_DOCUMENT_BADGE = "documentBadge";
+	public static final String TAG_DETAIL = "detail";
 	
 	// Access control
 	private static final String ACA = "Access-Control-Allow-";
@@ -72,8 +76,6 @@ public class Cst {
 	public static final String TAG_TERM = "term";
 	public static final String TAG_FREQUENCIES = "frequencies";
 	public static final String TAG_FREQUENCY = "frequency";
-	public static final String TAG_DOCUMENT_BADGE = "documentBadge";
-	public static final String TAG_DETAIL = "detail";
 
 	// Federated recommender
 	public static final String RECOMMENDER_LABEL = Config.getValue(Config.RECOMMENDER_LABEL);
@@ -88,8 +90,9 @@ public class Cst {
 	public static final String SERVICE_RECOMMEND = RECOMMENDER_API_URL + PATH_RECOMMEND;
 	public static final String SERVICE_GET_DETAILS = RECOMMENDER_API_URL + PATH_GET_DETAILS;
 	public static final String SERVICE_GET_REGISTERED_PARTNERS = RECOMMENDER_API_URL + PATH_GET_REGISTERED_PARTNERS;
-	public static final String SERVICE_DISAMBIGUATION = DISAMBIGUATER_API_URL + PATH_CATEGORY_SUGGESTION;
-
+	public static final String SERVICE_DISAMBIGUATION = DISAMBIGUATER_API_URL + "/categorysuggestion";
+	public static final String SERVICE_GET_PARTNER_FAVICON = RECOMMENDER_API_URL + PATH_GET_PARTNER_FAVICON;
+	
 	// Loggers
 	public static final String PATH_LOG_DIRECTORY = Config.getValue(Config.LOG_DIRECTORY);
 	public static final Logger LOGGER_PRIVACY_PROXY = Logger.getLogger(Config.getValue(Config.LOGGER_PRIVACY_PROXY));
@@ -99,6 +102,12 @@ public class Cst {
 	// Log processor
 	public static final ProxyLogProcessor LOG_PROCESSOR = new ProxyLogProcessor();
 	
-	// JSON 
+	// 
+	public static final String COLUMN_SEPARATOR = "\t";
+	public static final String KEYWORDS_SEPARATOR = Cst.SPACE;
+	public static final String MATCHING_CRITERION = "^\\w{3,}$"; // Words with at least 3 characters
+	public static final String LINE_BREAK = System.getProperty("line.separator"); 
+	
+	public static final String TMP_FILE_PREFIX = "tmp-";
 	
 }

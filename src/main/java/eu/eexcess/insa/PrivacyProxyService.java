@@ -1,5 +1,6 @@
 package eu.eexcess.insa;
 
+import java.io.File;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,13 +24,14 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
+import eu.eexcess.Config;
 import eu.eexcess.Cst;
 import eu.eexcess.JsonUtil;
+import eu.eexcess.insa.peas.CacheReader;
 import eu.eexcess.insa.peas.Clique;
-//import eu.eexcess.Util;
 import eu.eexcess.insa.peas.CoOccurrenceGraph;
-import eu.eexcess.insa.peas.Dictionary;
 import eu.eexcess.insa.peas.QueryEngine;
+import eu.eexcess.insa.peas.Scheduler;
 
 /**
  * This class defines all the services offered by the Privacy Proxy. 
@@ -38,6 +40,44 @@ import eu.eexcess.insa.peas.QueryEngine;
  */
 @Path(Cst.VERSION)
 public class PrivacyProxyService {
+	
+	protected String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
+	
+	/**
+	 * Initialization of the Privacy Proxy. 
+	 */
+	public PrivacyProxyService(){
+		Scheduler.addCachesTasks();
+		Scheduler.flushOutQueryLogTask();
+	}
+	
+	/**
+	 * Service returning the list of registered partners. 
+	 * This service only forwards the query to the federated recommender, 
+	 * and returns the result. 
+	 * @param servletResp HTTP response. 
+	 * @return The list of partners registered on the federated recommender. 
+	 */
+	@GET
+	@Path(Cst.PATH_GET_REGISTERED_PARTNERS)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getRegisteredPartners(@Context HttpServletResponse servletResp) {
+		Response response;
+		Client client = Client.create();
+		WebResource webResource = client.resource(Cst.SERVICE_GET_REGISTERED_PARTNERS);
+		ClientResponse r = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		int status = r.getStatus();
+		if (status == Response.Status.OK.getStatusCode()){
+			String output = r.getEntity(String.class);
+			response = Response.ok().entity(output).build();
+		} else {
+			response = Response.status(status).build();
+		}
+	
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		return response;
+	}
 
 	/**
 	 * Service providing recommendations for a query. 
@@ -45,7 +85,7 @@ public class PrivacyProxyService {
 	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @param queryStr Query of format QF1 or QF2 (both are supported). 
-	 * @return Result containing a set of recommendations. The format is RF1 (respectively RF2) if the format of the query is QF1 (respectively QF2). 
+	 * @return A set of recommendations. The format is RF1 (respectively RF2) if the format of the query is QF1 (respectively QF2). 
 	 * @see QueryEngine
 	 */
 	@POST
@@ -56,14 +96,14 @@ public class PrivacyProxyService {
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp, 
 			String queryStr) {
-
+		
 		Response resp;
 		
 		JSONObject query = new JSONObject(queryStr);
 		
 		if (origin == null) { origin = Cst.EMPTY_ORIGIN; }
 		
-		QueryEngine engine = new QueryEngine();
+		QueryEngine engine = QueryEngine.getInstance();
 		query = engine.alterQuery(origin, query);
 		if (engine.isObfuscatedQuery(query)){
 			resp = engine.processQuery(origin, req, query, QueryFormats.QF2);
@@ -103,7 +143,7 @@ public class PrivacyProxyService {
 	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @param detailsStr
-	 * @return TODO
+	 * @return A set of detailed results (aka document badges). 
 	 */
 	@POST
 	@Path(Cst.PATH_GET_DETAILS)
@@ -118,7 +158,7 @@ public class PrivacyProxyService {
 		
 		if (origin == null) { origin = Cst.EMPTY_ORIGIN; }
 		
-		QueryEngine engine = new QueryEngine();
+		QueryEngine engine = QueryEngine.getInstance();
 		Response resp = engine.processQuery(origin, req, detailsQuery, QueryFormats.QF3);
 		
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
@@ -169,24 +209,24 @@ public class PrivacyProxyService {
 
 		Response resp = Response.ok().build();
 		/*
-//		String ip = req.getRemoteAddr();
+		String ip = req.getRemoteAddr();
 
 		if (interactionType.equals(Cst.RATING) || 
 				interactionType.equals(Cst.RESULT_CLOSE) || 
 				interactionType.equals(Cst.RESULT_VIEW) ||
 				interactionType.equals(Cst.SHOW_HIDE) ||
 				interactionType.equals(Cst.QUERY_ACTIVATED)){
-			//Cst.LOG_PROCESSOR.process(interactionType, origin, ip, input);
+			Cst.LOG_PROCESSOR.process(interactionType, origin, ip, input);
 		} else if (interactionType.equals(Cst.FACET_SCAPE)) {
-//			String msg = Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
-//					+ Util.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
-//					+ input;
-//			Cst.LOGGER_FACET_SCAPE.trace(msg);
+			String msg = JsonUtil.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
+					+ JsonUtil.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
+					+ input;
+			Cst.LOGGER_FACET_SCAPE.trace(msg);
 		} else {
-//			String msg = Util.sBrackets(Cst.PATH_LOG_DIRECTORY + interactionType) + Cst.SPACE
-//					+ Util.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
-//					+ Cst.PATH_LOG_DIRECTORY + interactionType + Cst.SPACE + Cst.ERR_MSG_NOT_REST_API;
-//			Cst.LOGGER_PRIVACY_PROXY.error(msg);
+			String msg = JsonUtil.sBrackets(Cst.PATH_LOG_DIRECTORY + interactionType) + Cst.SPACE
+					+ JsonUtil.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
+					+ Cst.PATH_LOG_DIRECTORY + interactionType + Cst.SPACE + Cst.ERR_MSG_NOT_REST_API;
+			Cst.LOGGER_PRIVACY_PROXY.error(msg);
 			resp = Response.status(Response.Status.NOT_FOUND).build();
 		}
 		*/
@@ -197,7 +237,6 @@ public class PrivacyProxyService {
 	}
 	
 	/**
-	 * XXX Not sure this service is used. 
 	 * Default service logging interactions. 
 	 * It does not do anything else than returning the header. 
 	 * @param interactionType  
@@ -224,16 +263,17 @@ public class PrivacyProxyService {
 	 * Service logging disambiguation calls. 
 	 * @param servletResp HTTP response. 
 	 * @param input XXX Don't know what this parameter is supposed to contain. 
-	 * @return TODO
+	 * @return XXX Don't know what this method is supposed to return. 
 	 */
 	@POST
 	@Path(Cst.PATH_DISAMBIGUATE)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response logDisambiguate(@Context HttpServletResponse servletResp, String input) {
+	public Response disambiguate(@Context HttpServletResponse servletResp, String input) {
 		// Forward the query
 		Client client = Client.create();
 		WebResource webResource = client.resource(Cst.SERVICE_DISAMBIGUATION);
+		System.out.println(Cst.SERVICE_DISAMBIGUATION);
 		ClientResponse response = webResource
 				.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
 				.post(ClientResponse.class, input);
@@ -266,7 +306,7 @@ public class PrivacyProxyService {
 	@Path(Cst.PATH_DISAMBIGUATE)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response logDisambiguate(@Context HttpServletResponse servletResp) {
+	public Response disambiguate(@Context HttpServletResponse servletResp) {
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
@@ -274,41 +314,13 @@ public class PrivacyProxyService {
 	}
 	
 	/**
-	 * Service returning the list of registered partners. 
-	 * This service only forwards the query to the federated recommender, 
-	 * and returns the result. 
-	 * @param servletResp HTTP response. 
-	 * @return The list of partners registered on the federated recommender. 
-	 */
-	@GET
-	@Path(Cst.PATH_GET_REGISTERED_PARTNERS)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getRegisteredPartners(@Context HttpServletResponse servletResp) {
-		Response response;
-		Client client = Client.create();
-		WebResource webResource = client.resource(Cst.SERVICE_GET_REGISTERED_PARTNERS);
-		ClientResponse r = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-		int status = r.getStatus();
-		if (status == Response.Status.OK.getStatusCode()){
-			String output = r.getEntity(String.class);
-			response = Response.ok().entity(output).build();
-		} else {
-			response = Response.status(status).build();
-		}
-
-		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
-		return response;
-	}
-	
-	/**
 	 * Service providing access to the co-occurrence graph. 
-	 * The co-occurence graph is supposed to be up-to-date at any time (no caching).   
+	 * The co-occurrence graph is supposed to be up-to-date at any time (no caching).   
 	 * @param origin Origin of the query. 
 	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @return A co-occurrence graph. 
-	 * @see eu.eexcess.insa.peas.CoOccurrenceGraph
+	 * @see eu.eexcess.insa.peas.CacheReader
 	 */
 	@GET
 	@Path(Cst.PATH_GET_CO_OCCURRENCE_GRAPH)
@@ -317,7 +329,8 @@ public class PrivacyProxyService {
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
 		
-		CoOccurrenceGraph graph = new CoOccurrenceGraph();
+		CacheReader cacheReader = CacheReader.getInstance();
+		CoOccurrenceGraph graph = cacheReader.getCoOccurrenceGraph();
 		String output = graph.toJsonString();
 		
 		Response resp = Response.ok().entity(output).build();
@@ -340,14 +353,13 @@ public class PrivacyProxyService {
 	@GET
 	@Path(Cst.PATH_GET_CLIQUES)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getCliques(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+	public Response getMaximalCliques(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
 		
 		Response resp = null;
-		
-		CoOccurrenceGraph graph = new CoOccurrenceGraph();
-		List<Clique> cliques = graph.getMaximalCliques();
+		CacheReader cacheReader = CacheReader.getInstance();
+		List<Clique> cliques = cacheReader.getMaximalCliques();
 		String jsonCliques = "";
 		for (Clique clique : cliques){
 			jsonCliques += clique.toJsonString() + JsonUtil.CS;
@@ -363,30 +375,27 @@ public class PrivacyProxyService {
 		return resp;
 	}
 	
-	/**
-	 * Service providing a dictionary. 
-	 * The dictionary is expected to be static so every call will return the exact same result. 
-	 * The number of entries is not very large (~4000 entries).  
-	 * @param origin Origin of the query. 
-	 * @param req HTTP request. 
-	 * @param servletResp HTTP response. 
-	 * @return A set of words. 
-	 */
 	@GET
-	@Path(Cst.PATH_GET_DICTIONARY)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getDictionary(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+	@Path("queryLog")
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response getQueryLog(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
 		
-		Dictionary dictionary = new Dictionary();
-		String output = dictionary.toJsonString();
+		Response resp = null;
+		String base = System.getProperty("catalina.base");
+		String folder = Config.getValue(Config.DATA_DIRECTORY);
 		
-		Response resp = Response.ok().entity(output).build();
+		String queryLogLocation = base + folder + Config.getValue(Config.QUERY_LOG);
+		File queryLog = new File(queryLogLocation);
+		String content = queryLogLocation + " exists: " + queryLog.exists() + "\n";
+		
+		
+		resp = Response.ok().entity(content).build();
 		
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
-	
+
 }
