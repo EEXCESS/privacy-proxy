@@ -1,6 +1,6 @@
 package eu.eexcess.insa;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +13,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -49,34 +50,6 @@ public class PrivacyProxyService {
 	public PrivacyProxyService(){
 		Scheduler.addCachesTasks();
 		Scheduler.flushOutQueryLogTask();
-	}
-	
-	/**
-	 * Service returning the list of registered partners. 
-	 * This service only forwards the query to the federated recommender, 
-	 * and returns the result. 
-	 * @param servletResp HTTP response. 
-	 * @return The list of partners registered on the federated recommender. 
-	 */
-	@GET
-	@Path(Cst.PATH_GET_REGISTERED_PARTNERS)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getRegisteredPartners(@Context HttpServletResponse servletResp) {
-		Response response;
-		Client client = Client.create();
-		WebResource webResource = client.resource(Cst.SERVICE_GET_REGISTERED_PARTNERS);
-		ClientResponse r = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-		int status = r.getStatus();
-		if (status == Response.Status.OK.getStatusCode()){
-			String output = r.getEntity(String.class);
-			response = Response.ok().entity(output).build();
-		} else {
-			response = Response.status(status).build();
-		}
-	
-		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
-		return response;
 	}
 
 	/**
@@ -201,7 +174,7 @@ public class PrivacyProxyService {
 	@POST
 	@Path(Cst.PATH_LOG)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response log(@PathParam("InteractionType") String interactionType,
+	public Response log(@PathParam(Cst.PARAM_INTERACTION_TYPE) String interactionType,
 			@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp,
@@ -248,7 +221,7 @@ public class PrivacyProxyService {
 	@OPTIONS
 	@Path(Cst.PATH_LOG)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response log(@PathParam("InteractionType") String interactionType,
+	public Response log(@PathParam(Cst.PARAM_INTERACTION_TYPE) String interactionType,
 			@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
@@ -375,27 +348,65 @@ public class PrivacyProxyService {
 		return resp;
 	}
 	
+	/**
+	 * Service returning the list of registered partners. 
+	 * This service only forwards the query to the federated recommender, 
+	 * and returns the result. 
+	 * @param servletResp HTTP response. 
+	 * @return The list of partners registered on the federated recommender. 
+	 */
 	@GET
-	@Path("queryLog")
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response getQueryLog(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+	@Path(Cst.PATH_GET_REGISTERED_PARTNERS)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getRegisteredPartners(@Context HttpServletResponse servletResp) {
+		Response response;
+		Client client = Client.create();
+		WebResource webResource = client.resource(Cst.SERVICE_GET_REGISTERED_PARTNERS);
+		ClientResponse r = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		int status = r.getStatus();
+		if (status == Response.Status.OK.getStatusCode()){
+			String output = r.getEntity(String.class);
+			response = Response.ok().entity(output).build();
+		} else {
+			response = Response.status(status).build();
+		}
+	
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		return response;
+	}
+	
+	/**
+	 * TODO
+	 * @param partnerId
+	 * @param origin
+	 * @param req
+	 * @param servletResp
+	 * @return
+	 */
+	@GET
+	@Path(Cst.PATH_GET_PARTNER_FAVICON)
+	@Produces(Cst.MEDIA_TYPE_IMAGE)
+	public Response getPartnerFavIcon(@QueryParam(Cst.PARAM_PARTNER_ID) String partnerId, 
+			@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp) {
 		
-		Response resp = null;
-		String base = System.getProperty("catalina.base");
-		String folder = Config.getValue(Config.DATA_DIRECTORY);
-		
-		String queryLogLocation = base + folder + Config.getValue(Config.QUERY_LOG);
-		File queryLog = new File(queryLogLocation);
-		String content = queryLogLocation + " exists: " + queryLog.exists() + "\n";
-		
-		
-		resp = Response.ok().entity(content).build();
-		
+		Response response;
+		Client client = Client.create();
+		WebResource webResource = client.resource(Cst.SERVICE_GET_PARTNER_FAVICON).queryParam(Cst.PARAM_PARTNER_ID, partnerId);
+		ClientResponse r = webResource.accept(Cst.MEDIA_TYPE_IMAGE).type(Cst.MEDIA_TYPE_IMAGE).get(ClientResponse.class);
+		int status = r.getStatus();
+		if (status == Response.Status.OK.getStatusCode()){
+            InputStream output = r.getEntity(InputStream.class);
+			response = Response.ok().entity(output).build();
+		} else {
+			response = Response.status(status).build();
+		}
+	
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
-		return resp;
+		return response;
 	}
 
 }
