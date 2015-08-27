@@ -4,6 +4,7 @@ source ./common.sh
 
 if [ "$#" -eq 1 ]; then 
 
+	# Calls
 	R1=`./getRegisteredPartners.sh $1 GET`
 	R2=`./recommend.sh $1 POST ../resources/query-QF1.json`
 	R3=`./recommend.sh $1 POST ../resources/query-QF2.json`
@@ -17,6 +18,7 @@ if [ "$#" -eq 1 ]; then
 	rm $File2
 	./getPreviewImage.sh $1 GET unknown $File2
 	
+	# Verdicts	
 	printVerdictJson "getRegisteredPartners" $R1
 	printVerdictJson "recommend QF1" $R2
 	printVerdictJson "recommend QF2" $R3
@@ -26,6 +28,10 @@ if [ "$#" -eq 1 ]; then
 
 	printVerdictFile "getPartnerFavIcon" $File1
 	printVerdictFile "getPreviewImage" $File2
+	
+	# Cleaning
+	rm $File1
+	rm $File2
 
 else 
 	echo "Usage 'runTests local-eclipse|local|remote-dev|remote-dev-test|<http://your-server/'"

@@ -17,7 +17,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.json.JSONObject;
 
@@ -231,60 +230,60 @@ public class PrivacyProxyService {
 		return Response.ok().build();
 	}
 
-	/**
-	 * XXX Not sure this service is used. 
-	 * Service logging disambiguation calls. 
-	 * @param servletResp HTTP response. 
-	 * @param input XXX Don't know what this parameter is supposed to contain. 
-	 * @return XXX Don't know what this method is supposed to return. 
-	 */
-	@POST
-	@Path(Cst.PATH_DISAMBIGUATE)
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response disambiguate(@Context HttpServletResponse servletResp, String input) {
-		// Forward the query
-		Client client = Client.create();
-		WebResource webResource = client.resource(Cst.SERVICE_DISAMBIGUATION);
-		System.out.println(Cst.SERVICE_DISAMBIGUATION);
-		ClientResponse response = webResource
-				.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
-				.post(ClientResponse.class, input);
-
-		String output = response.getEntity(String.class);
-
-		Response resp;
-		if (response.getStatus() == Response.Status.CREATED.getStatusCode() || response.getStatus() == Response.Status.OK.getStatusCode()) {
-			resp = Response.ok().entity(output).build();
-		} else {
+//	/**
+//	 * Service logging disambiguation calls. 
+//	 * @param servletResp HTTP response. 
+//	 * @param input XXX Don't know what this parameter is supposed to contain. 
+//	 * @return XXX Don't know what this method is supposed to return. 
+//	 */
+//	@POST
+//	@Path(Cst.PATH_DISAMBIGUATE)
+//	@Consumes(MediaType.APPLICATION_JSON)
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public Response disambiguate(@Context HttpServletResponse servletResp, String input) {
+//		// Forward the query
+//		Client client = Client.create();
+//		WebResource webResource = client.resource(Cst.SERVICE_DISAMBIGUATION);
+//		System.out.println(Cst.SERVICE_DISAMBIGUATION);
+//		ClientResponse response = webResource
+//				.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
+//				.post(ClientResponse.class, input);
+//
+//		String output = response.getEntity(String.class);
+//
+//		Response resp;
+//		if (response.getStatus() == Response.Status.CREATED.getStatusCode() || response.getStatus() == Response.Status.OK.getStatusCode()) {
+//			resp = Response.ok().entity(output).build();
+//		} else {
+//			/*
 //			String msg = Util.sBrackets(Cst.PATH_DISAMBIGUATE) + Cst.SPACE
 //					+ Util.sBracketsColon(Cst.TAG_HTTP_ERR_CODE, response.getStatus()) + Cst.SPACE 
 //					+ output;
 //			Cst.LOGGER_PRIVACY_PROXY.error(msg);
-			resp = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-		}
-		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
-		return resp;
-	}
-
-	/**
-	 * XXX Not sure this service is used. 
-	 * Default service logging disambiguation calls. 
-	 * It does not do anything else than returning the header. 
-	 * @param servletResp HTTP response. 
-	 * @return An empty response with status OK. 
-	 */
-	@OPTIONS
-	@Path(Cst.PATH_DISAMBIGUATE)
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response disambiguate(@Context HttpServletResponse servletResp) {
-		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
-		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
-		return Response.ok().build();
-	}
+//			*/
+//			resp = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+//		}
+//		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+//		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+//		return resp;
+//	}
+//
+//	/**
+//	 * Default service logging disambiguation calls. 
+//	 * It does not do anything else than returning the header. 
+//	 * @param servletResp HTTP response. 
+//	 * @return An empty response with status OK. 
+//	 */
+//	@OPTIONS
+//	@Path(Cst.PATH_DISAMBIGUATE)
+//	@Consumes(MediaType.APPLICATION_JSON)
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public Response disambiguate(@Context HttpServletResponse servletResp) {
+//		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+//		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+//		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
+//		return Response.ok().build();
+//	}
 	
 	/**
 	 * Service providing access to the co-occurrence graph. 
@@ -377,12 +376,12 @@ public class PrivacyProxyService {
 	}
 	
 	/**
-	 * TODO
-	 * @param origin
-	 * @param req
-	 * @param servletResp
-	 * @param partnerId
-	 * @return
+	 * Service providing the favicon of a given partner. 
+	 * @param origin Origin of the query. 
+	 * @param req HTTP request. 
+	 * @param servletResp HTTP response. 
+	 * @param partnerId Identifier of a partner. 
+	 * @return An image (image/png). 
 	 */
 	@GET
 	@Path(Cst.PATH_GET_PARTNER_FAVICON)
@@ -410,12 +409,12 @@ public class PrivacyProxyService {
 	}
 
 	/**
-	 * TODO
-	 * @param origin
-	 * @param req
-	 * @param servletResp
-	 * @param type
-	 * @return
+	 * Service providing a default image if a media is missing. 
+	 * @param origin Origin of the query. 
+	 * @param req HTTP request. 
+	 * @param servletResp HTTP response. 
+	 * @param type Type of the missing media. Possible values are : text, audio, 3d, image, video, other, unknown.  
+	 * @return An image (image/png). 
 	 */
 	@GET
 	@Path(Cst.PATH_GET_PREVIEW_IMAGE)
