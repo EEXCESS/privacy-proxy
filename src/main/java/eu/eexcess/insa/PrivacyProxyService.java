@@ -378,19 +378,19 @@ public class PrivacyProxyService {
 	
 	/**
 	 * TODO
-	 * @param partnerId
 	 * @param origin
 	 * @param req
 	 * @param servletResp
+	 * @param partnerId
 	 * @return
 	 */
 	@GET
 	@Path(Cst.PATH_GET_PARTNER_FAVICON)
 	@Produces(Cst.MEDIA_TYPE_IMAGE)
-	public Response getPartnerFavIcon(@QueryParam(Cst.PARAM_PARTNER_ID) String partnerId, 
-			@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+	public Response getPartnerFavIcon(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
-			@Context HttpServletResponse servletResp) {
+			@Context HttpServletResponse servletResp,
+			@QueryParam(Cst.PARAM_PARTNER_ID) String partnerId) {
 		
 		Response response;
 		Client client = Client.create();
@@ -409,4 +409,37 @@ public class PrivacyProxyService {
 		return response;
 	}
 
+	/**
+	 * TODO
+	 * @param origin
+	 * @param req
+	 * @param servletResp
+	 * @param type
+	 * @return
+	 */
+	@GET
+	@Path(Cst.PATH_GET_PREVIEW_IMAGE)
+	@Produces(Cst.MEDIA_TYPE_IMAGE)
+	public Response getPreviewImage(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
+			@Context HttpServletRequest req,
+			@Context HttpServletResponse servletResp,
+			@QueryParam(Cst.PARAM_IMAGE_TYPE) String type) {
+		
+		Response response;
+		Client client = Client.create();
+		WebResource webResource = client.resource(Cst.SERVICE_GET_PREVIEW_IMAGE).queryParam(Cst.PARAM_IMAGE_TYPE, type);
+		ClientResponse r = webResource.accept(Cst.MEDIA_TYPE_IMAGE).type(Cst.MEDIA_TYPE_IMAGE).get(ClientResponse.class);
+		int status = r.getStatus();
+		if (status == Response.Status.OK.getStatusCode()){
+            InputStream output = r.getEntity(InputStream.class);
+			response = Response.ok().entity(output).build();
+		} else {
+			response = Response.status(status).build();
+		}
+		
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		return response;
+	}
+	
 }

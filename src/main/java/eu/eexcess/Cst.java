@@ -25,6 +25,7 @@ public class Cst {
 	public static final String VERSION = "/v1";
 	public static final String PATH_GET_REGISTERED_PARTNERS = "/getRegisteredPartners";
 	public static final String PATH_GET_PARTNER_FAVICON = "/getPartnerFavIcon";
+	public static final String PATH_GET_PREVIEW_IMAGE = "/getPreviewImage";
 	public static final String PATH_RECOMMEND = "/recommend";
 	public static final String PATH_GET_DETAILS = "/getDetails";
 	public static final String PATH_LOG = "/log/{InteractionType}";
@@ -36,6 +37,8 @@ public class Cst {
 	public static final String PARAM_ORIGIN = "origin";
 	public static final String PARAM_INTERACTION_TYPE = "interactionType";
 	public static final String PARAM_PARTNER_ID = "partnerId";
+	public static final String PARAM_IMAGE_TYPE = "type";
+	
 	// Tags
 	public static final String TAG_ORIGIN = "origin";
 	public static final String TAG_IP = "ip";
@@ -95,6 +98,7 @@ public class Cst {
 	public static final String SERVICE_GET_DETAILS = RECOMMENDER_API_URL + PATH_GET_DETAILS;
 	public static final String SERVICE_GET_REGISTERED_PARTNERS = RECOMMENDER_API_URL + PATH_GET_REGISTERED_PARTNERS;
 	public static final String SERVICE_GET_PARTNER_FAVICON = RECOMMENDER_API_URL + PATH_GET_PARTNER_FAVICON;
+	public static final String SERVICE_GET_PREVIEW_IMAGE = RECOMMENDER_API_URL + PATH_GET_PREVIEW_IMAGE;
 	public static final String SERVICE_DISAMBIGUATION = DISAMBIGUATER_API_URL + "/categorysuggestion";
 	
 	// Loggers
