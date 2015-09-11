@@ -1,0 +1,3 @@
+http://zaire.dimis.fim.uni-passau.de:8999/doser-disambiguationserverstable/disambiguation/categorysuggestion-proxy
+
+http://zaire.dimis.fim.uni-passau.de:8999/doser-disambiguationserverstable/webclassify/entityAndCategoryStatistic
