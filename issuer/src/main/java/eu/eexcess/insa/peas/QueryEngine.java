@@ -3,10 +3,10 @@ package eu.eexcess.insa.peas;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -94,21 +94,21 @@ public class QueryEngine {
 	 * @param type Type of the query to be processed
 	 * @return Result of format RF1, RF2 or RF3 (depending on the format of the query). 
 	 */
-	public Response processQuery(String origin, HttpServletRequest req, JSONObject query, QueryFormats type){
+	public Response processQuery(JSONObject query, QueryFormats type, UriInfo uriInfo){
 		Response resp = Response.status(Status.BAD_REQUEST).build();
 		if (type.equals(QueryFormats.QF1)) {
 			QueryLogThread thread = new QueryLogThread();
 			thread.log(query);
 		} 
 		if (type.equals(QueryFormats.QF2)){
-			resp = processObfuscatedQuery(origin, req, query);
+			resp = processObfuscatedQuery(query, uriInfo);
 		} else if (type.equals(QueryFormats.QF1) || type.equals(QueryFormats.QF3)){
 			String serviceUrl = Cst.SERVICE_RECOMMEND;
 			if (type.equals(QueryFormats.QF3)){
 				serviceUrl = Cst.SERVICE_GET_DETAILS;
 			} 
 			Client client = Client.create();
-			WebResource webResource = client.resource(serviceUrl);
+			WebResource webResource = client.resource(serviceUrl).queryParams(uriInfo.getQueryParameters());
 			ClientResponse response = webResource
 					.accept(MediaType.APPLICATION_JSON)
 					.type(MediaType.APPLICATION_JSON)
@@ -138,7 +138,7 @@ public class QueryEngine {
 	 * @param query Obfuscated query (i.e., query of format QF2). 
 	 * @return Result containing a list of set of recommendations. The format is RF2. 
 	 */
-	private Response processObfuscatedQuery(String origin, HttpServletRequest req, JSONObject query){
+	private Response processObfuscatedQuery(JSONObject query, UriInfo uriInfo){
 		Response resp = Response.status(Response.Status.BAD_REQUEST).build();
 		if (query.has(Cst.TAG_CONTEXT_KEYWORDS)){
 			JSONArray queryArray = query.getJSONArray(Cst.TAG_CONTEXT_KEYWORDS);
@@ -153,7 +153,7 @@ public class QueryEngine {
 					clonedQuery.put(Cst.TAG_ID, clonedQuery.get(Cst.TAG_ID) + i.toString());
 				}
 				clonedQuery.put(Cst.TAG_CONTEXT_KEYWORDS, queryArrayEntry);
-				Response respClonedQuery = processQuery(origin, req, clonedQuery, QueryFormats.QF1);
+				Response respClonedQuery = processQuery(clonedQuery, QueryFormats.QF1, uriInfo);
 				Boolean success = (respClonedQuery.getStatus() == Response.Status.OK.getStatusCode());
 				oneSuccess = oneSuccess || success;
 				JSONObject result = new JSONObject();
@@ -177,18 +177,10 @@ public class QueryEngine {
 	}
 	
 	/**
-<<<<<<< HEAD
-	 * TODO
-	 * This method ensures that the "detail" attribute is well-formed. 
-	 * Ideally it should not be here. 
-	 * @param jsonString
-	 * @return
-=======
 	 * This method ensures that the "detail" attribute is well-formed. 
 	 * Ideally it should not be here (it should be done on the federated recommender). 
 	 * @param jsonString The JSON string to be corrected. 
 	 * @return A JSON string. 
->>>>>>> dev
 	 */
 	protected String correctDetailField(String jsonString){ 
 		JSONObject tempResponse = new JSONObject(jsonString);

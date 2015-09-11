@@ -13,10 +13,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
 
@@ -38,15 +39,15 @@ import eu.eexcess.insa.peas.Scheduler;
  * @author Thomas Cerqueus
  * @version 2.0
  */
-@Path(Cst.VERSION)
-public class PrivacyProxyService {
+@Path(Cst.PATH)
+public class Issuer {
 	
 	protected String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
 	
 	/**
 	 * Initialization of the Privacy Proxy. 
 	 */
-	public PrivacyProxyService(){
+	public Issuer(){
 		Scheduler.addCachesTasks();
 		Scheduler.flushOutQueryLogTask();
 	}
@@ -56,7 +57,7 @@ public class PrivacyProxyService {
 	 * @param origin Origin of the query. 
 	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
-	 * @param queryStr Query of format QF1 or QF2 (both are supported). 
+	 * @param query Query of format QF1 or QF2 (both are supported). 
 	 * @return A set of recommendations. The format is RF1 (respectively RF2) if the format of the query is QF1 (respectively QF2). 
 	 * @see QueryEngine
 	 */
@@ -67,20 +68,21 @@ public class PrivacyProxyService {
 	public Response getRecommendations(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp, 
-			String queryStr) {
+			@Context UriInfo uriInfo,
+			String query) {
 		
 		Response resp;
 		
-		JSONObject query = new JSONObject(queryStr);
+		JSONObject jsonQuery = new JSONObject(query);
 		
 		if (origin == null) { origin = Cst.EMPTY_ORIGIN; }
 		
 		QueryEngine engine = QueryEngine.getInstance();
-		query = engine.alterQuery(origin, query);
-		if (engine.isObfuscatedQuery(query)){
-			resp = engine.processQuery(origin, req, query, QueryFormats.QF2);
+		jsonQuery = engine.alterQuery(origin, jsonQuery);
+		if (engine.isObfuscatedQuery(jsonQuery)){
+			resp = engine.processQuery(jsonQuery, QueryFormats.QF2, uriInfo);
 		} else {
-			resp = engine.processQuery(origin, req, query, QueryFormats.QF1);
+			resp = engine.processQuery(jsonQuery, QueryFormats.QF1, uriInfo);
 		}
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
@@ -90,8 +92,6 @@ public class PrivacyProxyService {
 	/**
 	 * Default service providing recommendations for a query. 
 	 * It does not do anything else than returning the header. 
-	 * @param origin Origin of the query. 
-	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @return An empty response with status OK. 
 	 * @see QueryEngine
@@ -100,9 +100,7 @@ public class PrivacyProxyService {
 	@Path(Cst.PATH_RECOMMEND)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getRecommendations(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
-			@Context HttpServletRequest req,
-			@Context HttpServletResponse servletResp) {
+	public Response getRecommendations(@Context HttpServletResponse servletResp) {
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
@@ -114,7 +112,7 @@ public class PrivacyProxyService {
 	 * @param origin Origin of the query. 
 	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
-	 * @param detailsStr
+	 * @param detailsQuery
 	 * @return A set of detailed results (aka document badges). 
 	 */
 	@POST
@@ -124,14 +122,15 @@ public class PrivacyProxyService {
 	public Response getDetails(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp, 
-			String detailsStr) {
+			@Context UriInfo uriInfo, 
+			String detailsQuery) {
 
-		JSONObject detailsQuery = new JSONObject(detailsStr);
+		JSONObject jsonDetailsQuery = new JSONObject(detailsQuery);
 		
 		if (origin == null) { origin = Cst.EMPTY_ORIGIN; }
 		
 		QueryEngine engine = QueryEngine.getInstance();
-		Response resp = engine.processQuery(origin, req, detailsQuery, QueryFormats.QF3);
+		Response resp = engine.processQuery(jsonDetailsQuery, QueryFormats.QF3, uriInfo);
 		
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
@@ -141,8 +140,6 @@ public class PrivacyProxyService {
 	/**
 	 * Default service providing detailed information of a set of resources. 
 	 * It does not do anything else than returning the header. 
-	 * @param origin Origin of the query. 
-	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @return An empty response with status OK. 
 	 */
@@ -150,14 +147,11 @@ public class PrivacyProxyService {
 	@Path(Cst.PATH_GET_DETAILS)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getDetails(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
-			@Context HttpServletRequest req,
-			@Context HttpServletResponse servletResp) {
-		Response resp = Response.ok().build();
+	public Response getDetails(@Context HttpServletResponse servletResp) {
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
-		return resp;
+		return Response.ok().build();
 	}
 
 	/**
@@ -211,85 +205,22 @@ public class PrivacyProxyService {
 	/**
 	 * Default service logging interactions. 
 	 * It does not do anything else than returning the header. 
-	 * @param interactionType  
-	 * @param origin Origin of the query. 
-	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @return An empty response with status OK. 
 	 */
 	@OPTIONS
 	@Path(Cst.PATH_LOG)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response log(@PathParam(Cst.PARAM_INTERACTION_TYPE) String interactionType,
-			@HeaderParam(Cst.PARAM_ORIGIN) String origin,
-			@Context HttpServletRequest req,
-			@Context HttpServletResponse servletResp) {
+	public Response log(@Context HttpServletResponse servletResp) {
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return Response.ok().build();
 	}
-
-//	/**
-//	 * Service logging disambiguation calls. 
-//	 * @param servletResp HTTP response. 
-//	 * @param input XXX Don't know what this parameter is supposed to contain. 
-//	 * @return XXX Don't know what this method is supposed to return. 
-//	 */
-//	@POST
-//	@Path(Cst.PATH_DISAMBIGUATE)
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response disambiguate(@Context HttpServletResponse servletResp, String input) {
-//		// Forward the query
-//		Client client = Client.create();
-//		WebResource webResource = client.resource(Cst.SERVICE_DISAMBIGUATION);
-//		System.out.println(Cst.SERVICE_DISAMBIGUATION);
-//		ClientResponse response = webResource
-//				.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
-//				.post(ClientResponse.class, input);
-//
-//		String output = response.getEntity(String.class);
-//
-//		Response resp;
-//		if (response.getStatus() == Response.Status.CREATED.getStatusCode() || response.getStatus() == Response.Status.OK.getStatusCode()) {
-//			resp = Response.ok().entity(output).build();
-//		} else {
-//			/*
-//			String msg = Util.sBrackets(Cst.PATH_DISAMBIGUATE) + Cst.SPACE
-//					+ Util.sBracketsColon(Cst.TAG_HTTP_ERR_CODE, response.getStatus()) + Cst.SPACE 
-//					+ output;
-//			Cst.LOGGER_PRIVACY_PROXY.error(msg);
-//			*/
-//			resp = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-//		}
-//		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
-//		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
-//		return resp;
-//	}
-//
-//	/**
-//	 * Default service logging disambiguation calls. 
-//	 * It does not do anything else than returning the header. 
-//	 * @param servletResp HTTP response. 
-//	 * @return An empty response with status OK. 
-//	 */
-//	@OPTIONS
-//	@Path(Cst.PATH_DISAMBIGUATE)
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response disambiguate(@Context HttpServletResponse servletResp) {
-//		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
-//		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
-//		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
-//		return Response.ok().build();
-//	}
 	
 	/**
 	 * Service providing access to the co-occurrence graph. 
 	 * The co-occurrence graph is supposed to be up-to-date at any time (no caching).   
-	 * @param origin Origin of the query. 
-	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @return A co-occurrence graph. 
 	 * @see eu.eexcess.insa.peas.CacheReader
@@ -297,10 +228,7 @@ public class PrivacyProxyService {
 	@GET
 	@Path(Cst.PATH_GET_CO_OCCURRENCE_GRAPH)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getCoOccurrenceGraph(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
-			@Context HttpServletRequest req,
-			@Context HttpServletResponse servletResp) {
-		
+	public Response getCoOccurrenceGraph(@Context HttpServletResponse servletResp) {
 		CacheReader cacheReader = CacheReader.getInstance();
 		CoOccurrenceGraph graph = cacheReader.getCoOccurrenceGraph();
 		String output = graph.toJsonString();
@@ -316,8 +244,6 @@ public class PrivacyProxyService {
 	 * Each clique is a graph. 
 	 * As the computation of cliques is very time-consuming, a cached version is returned. 
 	 * The frequency at which the cache is updated is not fixed (yet): every day, every hour, etc.  
-	 * @param origin Origin of the query. 
-	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @return A set of cliques. 
 	 * @see eu.eexcess.insa.peas.Clique
@@ -325,11 +251,8 @@ public class PrivacyProxyService {
 	@GET
 	@Path(Cst.PATH_GET_CLIQUES)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMaximalCliques(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
-			@Context HttpServletRequest req,
-			@Context HttpServletResponse servletResp) {
-		
-		Response resp = null;
+	public Response getMaximalCliques(@Context HttpServletResponse servletResp) {
+		Response resp;
 		CacheReader cacheReader = CacheReader.getInstance();
 		List<Clique> cliques = cacheReader.getMaximalCliques();
 		String jsonCliques = "";
@@ -357,19 +280,8 @@ public class PrivacyProxyService {
 	@GET
 	@Path(Cst.PATH_GET_REGISTERED_PARTNERS)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getRegisteredPartners(@Context HttpServletResponse servletResp) {
-		Response response;
-		Client client = Client.create();
-		WebResource webResource = client.resource(Cst.SERVICE_GET_REGISTERED_PARTNERS);
-		ClientResponse r = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-		int status = r.getStatus();
-		if (status == Response.Status.OK.getStatusCode()){
-			String output = r.getEntity(String.class);
-			response = Response.ok().entity(output).build();
-		} else {
-			response = Response.status(status).build();
-		}
-	
+	public Response getRegisteredPartners(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo) {
+		Response response = forwardRequest(Cst.SERVICE_GET_REGISTERED_PARTNERS, MediaType.APPLICATION_JSON, String.class, uriInfo.getQueryParameters());
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return response;
@@ -377,8 +289,6 @@ public class PrivacyProxyService {
 	
 	/**
 	 * Service providing the favicon of a given partner. 
-	 * @param origin Origin of the query. 
-	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @param partnerId Identifier of a partner. 
 	 * @return An image (image/png). 
@@ -386,23 +296,8 @@ public class PrivacyProxyService {
 	@GET
 	@Path(Cst.PATH_GET_PARTNER_FAVICON)
 	@Produces(Cst.MEDIA_TYPE_IMAGE)
-	public Response getPartnerFavIcon(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
-			@Context HttpServletRequest req,
-			@Context HttpServletResponse servletResp,
-			@QueryParam(Cst.PARAM_PARTNER_ID) String partnerId) {
-		
-		Response response;
-		Client client = Client.create();
-		WebResource webResource = client.resource(Cst.SERVICE_GET_PARTNER_FAVICON).queryParam(Cst.PARAM_PARTNER_ID, partnerId);
-		ClientResponse r = webResource.accept(Cst.MEDIA_TYPE_IMAGE).type(Cst.MEDIA_TYPE_IMAGE).get(ClientResponse.class);
-		int status = r.getStatus();
-		if (status == Response.Status.OK.getStatusCode()){
-            InputStream output = r.getEntity(InputStream.class);
-			response = Response.ok().entity(output).build();
-		} else {
-			response = Response.status(status).build();
-		}
-	
+	public Response getPartnerFavIcon(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo) {
+		Response response = forwardRequest(Cst.SERVICE_GET_PARTNER_FAVICON, Cst.MEDIA_TYPE_IMAGE, InputStream.class, uriInfo.getQueryParameters());
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return response;
@@ -410,8 +305,6 @@ public class PrivacyProxyService {
 
 	/**
 	 * Service providing a default image if a media is missing. 
-	 * @param origin Origin of the query. 
-	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @param type Type of the missing media. Possible values are : text, audio, 3d, image, video, other, unknown.  
 	 * @return An image (image/png). 
@@ -419,26 +312,37 @@ public class PrivacyProxyService {
 	@GET
 	@Path(Cst.PATH_GET_PREVIEW_IMAGE)
 	@Produces(Cst.MEDIA_TYPE_IMAGE)
-	public Response getPreviewImage(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
-			@Context HttpServletRequest req,
-			@Context HttpServletResponse servletResp,
-			@QueryParam(Cst.PARAM_IMAGE_TYPE) String type) {
-		
-		Response response;
-		Client client = Client.create();
-		WebResource webResource = client.resource(Cst.SERVICE_GET_PREVIEW_IMAGE).queryParam(Cst.PARAM_IMAGE_TYPE, type);
-		ClientResponse r = webResource.accept(Cst.MEDIA_TYPE_IMAGE).type(Cst.MEDIA_TYPE_IMAGE).get(ClientResponse.class);
-		int status = r.getStatus();
-		if (status == Response.Status.OK.getStatusCode()){
-            InputStream output = r.getEntity(InputStream.class);
-			response = Response.ok().entity(output).build();
-		} else {
-			response = Response.status(status).build();
-		}
-		
+	public Response getPreviewImage(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo) {
+		Response response = forwardRequest(Cst.SERVICE_GET_PREVIEW_IMAGE, Cst.MEDIA_TYPE_IMAGE, InputStream.class, uriInfo.getQueryParameters());	
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return response;
+	}
+	
+	/**
+	 * TODO
+	 * @param serviceUrl
+	 * @param returnedTypeName
+	 * @param returnedTypeClass
+	 * @param params
+	 * @return
+	 */
+	protected Response forwardRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, MultivaluedMap<String, String> params){
+		Response resp;
+		Client client = Client.create();
+		WebResource webResource = client.resource(serviceUrl);
+		if (params != null){
+			webResource = client.resource(serviceUrl).queryParams(params);
+		}
+		ClientResponse r = webResource.accept(returnedTypeName).type(returnedTypeName).get(ClientResponse.class);
+		int status = r.getStatus();
+		if (status == Response.Status.OK.getStatusCode()){
+			Object output = r.getEntity(returnedTypeClass);
+			resp = Response.ok().entity(output).build();
+		} else {
+			resp = Response.status(status).build();
+		}
+		return resp;
 	}
 	
 }

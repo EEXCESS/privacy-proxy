@@ -22,7 +22,7 @@ public class Cst {
 	public static final String MEDIA_TYPE_IMAGE = "image/png";
 	
 	// Services
-	public static final String VERSION = "/v1";
+	public static final String PATH = "/issuer";
 	public static final String PATH_GET_REGISTERED_PARTNERS = "/getRegisteredPartners";
 	public static final String PATH_GET_PARTNER_FAVICON = "/getPartnerFavIcon";
 	public static final String PATH_GET_PREVIEW_IMAGE = "/getPreviewImage";

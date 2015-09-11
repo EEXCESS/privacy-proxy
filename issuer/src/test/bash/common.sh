@@ -1,16 +1,16 @@
 function extractUrl() {
 	ServiceURL=$1
 	if [ $1 = "local-eclipse" ]; then # local through Eclipse
-		ServiceURL="http://localhost:8080/eexcess-privacy-proxy/" 
+		ServiceURL="http://localhost:8080/eexcess-privacy-proxy-issuer/issuer/" 
 	else 
 		if [ $1 = "local" ]; then # local manual deployment
-			ServiceURL="http://localhost:8080/eexcess-privacy-proxy-1.0-SNAPSHOT/"
+			ServiceURL="http://localhost:8080/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/"
 		else 
 			if [ $1 = "remote-dev" ]; then # development server
-				ServiceURL="http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-SNAPSHOT/"
+				ServiceURL="http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/"
 			else 
 				if [ $1 = "remote-dev-test" ]; then # development server
-					ServiceURL="http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-DEV-SNAPSHOT/"
+					ServiceURL="http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-issuer-1.0-DEV-SNAPSHOT/issuer/"
 				fi
 			fi
 		fi

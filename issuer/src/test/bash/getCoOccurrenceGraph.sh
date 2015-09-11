@@ -4,7 +4,7 @@ source ./common.sh
 
 if [ "$#" -eq 2 ]; then 
 	ServiceURL=`extractUrl $1`
-	ServiceURL=`echo $ServiceURL"api/v1/getCoOccurrenceGraph"`
+	ServiceURL=`echo $ServiceURL"getCoOccurrenceGraph"`
 	Method=$2
 	curl -X $Method $ServiceURL
 else 

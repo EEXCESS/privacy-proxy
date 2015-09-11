@@ -6,7 +6,7 @@ if [ "$#" -eq 3 ]; then
 	ServiceURL=`extractUrl $1`
 	Method=$2
 	File=$3
-	ServiceURL=`echo $ServiceURL"api/v1/getDetails"`
+	ServiceURL=`echo $ServiceURL"getDetails"`
 	curl -X $Method $ServiceURL -d @$File --header "Content-Type: application/json"
 else 
 	echo "Usage 'getDetails local-eclipse|local|remote-dev|remote-dev-test|<http://your-server/> POST|OPTIONS input-test-file.json'"
