@@ -1,0 +1,26 @@
+{
+    "numResults": 3,
+    "contextKeywords": [
+        [{
+            "text": "graz",
+            "weight": 0.1
+        }, {
+            "text": "vienna",
+            "weight": 0.1
+        }],
+        [{
+            "text": "music",
+            "weight": 0.1
+        }, {
+            "text": "bass",
+            "weight": 0.1
+        }],
+        [{
+            "text": "money",
+            "weight": 0.1
+        }, {
+            "text": "euro",
+            "weight": 0.1
+        }]
+    ]
+}
