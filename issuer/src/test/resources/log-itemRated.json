@@ -1,0 +1,25 @@
+{
+	"origin": {
+		"userID": "E993A29B-A063-426D-896E-131F85193EB7", 
+		"clientType": "EEXCESS - Google Chrome Extension", 
+		"clientVersion": "2beta", 
+		"module": "facetScape"
+	
+	},
+	"content": {
+		"documentBadge": {
+	        "id": "sl23394330",
+	        "uri": "http://service.wissens-server.com/wissensserver/view.html?a=t&r=CURRENT&i=sl23394330&s=BEP&v=eexcess&w=EEXCESS",
+	        "provider": "Wissenmedia"
+		}, 
+		"rating": {
+			"@context" : "http://www.w3.org/ns/oa-context-20130208.json",
+			"@type" : "oa:Annotation",
+			"hasBody" : {
+				"http://purl.org/stuff/rev#rating" : 2,
+				"http://purl.org/stuff/rev#minRating" : 1,
+				"http://purl.org/stuff/rev#maxRating" : 2
+			}
+		}
+	}
+}

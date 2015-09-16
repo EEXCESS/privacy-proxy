@@ -22,6 +22,10 @@ public class Config {
 	public static final String DISAMBIGUATER_PATH = "disambiguater.path";
 	public static final String DISAMBIGUATER_SERVICE_CATEGORY_SUGGESTION = "disambiguater.service.categorySuggestion";
 	
+	public static final String ENTITY_RECOGNIZER_URL = "entityRecognizer.url";
+	public static final String ENTITY_RECOGNIZER_PATH = "entityRecognizer.path";
+	public static final String ENTITY_RECOGNIZER_SERVICE_ENTITY_RECOGNITION = "entityRecognizer.service.entityRecognition";
+	
 	public static final String LOGGER_PRIVACY_PROXY = "logging.privacyProxy";
 	public static final String LOGGER_INTERACTION = "logging.interaction";
 	public static final String LOGGER_FACET_SCAPE = "logging.interaction";

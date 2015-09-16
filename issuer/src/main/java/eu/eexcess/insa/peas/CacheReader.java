@@ -25,7 +25,6 @@ public class CacheReader {
 	
 	protected String cacheCoOccurrenceGraphLocation = Cst.CATALINA_BASE + Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CO_OCCURRENCE_GRAPH_FILE);
 	protected String cacheMaximalCliquesLocation = Cst.CATALINA_BASE + Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CLIQUES_FILE);
-	
 	/**
 	 * Default constructor. 
 	 */

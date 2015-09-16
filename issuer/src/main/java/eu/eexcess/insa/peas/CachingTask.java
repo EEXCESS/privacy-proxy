@@ -22,7 +22,7 @@ import eu.eexcess.JsonUtil;
  * @version 1.0
  */
 public class CachingTask extends TimerTask {
-	
+
 	// Query log
 	protected String queryLogLocation = Cst.CATALINA_BASE + Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
 	// Co-occurrence graph cache
@@ -31,12 +31,12 @@ public class CachingTask extends TimerTask {
 	// Maximal cliques cache
 	protected String cacheMaximalCliquesLocation = Cst.CATALINA_BASE + Config.getValue(Config.CACHE_DIRECTORY) + Config.getValue(Config.CLIQUES_FILE);
 	protected String tmpCacheMaximalCliquesLocation = Cst.CATALINA_BASE + Config.getValue(Config.CACHE_DIRECTORY) + Cst.TMP_FILE_PREFIX + Config.getValue(Config.CLIQUES_FILE);
-	
+
 	/**
 	 * Default constructor. 
 	 */
 	public CachingTask(){}
-	
+
 	/**
 	 * Performs the caching of the co-occurrence graph and the maximal cliques. 
 	 * This method does not have to be called explicitly, as a scheduler is supposed to do it. 
@@ -60,7 +60,7 @@ public class CachingTask extends TimerTask {
 		}
 		System.out.println(this.getClass() + " " + this.hashCode());
 	}
-	
+
 	/**
 	 * Extracts the co-occurrence graph from the query log.  
 	 * @param queryLog File containing the query log. 
@@ -105,7 +105,7 @@ public class CachingTask extends TimerTask {
 		} 
 		return graph;
 	}
-	
+
 	/**
 	 * Puts a co-occurrence graph in cache. 
 	 * @param graph The co-occurrence graph to be cached. 
@@ -124,7 +124,7 @@ public class CachingTask extends TimerTask {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Puts a list of cliques in cache. 
 	 * @param listMaximalCliques The list of cliques to be cached. 

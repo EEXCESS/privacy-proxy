@@ -1,4 +1,4 @@
-package eu.eexcess.up;
+package eu.eexcess.insa.logging;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,7 +13,7 @@ import eu.eexcess.JsonUtil;
  * @version 1.0
  */
 public class ProxyLogProcessor {
-
+	
 	/**
 	 * Logs an interaction. 
 	 * @param interactionType Type of the interaction. 
@@ -38,9 +38,9 @@ public class ProxyLogProcessor {
 		String userID = "";
 		String msg; 
 
-		if (interactionType.equals(Cst.RESULT)) {
+		if (interactionType.equals(Cst.INTERACTION_RESPONSE)) {
 
-			JSONObject jsonOutput = new JSONObject(); // Will look like: {"results":<resultArr>], "query":q}
+			JSONObject jsonOutput = new JSONObject(); // Will look like: {"results":<resultArr>, "query":q}
 			JSONObject jsonInputRequest = new JSONObject(request);
 			JSONObject jsonInputAnswer = new JSONObject(answer);
 			if (jsonInputRequest.has(Cst.TAG_UUID)){

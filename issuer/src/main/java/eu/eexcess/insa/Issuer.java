@@ -28,6 +28,7 @@ import com.sun.jersey.api.client.WebResource;
 import eu.eexcess.Config;
 import eu.eexcess.Cst;
 import eu.eexcess.JsonUtil;
+import eu.eexcess.insa.logging.Logger;
 import eu.eexcess.insa.peas.CacheReader;
 import eu.eexcess.insa.peas.Clique;
 import eu.eexcess.insa.peas.CoOccurrenceGraph;
@@ -43,7 +44,7 @@ import eu.eexcess.insa.peas.Scheduler;
 public class Issuer {
 	
 	protected String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
-	
+	protected Logger logger = new Logger();
 	/**
 	 * Initialization of the Privacy Proxy. 
 	 */
@@ -75,6 +76,14 @@ public class Issuer {
 		
 		JSONObject jsonQuery = new JSONObject(query);
 		
+		String ip = req.getRemoteAddr();
+		JSONObject jsonOrigin = new JSONObject();
+		if (jsonQuery.has(Cst.TAG_ORIGIN)){
+			jsonOrigin = jsonQuery.getJSONObject(Cst.TAG_ORIGIN);
+		}
+		String queryId = logger.logQuery(ip, jsonQuery);
+		jsonQuery.put(Cst.TAG_QUERY_ID, queryId);
+		
 		if (origin == null) { origin = Cst.EMPTY_ORIGIN; }
 		
 		QueryEngine engine = QueryEngine.getInstance();
@@ -84,6 +93,10 @@ public class Issuer {
 		} else {
 			resp = engine.processQuery(jsonQuery, QueryFormats.QF1, uriInfo);
 		}
+		JSONObject results = new JSONObject(resp.getEntity().toString());
+		
+		logger.logResults(jsonOrigin, ip, results, queryId);
+		
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
@@ -174,28 +187,12 @@ public class Issuer {
 			String input) {
 
 		Response resp = Response.ok().build();
-		/*
-		String ip = req.getRemoteAddr();
-
-		if (interactionType.equals(Cst.RATING) || 
-				interactionType.equals(Cst.RESULT_CLOSE) || 
-				interactionType.equals(Cst.RESULT_VIEW) ||
-				interactionType.equals(Cst.SHOW_HIDE) ||
-				interactionType.equals(Cst.QUERY_ACTIVATED)){
-			Cst.LOG_PROCESSOR.process(interactionType, origin, ip, input);
-		} else if (interactionType.equals(Cst.FACET_SCAPE)) {
-			String msg = JsonUtil.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
-					+ JsonUtil.sBracketsColon(Cst.TAG_IP, ip) + Cst.SPACE
-					+ input;
-			Cst.LOGGER_FACET_SCAPE.trace(msg);
-		} else {
-			String msg = JsonUtil.sBrackets(Cst.PATH_LOG_DIRECTORY + interactionType) + Cst.SPACE
-					+ JsonUtil.sBracketsColon(Cst.TAG_ORIGIN, origin) + Cst.SPACE
-					+ Cst.PATH_LOG_DIRECTORY + interactionType + Cst.SPACE + Cst.ERR_MSG_NOT_REST_API;
-			Cst.LOGGER_PRIVACY_PROXY.error(msg);
-			resp = Response.status(Response.Status.NOT_FOUND).build();
-		}
-		*/
+		JSONObject jsonInput = new JSONObject(input);
+		jsonInput.put(Cst.TAG_IP, req.getRemoteAddr());
+		
+		if (!logger.log(interactionType, jsonInput)){
+			resp = Response.serverError().build();
+		}		
 		
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
@@ -281,7 +278,7 @@ public class Issuer {
 	@Path(Cst.PATH_GET_REGISTERED_PARTNERS)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRegisteredPartners(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo) {
-		Response response = forwardRequest(Cst.SERVICE_GET_REGISTERED_PARTNERS, MediaType.APPLICATION_JSON, String.class, uriInfo.getQueryParameters());
+		Response response = forwardGetRequest(Cst.SERVICE_GET_REGISTERED_PARTNERS, MediaType.APPLICATION_JSON, String.class, uriInfo.getQueryParameters());
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return response;
@@ -297,7 +294,7 @@ public class Issuer {
 	@Path(Cst.PATH_GET_PARTNER_FAVICON)
 	@Produces(Cst.MEDIA_TYPE_IMAGE)
 	public Response getPartnerFavIcon(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo) {
-		Response response = forwardRequest(Cst.SERVICE_GET_PARTNER_FAVICON, Cst.MEDIA_TYPE_IMAGE, InputStream.class, uriInfo.getQueryParameters());
+		Response response = forwardGetRequest(Cst.SERVICE_GET_PARTNER_FAVICON, Cst.MEDIA_TYPE_IMAGE, InputStream.class, uriInfo.getQueryParameters());
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return response;
@@ -313,10 +310,64 @@ public class Issuer {
 	@Path(Cst.PATH_GET_PREVIEW_IMAGE)
 	@Produces(Cst.MEDIA_TYPE_IMAGE)
 	public Response getPreviewImage(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo) {
-		Response response = forwardRequest(Cst.SERVICE_GET_PREVIEW_IMAGE, Cst.MEDIA_TYPE_IMAGE, InputStream.class, uriInfo.getQueryParameters());	
+		Response response = forwardGetRequest(Cst.SERVICE_GET_PREVIEW_IMAGE, Cst.MEDIA_TYPE_IMAGE, InputStream.class, uriInfo.getQueryParameters());	
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return response;
+	}
+	
+	@POST
+	@Path(Cst.PATH_DISAMBIGUATE)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response disambiguate(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo, String input) {
+		Response resp;
+		Client client = Client.create();
+		
+		String url = "http://zaire.dimis.fim.uni-passau.de:8999/doser-disambiguationserverstable/disambiguation/categorysuggestion-proxy";
+		WebResource webResource = client.resource(url);
+		if (uriInfo.getQueryParameters() != null){
+			webResource = client.resource(url).queryParams(uriInfo.getQueryParameters());
+		}
+		ClientResponse r = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, input);
+		int status = r.getStatus();
+		if (status == Response.Status.OK.getStatusCode()){
+			Object output = r.getEntity(String.class);
+			resp = Response.ok().entity(output).build();
+		} else {
+			resp = Response.status(status).build();
+		}		
+
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		return resp;
+	}
+	
+	@POST
+	@Path(Cst.PATH_ENTITY_RECOGNITION)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response recognizeEntity(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo, String input) {
+		Response resp;
+		Client client = Client.create();
+		
+		String url = "http://zaire.dimis.fim.uni-passau.de:8999/doser-disambiguationserverstable/webclassify/entityAndCategoryStatistic";
+		WebResource webResource = client.resource(url);
+		if (uriInfo.getQueryParameters() != null){
+			webResource = client.resource(url).queryParams(uriInfo.getQueryParameters());
+		}
+		ClientResponse r = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, input);
+		int status = r.getStatus();
+		if (status == Response.Status.OK.getStatusCode()){
+			Object output = r.getEntity(String.class);
+			resp = Response.ok().entity(output).build();
+		} else {
+			resp = Response.status(status).build();
+		}		
+
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		return resp;
 	}
 	
 	/**
@@ -327,7 +378,7 @@ public class Issuer {
 	 * @param params
 	 * @return
 	 */
-	protected Response forwardRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, MultivaluedMap<String, String> params){
+	protected Response forwardGetRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, MultivaluedMap<String, String> params){
 		Response resp;
 		Client client = Client.create();
 		WebResource webResource = client.resource(serviceUrl);

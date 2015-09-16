@@ -6,9 +6,8 @@ if [ "$#" -eq 3 ]; then
 	ServiceURL=`extractUrl $1`
 	Method=$2
 	File=$3
-	ServiceURL=$ServiceURL"disambiguate"
+	ServiceURL=`echo $ServiceURL"disambiguate"`
 	curl -X $Method $ServiceURL -d @$File --header "Content-Type: application/json"
 else 
-	echo "Usage 'disambiguate local-eclipse|local|remote-dev|remote-dev-test|<http://your-server/> POST|OPTIONS input-test-file.json '"
+	echo "Usage 'disambiguate local-eclipse|local|remote-dev|remote-dev-test|<http://your-server/> POST input-test-file.json '"
 fi
-
