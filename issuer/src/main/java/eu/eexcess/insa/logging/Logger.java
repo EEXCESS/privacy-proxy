@@ -24,7 +24,7 @@ public class Logger {
 		if (isValidInteraction){
 			JSONObject entry = new JSONObject();
 
-			// Generic processing
+			// Generic processing:
 
 			// Interaction type
 			entry.put(Cst.TAG_INTERACTION_TYPE, interactionType);
@@ -50,7 +50,7 @@ public class Logger {
 				entry.put(Cst.TAG_CONTENT, input.getJSONObject(Cst.TAG_CONTENT));
 			}
 
-			// Interaction-specific processing
+			// Interaction-specific processing:
 
 			// Query ID
 			String queryId = "";
@@ -71,14 +71,12 @@ public class Logger {
 		return isValidInteraction;
 	}
 
-	public String logQuery(String ip, JSONObject query){
+	public String logQuery(JSONObject origin, String ip, JSONObject query){
 		String queryId = "";
 		JSONObject input = new JSONObject();
 		// IP address 
 		input.put(Cst.TAG_IP, ip);
-		if (query.has(Cst.TAG_ORIGIN)){
-			input.put(Cst.TAG_ORIGIN, query.getJSONObject(Cst.TAG_ORIGIN));
-		}
+		input.put(Cst.TAG_ORIGIN, origin);
 		// Content
 		JSONObject content = new JSONObject();
 		// Content / query
@@ -93,13 +91,29 @@ public class Logger {
 		} else {
 			content.put(Cst.TAG_QUERY_ID, query.getString(Cst.TAG_QUERY_ID));
 		}
-		System.out.println(content.getString(Cst.TAG_QUERY_ID));
 		input.put(Cst.TAG_CONTENT, content);
 		log(Cst.INTERACTION_QUERY, input);
 		return queryId;
 	}
 
-	public Boolean logResults(JSONObject origin, String ip, JSONObject results, String queryId){
+	public Boolean logDetailsQuery(JSONObject origin, String ip, String queryId, JSONObject detailsQuery){
+		Boolean logged = false;
+		JSONObject input = new JSONObject();
+		// IP address 
+		input.put(Cst.TAG_IP, ip);
+		// Origin
+		input.put(Cst.TAG_ORIGIN, origin);
+		// Content
+		JSONObject content = new JSONObject();
+		// Content / query
+		content.put(Cst.TAG_DETAILS_QUERY, detailsQuery);
+		content.put(Cst.TAG_QUERY_ID, queryId);
+		input.put(Cst.TAG_CONTENT, content);
+		logged = log(Cst.INTERACTION_DETAILS_QUERY, input);
+		return logged;
+	}
+	
+	public Boolean logRegularResults(JSONObject origin, String ip, String queryId, JSONObject results){
 		Boolean logged = false;
 		JSONObject input = new JSONObject();
 		input.put(Cst.TAG_IP, ip);
@@ -111,7 +125,30 @@ public class Logger {
 		logged = log(Cst.INTERACTION_RESPONSE, input);
 		return logged;
 	}
+	
+	public Boolean logMergedResults(JSONObject origin, String ip, String queryId, JSONObject results){
+		Boolean logged = false;
+		JSONObject input = new JSONObject();
+		input.put(Cst.TAG_IP, ip);
+		input.put(Cst.TAG_ORIGIN, origin);
+		input.put(Cst.TAG_CONTENT, results);
+		logged = log(Cst.INTERACTION_RESPONSE, input);
+		return logged;
+	}
 
+	public Boolean logDetailsResults(JSONObject origin, String ip, String queryId, JSONObject results){
+		Boolean logged = false;
+		JSONObject input = new JSONObject();
+		input.put(Cst.TAG_IP, ip);
+		input.put(Cst.TAG_ORIGIN, origin);
+		JSONObject content = new JSONObject();
+		content.put(Cst.TAG_RESULTS, results);
+		content.put(Cst.TAG_QUERY_ID, queryId);
+		input.put(Cst.TAG_CONTENT, content);
+		logged = log(Cst.INTERACTION_DETAILS_RESPONSE, input);
+		return logged;
+	}
+	
 	private void writeEntry(JSONObject entry){
 		File file = new File(getLogFileName());
 		try {

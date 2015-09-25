@@ -56,7 +56,7 @@ public class QueryEngine {
 	 * @param query Query of format QF1 or QF2. 
 	 * @return A query (QF1 or QF2). 
 	 */
-	public JSONObject alterQuery(String origin, JSONObject query){
+	public JSONObject alterQuery(JSONObject query){
 		// Generates a query ID if it does not exist yet
 		if (!query.has(Cst.TAG_QUERY_ID) && query.has(Cst.TAG_CONTEXT_KEYWORDS)){
 			String queryHash = String.valueOf(query.get(Cst.TAG_CONTEXT_KEYWORDS).toString().hashCode());
@@ -103,34 +103,37 @@ public class QueryEngine {
 		if (type.equals(QueryFormats.QF2)){
 			resp = processObfuscatedQuery(query, uriInfo);
 		} else if (type.equals(QueryFormats.QF1) || type.equals(QueryFormats.QF3)){
-			String serviceUrl = Cst.SERVICE_RECOMMEND;
-			if (type.equals(QueryFormats.QF3)){
-				serviceUrl = Cst.SERVICE_GET_DETAILS;
-			} 
-			Client client = Client.create();
-			WebResource webResource = client.resource(serviceUrl).queryParams(uriInfo.getQueryParameters());
-			ClientResponse response = webResource
-					.accept(MediaType.APPLICATION_JSON)
-					.type(MediaType.APPLICATION_JSON)
-					.post(ClientResponse.class, query.toString());
-			String output = response.getEntity(String.class);
-			if (type.equals(QueryFormats.QF3)){
-				// Not sure why it's needed on the privacy proxy
-				output = correctDetailField(output);
-			}
-			Integer status = response.getStatus();
-
-			if (status.equals(Response.Status.OK.getStatusCode())){
-				resp = Response.ok().entity(output).build();
-			} else if (status.equals(Response.Status.CREATED.getStatusCode())){
-				resp = Response.status(response.getStatus()).entity(output).build();
-			} else {
-				resp = Response.status(response.getStatus()).build();
-			}
+			resp = processRegularQuery(query, type, uriInfo);
 		}
 		return resp;
 	}
 
+	private Response processRegularQuery(JSONObject query, QueryFormats type, UriInfo uriInfo){
+		Response resp = Response.status(Response.Status.BAD_REQUEST).build();
+		String serviceUrl = Cst.SERVICE_RECOMMEND;
+		if (type.equals(QueryFormats.QF3)){
+			serviceUrl = Cst.SERVICE_GET_DETAILS;
+		} 
+		Client client = Client.create();
+		WebResource webResource = client.resource(serviceUrl).queryParams(uriInfo.getQueryParameters());
+		ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, query.toString());
+		String output = response.getEntity(String.class);
+		if (type.equals(QueryFormats.QF3)){
+			// Not sure why it's needed on the privacy proxy
+			output = correctDetailField(output);
+		}
+		Integer status = response.getStatus();
+
+		if (status.equals(Response.Status.OK.getStatusCode())){
+			resp = Response.ok().entity(output).build();
+		} else if (status.equals(Response.Status.CREATED.getStatusCode())){
+			resp = Response.status(response.getStatus()).entity(output).build();
+		} else {
+			resp = Response.status(response.getStatus()).build();
+		}
+		return resp;
+	}
+	
 	/**
 	 * Processes a query of format QF2. The query is split into multiple queries (of format QF1) that are sent to the federated recommender. 
 	 * @param origin Origin of the query. 
@@ -144,29 +147,33 @@ public class QueryEngine {
 			JSONArray queryArray = query.getJSONArray(Cst.TAG_CONTEXT_KEYWORDS);
 			Boolean oneSuccess = false; // Determines if at least one query was processed successfully
 			List<JSONObject> results = new ArrayList<JSONObject>();
-
+			Integer nbResults = 0;
 			// Forwarding of all the sub-queries (independently)
 			for (Integer i = 0 ; i < queryArray.length() ; i++){
 				JSONArray queryArrayEntry = queryArray.getJSONArray(i);
 				JSONObject clonedQuery = new JSONObject(query.toString());
-				if (clonedQuery.has(Cst.TAG_ID)){
-					clonedQuery.put(Cst.TAG_ID, clonedQuery.get(Cst.TAG_ID) + i.toString());
+				if (clonedQuery.has(Cst.TAG_QUERY_ID)){
+					clonedQuery.put(Cst.TAG_QUERY_ID, clonedQuery.get(Cst.TAG_QUERY_ID) + i.toString());
 				}
 				clonedQuery.put(Cst.TAG_CONTEXT_KEYWORDS, queryArrayEntry);
 				Response respClonedQuery = processQuery(clonedQuery, QueryFormats.QF1, uriInfo);
 				Boolean success = (respClonedQuery.getStatus() == Response.Status.OK.getStatusCode());
 				oneSuccess = oneSuccess || success;
-				JSONObject result = new JSONObject();
 				if (success){
-					result = new JSONObject(respClonedQuery.getEntity().toString());
+					JSONObject result = new JSONObject(respClonedQuery.getEntity().toString());
+					result.remove(Cst.TAG_QUERY_ID);
+					nbResults += result.getJSONArray(Cst.TAG_RESULT).length();
+					results.add(result);
 				}
-				results.add(result);
 			}
 			// Returns the results
 			if (oneSuccess){
-				// Merges the results corresponding to the queries
-				JSONObject mergedResults = mergeResults(results);
-				resp = Response.ok().entity(mergedResults.toString()).build();
+				JSONObject globalResult = new JSONObject();
+				globalResult.put(Cst.TAG_RESULTS, results);
+				if (query.has(Cst.TAG_QUERY_ID)){
+					globalResult.put(Cst.TAG_QUERY_ID, query.getString(Cst.TAG_QUERY_ID));
+				}
+				resp = Response.ok().entity(globalResult.toString()).build();
 			} else {
 				resp = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
@@ -198,30 +205,6 @@ public class QueryEngine {
 		} 
 		jsonString = tempResponse.toString();
 		return jsonString;
-	}
-
-	/**
-	 * Merges results into a single result: {@code mergeResults([r1, r2, r3])} returns {@code r4} where r1, r2 and r3 are of format RF1 and r4 is of format RF2.  
-	 * @param results A list of results. Each element is in format RF1. 
-	 * @return A result of format RF2. The ordering of sub-results is kept. 
-	 */
-	private JSONObject mergeResults(List<JSONObject> results){
-		JSONObject mergedResults = new JSONObject();
-		mergedResults.put(Cst.TAG_PROVIDER, Cst.RECOMMENDER_LABEL); 
-		JSONArray resultsArray = new JSONArray();
-		Integer totalNbResults = 0;
-		for (Integer i = 0 ; i < results.size() ; i++){
-			JSONObject result = results.get(i);
-			JSONArray resultValue = new JSONArray();
-			if (result.has(Cst.TAG_RESULT)){
-				resultValue = result.getJSONArray(Cst.TAG_RESULT);
-				totalNbResults += resultValue.length();
-			}
-			resultsArray.put(i, resultValue);
-		}
-		mergedResults.put(Cst.TAG_NB_RESULTS, totalNbResults);
-		mergedResults.put(Cst.TAG_RESULT, resultsArray);
-		return mergedResults;
 	}
 
 }

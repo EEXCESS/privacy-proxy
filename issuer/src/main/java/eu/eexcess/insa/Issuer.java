@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -17,6 +16,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
@@ -66,37 +66,35 @@ public class Issuer {
 	@Path(Cst.PATH_RECOMMEND)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getRecommendations(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
-			@Context HttpServletRequest req,
+	public Response getRecommendations(@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp, 
 			@Context UriInfo uriInfo,
 			String query) {
 		
-		Response resp;
-		
+		Response resp = Response.ok().build();
 		JSONObject jsonQuery = new JSONObject(query);
 		
-		String ip = req.getRemoteAddr();
-		JSONObject jsonOrigin = new JSONObject();
 		if (jsonQuery.has(Cst.TAG_ORIGIN)){
-			jsonOrigin = jsonQuery.getJSONObject(Cst.TAG_ORIGIN);
-		}
-		String queryId = logger.logQuery(ip, jsonQuery);
-		jsonQuery.put(Cst.TAG_QUERY_ID, queryId);
-		
-		if (origin == null) { origin = Cst.EMPTY_ORIGIN; }
-		
-		QueryEngine engine = QueryEngine.getInstance();
-		jsonQuery = engine.alterQuery(origin, jsonQuery);
-		if (engine.isObfuscatedQuery(jsonQuery)){
-			resp = engine.processQuery(jsonQuery, QueryFormats.QF2, uriInfo);
+			JSONObject jsonOrigin = jsonQuery.getJSONObject(Cst.TAG_ORIGIN);
+			jsonQuery.remove(Cst.TAG_ORIGIN);
+			String ip = req.getRemoteAddr();
+			String queryId = logger.logQuery(jsonOrigin, ip, jsonQuery);
+			jsonQuery.put(Cst.TAG_QUERY_ID, queryId);
+			
+			QueryEngine engine = QueryEngine.getInstance();
+			jsonQuery = engine.alterQuery(jsonQuery);
+			if (engine.isObfuscatedQuery(jsonQuery)){
+				resp = engine.processQuery(jsonQuery, QueryFormats.QF2, uriInfo);
+				JSONObject results = new JSONObject(resp.getEntity().toString());
+				logger.logMergedResults(jsonOrigin, ip, queryId, results);
+			} else {
+				resp = engine.processQuery(jsonQuery, QueryFormats.QF1, uriInfo);
+				JSONObject results = new JSONObject(resp.getEntity().toString());
+				logger.logRegularResults(jsonOrigin, ip, queryId, results);
+			}
 		} else {
-			resp = engine.processQuery(jsonQuery, QueryFormats.QF1, uriInfo);
+			resp = Response.status(Status.BAD_REQUEST).build(); 
 		}
-		JSONObject results = new JSONObject(resp.getEntity().toString());
-		
-		logger.logResults(jsonOrigin, ip, results, queryId);
-		
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
@@ -132,19 +130,28 @@ public class Issuer {
 	@Path(Cst.PATH_GET_DETAILS)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getDetails(@HeaderParam(Cst.PARAM_ORIGIN) String origin,
-			@Context HttpServletRequest req,
-			@Context HttpServletResponse servletResp, 
-			@Context UriInfo uriInfo, 
-			String detailsQuery) {
+	public Response getDetails(@Context HttpServletRequest req, @Context HttpServletResponse servletResp, @Context UriInfo uriInfo, String detailsQuery) {
 
+		Response resp = Response.ok().build();
 		JSONObject jsonDetailsQuery = new JSONObject(detailsQuery);
 		
-		if (origin == null) { origin = Cst.EMPTY_ORIGIN; }
-		
-		QueryEngine engine = QueryEngine.getInstance();
-		Response resp = engine.processQuery(jsonDetailsQuery, QueryFormats.QF3, uriInfo);
-		
+		if (jsonDetailsQuery.has(Cst.TAG_ORIGIN) && jsonDetailsQuery.has(Cst.TAG_QUERY_ID)){
+			JSONObject jsonOrigin = jsonDetailsQuery.getJSONObject(Cst.TAG_ORIGIN);
+			jsonDetailsQuery.remove(Cst.TAG_ORIGIN); 
+			String queryId = jsonDetailsQuery.getString(Cst.TAG_QUERY_ID);
+			jsonDetailsQuery.remove(Cst.TAG_QUERY_ID); 
+			String ip = req.getRemoteAddr();
+			logger.logDetailsQuery(jsonOrigin, ip, queryId, jsonDetailsQuery);
+			
+			QueryEngine engine = QueryEngine.getInstance();
+			resp = engine.processQuery(jsonDetailsQuery, QueryFormats.QF3, uriInfo);
+			JSONObject results = new JSONObject(resp.getEntity().toString());
+			results.put(Cst.TAG_QUERY_ID, queryId);
+			resp = Response.ok().entity(results.toString()).build();
+			logger.logDetailsResults(jsonOrigin, ip, queryId, results);
+		} else {
+			resp = Response.status(Status.BAD_REQUEST).build();
+		}
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
@@ -167,8 +174,7 @@ public class Issuer {
 		return Response.ok().build();
 	}
 
-	/**
-	 * XXX Not sure this service is used. 
+	/** 
 	 * Service logging interactions. 
 	 * @param interactionType
 	 * @param origin Origin of the query. 
@@ -181,7 +187,6 @@ public class Issuer {
 	@Path(Cst.PATH_LOG)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response log(@PathParam(Cst.PARAM_INTERACTION_TYPE) String interactionType,
-			@HeaderParam(Cst.PARAM_ORIGIN) String origin,
 			@Context HttpServletRequest req,
 			@Context HttpServletResponse servletResp,
 			String input) {
@@ -317,14 +322,14 @@ public class Issuer {
 	}
 	
 	@POST
-	@Path(Cst.PATH_DISAMBIGUATE)
+	@Path(Cst.PATH_SUGGEST_CATEGORIES)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response disambiguate(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo, String input) {
+	public Response suggestCategories(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo, String input) {
 		Response resp;
 		Client client = Client.create();
 		
-		String url = "http://zaire.dimis.fim.uni-passau.de:8999/doser-disambiguationserverstable/disambiguation/categorysuggestion-proxy";
+		String url = Cst.SERVICE_SUGGEST_CATEGORIES; 
 		WebResource webResource = client.resource(url);
 		if (uriInfo.getQueryParameters() != null){
 			webResource = client.resource(url).queryParams(uriInfo.getQueryParameters());
@@ -344,14 +349,14 @@ public class Issuer {
 	}
 	
 	@POST
-	@Path(Cst.PATH_ENTITY_RECOGNITION)
+	@Path(Cst.PATH_RECOGNIZE_ENTITY)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response recognizeEntity(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo, String input) {
 		Response resp;
 		Client client = Client.create();
 		
-		String url = "http://zaire.dimis.fim.uni-passau.de:8999/doser-disambiguationserverstable/webclassify/entityAndCategoryStatistic";
+		String url = Cst.SERVICE_RECOGIZE_ENTITY; 
 		WebResource webResource = client.resource(url);
 		if (uriInfo.getQueryParameters() != null){
 			webResource = client.resource(url).queryParams(uriInfo.getQueryParameters());

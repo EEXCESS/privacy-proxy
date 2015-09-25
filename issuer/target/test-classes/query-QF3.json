@@ -1,4 +1,12 @@
 {
+	"origin": {
+		"userID": "E993A29B-A063-426D-896E-131F85193EB7", 
+		"clientType": "EEXCESS - Google Chrome Extension", 
+		"clientVersion": "2beta", 
+		"module": "testing"
+	
+	},
+	"queryID": "queryABC123",
     "documentBadge": [{
         "id": "sl23394330",
         "uri": "http://service.wissens-server.com/wissensserver/view.html?a=t&r=CURRENT&i=sl23394330&s=BEP&v=eexcess&w=EEXCESS",
