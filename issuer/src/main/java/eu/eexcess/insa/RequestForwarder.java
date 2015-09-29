@@ -1,5 +1,7 @@
 package eu.eexcess.insa;
 
+import java.util.Map;
+
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -7,25 +9,77 @@ import javax.ws.rs.core.Response.Status;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.util.StringKeyStringValueIgnoreCaseMultivaluedMap;
 
 // TODO documentation
 public class RequestForwarder {
 
 	private enum Method { POST, GET }
 	
-	public static Response forwardPostRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, MultivaluedMap<String, String> params){
-		return forwardRequest(Method.POST, serviceUrl, returnedTypeName, returnedTypeClass, params, null);
-	}
+	//******************
+	//** Post methods **
+	//******************
+	
+	// With input
 	
 	public static Response forwardPostRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, MultivaluedMap<String, String> params, String input){
 		return forwardRequest(Method.POST, serviceUrl, returnedTypeName, returnedTypeClass, params, input);
 	}
 	
+	public static Response forwardPostRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, Map<String, String> map, String input){
+		MultivaluedMap<String, String> params = new StringKeyStringValueIgnoreCaseMultivaluedMap();
+		for (String key : map.keySet()){
+			String value = map.get(key);
+			params.putSingle(key, value);
+		}
+		return forwardRequest(Method.POST, serviceUrl, returnedTypeName, returnedTypeClass, params, input);
+	}
+	
+	public static Response forwardPostRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, String input){
+		return forwardRequest(Method.POST, serviceUrl, returnedTypeName, returnedTypeClass, null, input);
+	}
+	
+	// Without input
+	
+	public static Response forwardPostRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, MultivaluedMap<String, String> params){
+		return forwardRequest(Method.POST, serviceUrl, returnedTypeName, returnedTypeClass, params, null);
+	}
+	
+	public static Response forwardPostRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, Map<String, String> map){
+		MultivaluedMap<String, String> params = new StringKeyStringValueIgnoreCaseMultivaluedMap();
+		for (String key : map.keySet()){
+			String value = map.get(key);
+			params.putSingle(key, value);
+		}
+		return forwardRequest(Method.POST, serviceUrl, returnedTypeName, returnedTypeClass, params, null);
+	}
+	
+	//*****************
+	//** Get methods **
+	//*****************
+	
 	public static Response forwardGetRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, MultivaluedMap<String, String> params){
 		return forwardRequest(Method.GET, serviceUrl, returnedTypeName, returnedTypeClass, params, null);
 	}
 	
-	private static Response forwardRequest(Method method, String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, MultivaluedMap<String, String> params, String input){
+	public static Response forwardGetRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, Map<String, String> map){
+		MultivaluedMap<String, String> params = new StringKeyStringValueIgnoreCaseMultivaluedMap();
+		for (String key : map.keySet()){
+			String value = map.get(key);
+			params.putSingle(key, value);
+		}
+		return forwardRequest(Method.GET, serviceUrl, returnedTypeName, returnedTypeClass, params, null);
+	}
+	
+	public static Response forwardGetRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass){
+		return forwardRequest(Method.GET, serviceUrl, returnedTypeName, returnedTypeClass, null, null);
+	}
+	
+	//********************
+	//** Implementation **
+	//********************
+	
+	private static Response forwardRequest(Method method, String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, MultivaluedMap<String, String> params,String input){
 		Response resp;
 		Client client = Client.create();
 		WebResource webResource = client.resource(serviceUrl);
@@ -36,7 +90,7 @@ public class RequestForwarder {
 			ClientResponse r; 
 			int status;
 			if (method.equals(Method.GET)){
-				r = webResource.accept(returnedTypeName).type(returnedTypeName).get(ClientResponse.class); // XXX check it's correct
+				r = webResource.accept(returnedTypeName).type(returnedTypeName).get(ClientResponse.class); 
 				status = r.getStatus();
 			} else {
 				if (input != null){

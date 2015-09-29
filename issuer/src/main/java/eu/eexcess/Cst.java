@@ -20,6 +20,7 @@ public class Cst {
 	
 	// Path
 	public static final String CATALINA_BASE = System.getProperty("catalina.base");
+	public static final String PRIVACY_PROXY_URL = Config.getValue(Config.PRIVACY_PROXY_URL);
 	
 	// Errors
 	public static final String SPACE = " ";
@@ -55,6 +56,11 @@ public class Cst {
 	public static final String TAG_DOCUMENT_BADGE = "documentBadge";
 	public static final String TAG_DETAIL = "detail";
 	public static final String TAG_PARTNER_RESPONSE_STATE = "partnerResponseState";
+	public static final String TAG_PARTNERS = "partner";
+	public static final String TAG_PARTNER_ID = "systemId";
+	public static final String TAG_CLIENT_TYPE = "clientType"; 
+	public static final String TAG_CLIENT_VERSION = "clientVersion";
+	public static final String TAG_MODULE = "module";
 	
 	// Dictionary and Co-occurence graph
 	public static final String TAG_TERM = "term";
@@ -124,7 +130,7 @@ public class Cst {
 	public static final String PATH_GET_REGISTERED_PARTNERS = "getRegisteredPartners";
 	public static final String PATH_GET_PARTNER_FAVICON = "getPartnerFavIcon";
 	public static final String PATH_GET_PREVIEW_IMAGE = "getPreviewImage";
-	public static final String PATH_LOG = "log/{" + Cst.PARAM_INTERACTION_TYPE + "}";
+	public static final String PATH_LOG = "log";
 	public static final String PATH_GET_CLIQUES = "getMaximalCliques";
 	public static final String PATH_GET_CO_OCCURRENCE_GRAPH = "getCoOccurrenceGraph";
 	public static final String PATH_SUGGEST_CATEGORIES = "suggestCategories";

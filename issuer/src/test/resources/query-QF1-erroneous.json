@@ -1,0 +1,17 @@
+{
+	"origin": {
+		"userID": "E993A29B-A063-426D-896E-131F85193EB7", 
+		"clientType": "EEXCESS - Google Chrome Extension", 
+
+		"module": "testing"
+	
+	},
+	"numResults":3,
+	"contextKeywords":[{
+		"text":"graz",
+		"weight":0.1
+	},{
+		"text":"vienna", 
+		"weight":0.1
+	}]
+}

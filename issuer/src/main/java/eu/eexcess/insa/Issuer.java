@@ -37,9 +37,9 @@ import eu.eexcess.insa.peas.Scheduler;
  */
 @Path(Cst.PATH)
 public class Issuer {
-	
+
 	protected String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
-	
+
 	/**
 	 * Initialization of the Privacy Proxy. 
 	 */
@@ -65,17 +65,17 @@ public class Issuer {
 			@Context HttpServletResponse servletResp, 
 			@Context UriInfo uriInfo,
 			String query) {
-		
+
 		Response resp = Response.ok().build();
 		JSONObject jsonQuery = new JSONObject(query);
 		Logger logger = Logger.getInstance();
-		if (jsonQuery.has(Cst.TAG_ORIGIN)){
+		if (containsCompliantOrigin(jsonQuery)){
 			JSONObject jsonOrigin = jsonQuery.getJSONObject(Cst.TAG_ORIGIN);
 			jsonQuery.remove(Cst.TAG_ORIGIN);
 			String ip = req.getRemoteAddr();
 			String queryId = logger.logQuery(jsonOrigin, ip, jsonQuery);
 			jsonQuery.put(Cst.TAG_QUERY_ID, queryId);
-			
+
 			QueryEngine engine = QueryEngine.getInstance();
 			jsonQuery = engine.alterQuery(jsonQuery);
 			if (engine.isObfuscatedQuery(jsonQuery)){
@@ -88,7 +88,7 @@ public class Issuer {
 				logger.logRegularResults(jsonOrigin, ip, queryId, results);
 			}
 		} else {
-			resp = Response.status(Status.BAD_REQUEST).build(); 
+			resp = badRequestResponse(); 
 		}
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
@@ -112,7 +112,7 @@ public class Issuer {
 		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return Response.ok().build();
 	}
-	
+
 	/**
 	 * Service providing detailed information of a set of resources. 
 	 * @param origin Origin of the query. 
@@ -126,18 +126,17 @@ public class Issuer {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getDetails(@Context HttpServletRequest req, @Context HttpServletResponse servletResp, @Context UriInfo uriInfo, String detailsQuery) {
-
 		Response resp = Response.ok().build();
 		JSONObject jsonDetailsQuery = new JSONObject(detailsQuery);
 		Logger logger = Logger.getInstance();
-		if (jsonDetailsQuery.has(Cst.TAG_ORIGIN) && jsonDetailsQuery.has(Cst.TAG_QUERY_ID)){
+		if (containsCompliantOrigin(jsonDetailsQuery) && jsonDetailsQuery.has(Cst.TAG_QUERY_ID)){
 			JSONObject jsonOrigin = jsonDetailsQuery.getJSONObject(Cst.TAG_ORIGIN);
 			jsonDetailsQuery.remove(Cst.TAG_ORIGIN); 
 			String queryId = jsonDetailsQuery.getString(Cst.TAG_QUERY_ID);
 			jsonDetailsQuery.remove(Cst.TAG_QUERY_ID); 
 			String ip = req.getRemoteAddr();
 			logger.logDetailsQuery(jsonOrigin, ip, queryId, jsonDetailsQuery);
-			
+
 			QueryEngine engine = QueryEngine.getInstance();
 			resp = engine.processQuery(jsonDetailsQuery, QueryFormats.QF3, uriInfo);
 			JSONObject results = new JSONObject(resp.getEntity().toString());
@@ -151,7 +150,7 @@ public class Issuer {
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
-	
+
 	/**
 	 * Default service providing detailed information of a set of resources. 
 	 * It does not do anything else than returning the header. 
@@ -179,24 +178,29 @@ public class Issuer {
 	 * @return An empty response with status OK. 
 	 */
 	@POST
-	@Path(Cst.PATH_LOG)
+	@Path(Cst.PATH_LOG + "/{" + Cst.PARAM_INTERACTION_TYPE + "}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response log(@PathParam(Cst.PARAM_INTERACTION_TYPE) String interactionType,
 			@Context HttpServletRequest req, @Context HttpServletResponse servletResp,
 			String input) {
 
 		Response resp = Response.ok().build();
-		Logger logger = Logger.getInstance();
 		JSONObject jsonInput = new JSONObject(input);
-		jsonInput.put(Cst.TAG_IP, req.getRemoteAddr());
-		if (!logger.log(interactionType, jsonInput)){
-			resp = Response.serverError().build();
-		}		
+		if (containsCompliantOrigin(jsonInput)){
+			Logger logger = Logger.getInstance();
+			jsonInput.put(Cst.TAG_IP, req.getRemoteAddr());
+			Boolean logged = logger.log(interactionType, jsonInput); 
+			if (!logged){
+				resp = Response.serverError().build();
+			}
+		} else {
+			resp = Response.status(Status.BAD_REQUEST).build();
+		}
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
-	
+
 	/**
 	 * Default service logging interactions. 
 	 * It does not do anything else than returning the header. 
@@ -212,7 +216,7 @@ public class Issuer {
 		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return Response.ok().build();
 	}
-	
+
 	/**
 	 * Service providing access to the co-occurrence graph. 
 	 * The co-occurrence graph is supposed to be up-to-date at any time (no caching).   
@@ -227,13 +231,13 @@ public class Issuer {
 		CacheReader cacheReader = CacheReader.getInstance();
 		CoOccurrenceGraph graph = cacheReader.getCoOccurrenceGraph();
 		String output = graph.toJsonString();
-		
+
 		Response resp = Response.ok().entity(output).build();
-		
+
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		return resp;
 	}
-	
+
 	/**
 	 * Services providing the set of cliques contained in the co-occurrence graph. 
 	 * Each clique is a graph. 
@@ -259,12 +263,12 @@ public class Issuer {
 		}
 		jsonCliques = JsonUtil.sBrackets(jsonCliques);
 		resp = Response.ok().entity(jsonCliques).build();
-		
+
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
-	
+
 	/**
 	 * Service returning the list of registered partners. 
 	 * This service only forwards the query to the federated recommender, 
@@ -281,7 +285,7 @@ public class Issuer {
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return response;
 	}
-	
+
 	/**
 	 * Service providing the favicon of a given partner. 
 	 * @param servletResp HTTP response. 
@@ -313,7 +317,7 @@ public class Issuer {
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return response;
 	}
-	
+
 	/**
 	 * TODO
 	 * @param servletResp HTTP response.
@@ -331,7 +335,7 @@ public class Issuer {
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
-	
+
 	/**
 	 * TODO
 	 * @param servletResp HTTP response.
@@ -347,7 +351,7 @@ public class Issuer {
 		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return Response.ok().build();
 	}
-	
+
 	/**
 	 * TODO
 	 * @param servletResp HTTP response.
@@ -365,7 +369,7 @@ public class Issuer {
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
 	}
-	
+
 	/**
 	 * TODO
 	 * @param servletResp HTTP response. 
@@ -376,11 +380,30 @@ public class Issuer {
 	@Path(Cst.PATH_RECOGNIZE_ENTITY)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response recognizeEntity(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo) {
+	public Response recognizeEntity(@Context HttpServletResponse servletResp) {
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return Response.ok().build();
+	}
+
+	/**
+	 * TODO
+	 * @param object
+	 * @return
+	 */
+	private Boolean containsCompliantOrigin(JSONObject object){
+		Boolean complient = false;
+		if (object.has(Cst.TAG_ORIGIN)){
+			JSONObject origin = object.getJSONObject(Cst.TAG_ORIGIN);
+			complient = origin.has(Cst.TAG_USER_ID) && origin.has(Cst.TAG_CLIENT_TYPE) && origin.has(Cst.TAG_CLIENT_VERSION) && origin.has(Cst.TAG_MODULE);		
+		}
+		return complient;
+	}
+	
+	private Response badRequestResponse(){
+		//return Response.status(Status.BAD_REQUEST).build();
+		return Response.status(Status.BAD_REQUEST).entity("An attribute \"" + Cst.TAG_ORIGIN + "\" (composed of \"" + Cst.TAG_USER_ID + "\", \"" + Cst.TAG_CLIENT_TYPE + "\", \"" + Cst.TAG_CLIENT_VERSION + "\" and \"" + Cst.TAG_MODULE + "\") must be provided.").build();
 	}
 	
 }

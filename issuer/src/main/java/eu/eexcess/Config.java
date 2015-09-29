@@ -15,6 +15,7 @@ public class Config {
 	public static final String LOG_DIRECTORY = "log.directory";
 	
 	public static final String RECOMMENDER_URL = "recommender.url";
+	public static final String PRIVACY_PROXY_URL = "privacyProxy.url";
 	
 	public static final String DATA_DIRECTORY = "data.directory";
 	public static final String CACHE_DIRECTORY = "cache.directory";

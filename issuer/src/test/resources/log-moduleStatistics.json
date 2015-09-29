@@ -1,0 +1,17 @@
+{
+	"origin": {
+		"userID": "E993A29B-A063-426D-896E-131F85193EB7", 
+		"clientType": "EEXCESS - Google Chrome Extension", 
+		"clientVersion": "2beta", 
+		"module": "facetScape"
+	
+	},
+	"content": {
+		"aKey": "aValue", 
+		"anotherKey": [3, 4, 5], 
+		"theLastOne": {
+			"zero":0,
+			"three":3
+		}
+	}
+}

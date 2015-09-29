@@ -5,18 +5,18 @@ source ./common.sh
 if [ "$#" -eq 1 ]; then 
 
 	# Calls
-	R1=`./getRegisteredPartners.sh $1 GET`
-	R2=`./recommend.sh $1 POST ../resources/query-QF1.json`
-	R3=`./recommend.sh $1 POST ../resources/query-QF2.json`
-	R4=`./getDetails.sh $1 POST ../resources/query-QF3.json`
-	R5=`./getCoOccurrenceGraph.sh $1 GET`
-	R6=`./getMaximalCliques.sh $1 GET`
-	R7=`./suggestCategories.sh $1 POST ../resources/suggestCategories.json`
-	R8=`./recognizeEntity.sh $1 POST ../resources/recognizeEntity.json`
+	R1=`./getRegisteredPartners.sh $1 GET` 
+	R2=`./recommend.sh $1 POST ../resources/query-QF1.json` 
+	R3=`./recommend.sh $1 POST ../resources/query-QF2.json` 
+	R4=`./getDetails.sh $1 POST ../resources/query-QF3.json` 
+	R5=`./getCoOccurrenceGraph.sh $1 GET` 
+	R6=`./getMaximalCliques.sh $1 GET` 
+	R7=`./suggestCategories.sh $1 POST ../resources/suggestCategories.json` 
+	R8=`./recognizeEntity.sh $1 POST ../resources/recognizeEntity.json` 
 	R9a=`./log.sh $1 POST moduleOpened ../resources/log-moduleOpenedClosed.json`
 	R9b=`./log.sh $1 POST moduleClosed ../resources/log-moduleOpenedClosed.json`
 	R9c=`./log.sh $1 POST moduleStatisticsCollected ../resources/log-moduleStatistics.json`
-	R9d=`./log.sh $1 POST itemOpened ../resources/log-itemClosed.json`
+	R9d=`./log.sh $1 POST itemOpened ../resources/log-itemOpened.json`
 	R9e=`./log.sh $1 POST itemClosed ../resources/log-itemClosed.json`
 	R9f=`./log.sh $1 POST itemCitedAsText ../resources/log-itemCited.json`
 	R9g=`./log.sh $1 POST itemCitedAsImage ../resources/log-itemCited.json`

@@ -1,7 +1,6 @@
 package eu.eexcess.insa.peas;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -107,7 +106,7 @@ public class QueryEngine {
 	}
 
 	private Response processRegularQuery(JSONObject query, QueryFormats type, UriInfo uriInfo){
-		Date before = new Date();
+//		Date before = new Date();
 		Response resp = Response.status(Response.Status.BAD_REQUEST).build();
 		String serviceUrl = Cst.SERVICE_RECOMMEND;
 		if (type.equals(QueryFormats.QF3)){
@@ -120,8 +119,8 @@ public class QueryEngine {
 			output = correctDetailField(output);
 			resp = Response.ok().entity(output).build();
 		}
-		Date after = new Date();
-		System.out.println(after.getTime()-before.getTime());
+//		Date after = new Date();
+//		System.out.println(after.getTime()-before.getTime());
 		return resp;
 	}
 	
@@ -133,7 +132,7 @@ public class QueryEngine {
 	 * @return Result containing a list of set of recommendations. The format is RF2. 
 	 */
 	private Response processObfuscatedQuery(JSONObject query, UriInfo uriInfo){
-		Date before = new Date();
+//		Date before = new Date();
 		Response resp = Response.status(Response.Status.BAD_REQUEST).build();
 		if (query.has(Cst.TAG_CONTEXT_KEYWORDS)){
 			JSONArray queryArray = query.getJSONArray(Cst.TAG_CONTEXT_KEYWORDS);
@@ -172,8 +171,8 @@ public class QueryEngine {
 		} else {
 			resp = Response.status(Response.Status.BAD_REQUEST).build();
 		}
-		Date after = new Date();
-		System.out.println(after.getTime()-before.getTime());
+//		Date after = new Date();
+//		System.out.println(after.getTime()-before.getTime());
 		return resp;
 	}
 	
