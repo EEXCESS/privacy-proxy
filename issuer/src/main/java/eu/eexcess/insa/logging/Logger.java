@@ -14,13 +14,31 @@ import eu.eexcess.Cst;
 
 public class Logger {
 
-	protected String logDirectory = Cst.CATALINA_BASE + Config.getValue(Config.LOG_DIRECTORY);
+	private String logDirectoryName = Cst.CATALINA_BASE + Config.getValue(Config.LOG_DIRECTORY);
 
-	public Logger(){}
+	private static volatile Logger instance = null;
+	
+	/** Default constructor. */
+	private Logger(){
+		File logDirectory = new File(logDirectoryName);
+		if (!logDirectory.exists()){
+			logDirectory.mkdirs();
+		}
+	}
+	
+	/**
+	 * Method used in the implementation of the Singleton pattern. 
+	 * @return an instance of {@code Logger}. 
+	 */
+	public static Logger getInstance(){
+		if (instance == null){
+			instance = new Logger();
+		}
+		return instance;
+	}
 
 	public Boolean log(String interactionType, JSONObject input){
 		Boolean isValidInteraction = isValidInteraction(interactionType);
-
 		if (isValidInteraction){
 			JSONObject entry = new JSONObject();
 
@@ -155,7 +173,7 @@ public class Logger {
 			FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write(entry.toString() + Cst.LINE_BREAK);
-			bw.close();
+			bw.close();	
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -177,7 +195,7 @@ public class Logger {
 		if (dayStr.length() < 2){
 			dayStr = "0" + dayStr; 
 		}
-		return this.logDirectory + yearStr + monthStr + dayStr;
+		return this.logDirectoryName + yearStr + monthStr + dayStr;
 	}
 
 	private Boolean isValidInteraction(String element){

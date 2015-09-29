@@ -14,16 +14,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 
 import eu.eexcess.Config;
 import eu.eexcess.Cst;
@@ -44,7 +39,7 @@ import eu.eexcess.insa.peas.Scheduler;
 public class Issuer {
 	
 	protected String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
-	protected Logger logger = new Logger();
+	
 	/**
 	 * Initialization of the Privacy Proxy. 
 	 */
@@ -73,7 +68,7 @@ public class Issuer {
 		
 		Response resp = Response.ok().build();
 		JSONObject jsonQuery = new JSONObject(query);
-		
+		Logger logger = Logger.getInstance();
 		if (jsonQuery.has(Cst.TAG_ORIGIN)){
 			JSONObject jsonOrigin = jsonQuery.getJSONObject(Cst.TAG_ORIGIN);
 			jsonQuery.remove(Cst.TAG_ORIGIN);
@@ -124,7 +119,7 @@ public class Issuer {
 	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @param detailsQuery
-	 * @return A set of detailed results (aka document badges). 
+	 * @return A set of detailed results (i.e., document badges). 
 	 */
 	@POST
 	@Path(Cst.PATH_GET_DETAILS)
@@ -134,7 +129,7 @@ public class Issuer {
 
 		Response resp = Response.ok().build();
 		JSONObject jsonDetailsQuery = new JSONObject(detailsQuery);
-		
+		Logger logger = Logger.getInstance();
 		if (jsonDetailsQuery.has(Cst.TAG_ORIGIN) && jsonDetailsQuery.has(Cst.TAG_QUERY_ID)){
 			JSONObject jsonOrigin = jsonDetailsQuery.getJSONObject(Cst.TAG_ORIGIN);
 			jsonDetailsQuery.remove(Cst.TAG_ORIGIN); 
@@ -180,25 +175,23 @@ public class Issuer {
 	 * @param origin Origin of the query. 
 	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
-	 * @param input XXX Not sure this parameter is used. 
-	 * @return TODO
+	 * @param input Content to log. 
+	 * @return An empty response with status OK. 
 	 */
 	@POST
 	@Path(Cst.PATH_LOG)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response log(@PathParam(Cst.PARAM_INTERACTION_TYPE) String interactionType,
-			@Context HttpServletRequest req,
-			@Context HttpServletResponse servletResp,
+			@Context HttpServletRequest req, @Context HttpServletResponse servletResp,
 			String input) {
 
 		Response resp = Response.ok().build();
+		Logger logger = Logger.getInstance();
 		JSONObject jsonInput = new JSONObject(input);
 		jsonInput.put(Cst.TAG_IP, req.getRemoteAddr());
-		
 		if (!logger.log(interactionType, jsonInput)){
 			resp = Response.serverError().build();
 		}		
-		
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
@@ -283,7 +276,7 @@ public class Issuer {
 	@Path(Cst.PATH_GET_REGISTERED_PARTNERS)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRegisteredPartners(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo) {
-		Response response = forwardGetRequest(Cst.SERVICE_GET_REGISTERED_PARTNERS, MediaType.APPLICATION_JSON, String.class, uriInfo.getQueryParameters());
+		Response response = RequestForwarder.forwardGetRequest(Cst.SERVICE_GET_REGISTERED_PARTNERS, MediaType.APPLICATION_JSON, String.class, uriInfo.getQueryParameters());
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return response;
@@ -299,7 +292,7 @@ public class Issuer {
 	@Path(Cst.PATH_GET_PARTNER_FAVICON)
 	@Produces(Cst.MEDIA_TYPE_IMAGE)
 	public Response getPartnerFavIcon(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo) {
-		Response response = forwardGetRequest(Cst.SERVICE_GET_PARTNER_FAVICON, Cst.MEDIA_TYPE_IMAGE, InputStream.class, uriInfo.getQueryParameters());
+		Response response = RequestForwarder.forwardGetRequest(Cst.SERVICE_GET_PARTNER_FAVICON, Cst.MEDIA_TYPE_IMAGE, InputStream.class, uriInfo.getQueryParameters());
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return response;
@@ -315,61 +308,25 @@ public class Issuer {
 	@Path(Cst.PATH_GET_PREVIEW_IMAGE)
 	@Produces(Cst.MEDIA_TYPE_IMAGE)
 	public Response getPreviewImage(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo) {
-		Response response = forwardGetRequest(Cst.SERVICE_GET_PREVIEW_IMAGE, Cst.MEDIA_TYPE_IMAGE, InputStream.class, uriInfo.getQueryParameters());	
+		Response response = RequestForwarder.forwardGetRequest(Cst.SERVICE_GET_PREVIEW_IMAGE, Cst.MEDIA_TYPE_IMAGE, InputStream.class, uriInfo.getQueryParameters());	
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return response;
 	}
 	
+	/**
+	 * TODO
+	 * @param servletResp HTTP response.
+	 * @param uriInfo
+	 * @param input
+	 * @return
+	 */
 	@POST
 	@Path(Cst.PATH_SUGGEST_CATEGORIES)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response suggestCategories(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo, String input) {
-		Response resp;
-		Client client = Client.create();
-		
-		String url = Cst.SERVICE_SUGGEST_CATEGORIES; 
-		WebResource webResource = client.resource(url);
-		if (uriInfo.getQueryParameters() != null){
-			webResource = client.resource(url).queryParams(uriInfo.getQueryParameters());
-		}
-		ClientResponse r = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, input);
-		int status = r.getStatus();
-		if (status == Response.Status.OK.getStatusCode()){
-			Object output = r.getEntity(String.class);
-			resp = Response.ok().entity(output).build();
-		} else {
-			resp = Response.status(status).build();
-		}		
-
-		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
-		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
-		return resp;
-	}
-	
-	@POST
-	@Path(Cst.PATH_RECOGNIZE_ENTITY)
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response recognizeEntity(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo, String input) {
-		Response resp;
-		Client client = Client.create();
-		
-		String url = Cst.SERVICE_RECOGIZE_ENTITY; 
-		WebResource webResource = client.resource(url);
-		if (uriInfo.getQueryParameters() != null){
-			webResource = client.resource(url).queryParams(uriInfo.getQueryParameters());
-		}
-		ClientResponse r = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, input);
-		int status = r.getStatus();
-		if (status == Response.Status.OK.getStatusCode()){
-			Object output = r.getEntity(String.class);
-			resp = Response.ok().entity(output).build();
-		} else {
-			resp = Response.status(status).build();
-		}		
-
+		Response resp = RequestForwarder.forwardPostRequest(Cst.SERVICE_SUGGEST_CATEGORIES, MediaType.APPLICATION_JSON, InputStream.class, uriInfo.getQueryParameters(), input);	
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
@@ -377,28 +334,53 @@ public class Issuer {
 	
 	/**
 	 * TODO
-	 * @param serviceUrl
-	 * @param returnedTypeName
-	 * @param returnedTypeClass
-	 * @param params
+	 * @param servletResp HTTP response.
 	 * @return
 	 */
-	protected Response forwardGetRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, MultivaluedMap<String, String> params){
-		Response resp;
-		Client client = Client.create();
-		WebResource webResource = client.resource(serviceUrl);
-		if (params != null){
-			webResource = client.resource(serviceUrl).queryParams(params);
-		}
-		ClientResponse r = webResource.accept(returnedTypeName).type(returnedTypeName).get(ClientResponse.class);
-		int status = r.getStatus();
-		if (status == Response.Status.OK.getStatusCode()){
-			Object output = r.getEntity(returnedTypeClass);
-			resp = Response.ok().entity(output).build();
-		} else {
-			resp = Response.status(status).build();
-		}
+	@OPTIONS
+	@Path(Cst.PATH_SUGGEST_CATEGORIES)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response suggestCategories(@Context HttpServletResponse servletResp) {
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
+		return Response.ok().build();
+	}
+	
+	/**
+	 * TODO
+	 * @param servletResp HTTP response.
+	 * @param uriInfo
+	 * @param input
+	 * @return
+	 */
+	@POST
+	@Path(Cst.PATH_RECOGNIZE_ENTITY)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response recognizeEntity(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo, String input) {
+		Response resp = RequestForwarder.forwardPostRequest(Cst.SERVICE_RECOGIZE_ENTITY, MediaType.APPLICATION_JSON, InputStream.class, uriInfo.getQueryParameters(), input);
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		return resp;
+	}
+	
+	/**
+	 * TODO
+	 * @param servletResp HTTP response. 
+	 * @param uriInfo
+	 * @return
+	 */
+	@OPTIONS
+	@Path(Cst.PATH_RECOGNIZE_ENTITY)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response recognizeEntity(@Context HttpServletResponse servletResp, @Context UriInfo uriInfo) {
+		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
+		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
+		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
+		return Response.ok().build();
 	}
 	
 }

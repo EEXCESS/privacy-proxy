@@ -1,6 +1,7 @@
 package eu.eexcess.insa.peas;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -11,12 +12,9 @@ import javax.ws.rs.core.UriInfo;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-
 import eu.eexcess.Cst;
 import eu.eexcess.insa.QueryFormats;
+import eu.eexcess.insa.RequestForwarder;
 
 /**
  * Three formats of queries are handled in this component (see {@link eu.eexcess.insa.QueryFormats}): QF1, QF2 and QF3.  
@@ -109,28 +107,21 @@ public class QueryEngine {
 	}
 
 	private Response processRegularQuery(JSONObject query, QueryFormats type, UriInfo uriInfo){
+		Date before = new Date();
 		Response resp = Response.status(Response.Status.BAD_REQUEST).build();
 		String serviceUrl = Cst.SERVICE_RECOMMEND;
 		if (type.equals(QueryFormats.QF3)){
 			serviceUrl = Cst.SERVICE_GET_DETAILS;
 		} 
-		Client client = Client.create();
-		WebResource webResource = client.resource(serviceUrl).queryParams(uriInfo.getQueryParameters());
-		ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, query.toString());
-		String output = response.getEntity(String.class);
-		if (type.equals(QueryFormats.QF3)){
-			// Not sure why it's needed on the privacy proxy
+		resp = RequestForwarder.forwardPostRequest(serviceUrl, MediaType.APPLICATION_JSON, String.class, uriInfo.getQueryParameters(), query.toString());
+		String output = resp.getEntity().toString();
+		if (type.equals(QueryFormats.QF3) && (resp.getStatus() == Response.Status.OK.getStatusCode())){
+			// XXX Not sure why it's needed on the privacy proxy
 			output = correctDetailField(output);
-		}
-		Integer status = response.getStatus();
-
-		if (status.equals(Response.Status.OK.getStatusCode())){
 			resp = Response.ok().entity(output).build();
-		} else if (status.equals(Response.Status.CREATED.getStatusCode())){
-			resp = Response.status(response.getStatus()).entity(output).build();
-		} else {
-			resp = Response.status(response.getStatus()).build();
 		}
+		Date after = new Date();
+		System.out.println(after.getTime()-before.getTime());
 		return resp;
 	}
 	
@@ -142,6 +133,7 @@ public class QueryEngine {
 	 * @return Result containing a list of set of recommendations. The format is RF2. 
 	 */
 	private Response processObfuscatedQuery(JSONObject query, UriInfo uriInfo){
+		Date before = new Date();
 		Response resp = Response.status(Response.Status.BAD_REQUEST).build();
 		if (query.has(Cst.TAG_CONTEXT_KEYWORDS)){
 			JSONArray queryArray = query.getJSONArray(Cst.TAG_CONTEXT_KEYWORDS);
@@ -180,6 +172,8 @@ public class QueryEngine {
 		} else {
 			resp = Response.status(Response.Status.BAD_REQUEST).build();
 		}
+		Date after = new Date();
+		System.out.println(after.getTime()-before.getTime());
 		return resp;
 	}
 	

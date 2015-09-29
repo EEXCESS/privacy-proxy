@@ -11,8 +11,8 @@ if [ "$#" -eq 1 ]; then
 	R4=`./getDetails.sh $1 POST ../resources/query-QF3.json`
 	R5=`./getCoOccurrenceGraph.sh $1 GET`
 	R6=`./getMaximalCliques.sh $1 GET`
-	#R7=`./suggestCategories.sh $1 POST ../resources/suggestCategories.json`
-	#R8=`./recognizeEntity.sh $1 POST ../resources/recognizeEntity.json`
+	R7=`./suggestCategories.sh $1 POST ../resources/suggestCategories.json`
+	R8=`./recognizeEntity.sh $1 POST ../resources/recognizeEntity.json`
 	R9a=`./log.sh $1 POST moduleOpened ../resources/log-moduleOpenedClosed.json`
 	R9b=`./log.sh $1 POST moduleClosed ../resources/log-moduleOpenedClosed.json`
 	R9c=`./log.sh $1 POST moduleStatisticsCollected ../resources/log-moduleStatistics.json`
@@ -42,8 +42,8 @@ if [ "$#" -eq 1 ]; then
 	printVerdictFile "getPartnerFavIcon" $File1
 	printVerdictFile "getPreviewImage" $File2
 	
-	#printVerdictJson "suggestCategories" $R7
-	#printVerdictJson "recognizeEntity" $R8
+	printVerdictJson "suggestCategories" $R7
+	printVerdictJson "recognizeEntity" $R8
 	
 	printVerdictJson "log-moduleOpened" $R9a
 	printVerdictJson "log-moduleClosed" $R9b
