@@ -45,18 +45,19 @@ public class TestRecommenderServices {
 	@Test
 	public void recommendQf1OriginAttributeMissing(){
 		Response response;
+		String url = Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND;
 		JSONObject input = resrcManager.getJsonContent(QF1_INPUT);
 		JSONObject input1 = Util.removeOriginUserId(input);
-		response = RequestForwarder.forwardPostRequest(Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND, MediaType.APPLICATION_JSON, String.class, input1.toString());
+		response = RequestForwarder.forwardPostRequest(url, MediaType.APPLICATION_JSON, String.class, input1.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		JSONObject input2 = Util.removeOriginClientType(input);
-		response = RequestForwarder.forwardPostRequest(Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND, MediaType.APPLICATION_JSON, String.class, input2.toString());
+		response = RequestForwarder.forwardPostRequest(url, MediaType.APPLICATION_JSON, String.class, input2.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		JSONObject input3 = Util.removeOriginClientVersion(input);
-		response = RequestForwarder.forwardPostRequest(Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND, MediaType.APPLICATION_JSON, String.class, input3.toString());
+		response = RequestForwarder.forwardPostRequest(url, MediaType.APPLICATION_JSON, String.class, input3.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		JSONObject input4 = Util.removeOriginModule(input);
-		response = RequestForwarder.forwardPostRequest(Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND, MediaType.APPLICATION_JSON, String.class, input4.toString());
+		response = RequestForwarder.forwardPostRequest(url, MediaType.APPLICATION_JSON, String.class, input4.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 	}
 	
@@ -79,18 +80,19 @@ public class TestRecommenderServices {
 	@Test
 	public void recommendQf2OriginAttributeMissing(){
 		Response response;
+		String url = Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND;
 		JSONObject input = resrcManager.getJsonContent(QF2_INPUT);
 		JSONObject input1 = Util.removeOriginUserId(input);
-		response = RequestForwarder.forwardPostRequest(Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND, MediaType.APPLICATION_JSON, String.class, input1.toString());
+		response = RequestForwarder.forwardPostRequest(url, MediaType.APPLICATION_JSON, String.class, input1.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		JSONObject input2 = Util.removeOriginClientType(input);
-		response = RequestForwarder.forwardPostRequest(Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND, MediaType.APPLICATION_JSON, String.class, input2.toString());
+		response = RequestForwarder.forwardPostRequest(url, MediaType.APPLICATION_JSON, String.class, input2.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		JSONObject input3 = Util.removeOriginClientVersion(input);
-		response = RequestForwarder.forwardPostRequest(Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND, MediaType.APPLICATION_JSON, String.class, input3.toString());
+		response = RequestForwarder.forwardPostRequest(url, MediaType.APPLICATION_JSON, String.class, input3.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		JSONObject input4 = Util.removeOriginModule(input);
-		response = RequestForwarder.forwardPostRequest(Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND, MediaType.APPLICATION_JSON, String.class, input4.toString());
+		response = RequestForwarder.forwardPostRequest(url, MediaType.APPLICATION_JSON, String.class, input4.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 	}
 
@@ -113,18 +115,19 @@ public class TestRecommenderServices {
 	@Test
 	public void getDetailsOriginAttributeMissing(){
 		Response response;
+		String url = Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND;
 		JSONObject input = resrcManager.getJsonContent(QF3_INPUT);
 		JSONObject input1 = Util.removeOriginUserId(input);
-		response = RequestForwarder.forwardPostRequest(Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND, MediaType.APPLICATION_JSON, String.class, input1.toString());
+		response = RequestForwarder.forwardPostRequest(url, MediaType.APPLICATION_JSON, String.class, input1.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		JSONObject input2 = Util.removeOriginClientType(input);
-		response = RequestForwarder.forwardPostRequest(Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND, MediaType.APPLICATION_JSON, String.class, input2.toString());
+		response = RequestForwarder.forwardPostRequest(url, MediaType.APPLICATION_JSON, String.class, input2.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		JSONObject input3 = Util.removeOriginClientVersion(input);
-		response = RequestForwarder.forwardPostRequest(Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND, MediaType.APPLICATION_JSON, String.class, input3.toString());
+		response = RequestForwarder.forwardPostRequest(url, MediaType.APPLICATION_JSON, String.class, input3.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		JSONObject input4 = Util.removeOriginModule(input);
-		response = RequestForwarder.forwardPostRequest(Cst.PRIVACY_PROXY_URL + Cst.PATH_RECOMMEND, MediaType.APPLICATION_JSON, String.class, input4.toString());
+		response = RequestForwarder.forwardPostRequest(url, MediaType.APPLICATION_JSON, String.class, input4.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 	}
 
