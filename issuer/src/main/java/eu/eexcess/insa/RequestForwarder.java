@@ -9,12 +9,13 @@ import javax.ws.rs.core.Response.Status;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource.Builder;
 import com.sun.jersey.core.util.StringKeyStringValueIgnoreCaseMultivaluedMap;
 
 // TODO documentation
 public class RequestForwarder {
 
-	private enum Method { POST, GET }
+	private enum Method { POST, GET, OPTIONS }
 	
 	//******************
 	//** Post methods **
@@ -75,6 +76,27 @@ public class RequestForwarder {
 		return forwardRequest(Method.GET, serviceUrl, returnedTypeName, returnedTypeClass, null, null);
 	}
 	
+	//*****************
+	//** Options methods **
+	//*****************
+	
+	public static Response forwardOptionsRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, MultivaluedMap<String, String> params){
+		return forwardRequest(Method.OPTIONS, serviceUrl, returnedTypeName, returnedTypeClass, params, null);
+	}
+	
+	public static Response forwardOptionsRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass, Map<String, String> map){
+		MultivaluedMap<String, String> params = new StringKeyStringValueIgnoreCaseMultivaluedMap();
+		for (String key : map.keySet()){
+			String value = map.get(key);
+			params.putSingle(key, value);
+		}
+		return forwardRequest(Method.OPTIONS, serviceUrl, returnedTypeName, returnedTypeClass, params, null);
+	}
+	
+	public static Response forwardOptionsRequest(String serviceUrl, String returnedTypeName, Class<?> returnedTypeClass){
+		return forwardRequest(Method.OPTIONS, serviceUrl, returnedTypeName, returnedTypeClass, null, null);
+	}
+	
 	//********************
 	//** Implementation **
 	//********************
@@ -86,20 +108,22 @@ public class RequestForwarder {
 		if (params != null){
 			webResource = client.resource(serviceUrl).queryParams(params);
 		}
-		if (method.equals(Method.GET) || method.equals(Method.POST)){
-			ClientResponse r; 
+		if (method.equals(Method.GET) || method.equals(Method.POST) || method.equals(Method.OPTIONS)){
+			ClientResponse r = null; 
+			Builder builder = webResource.accept(returnedTypeName).type(returnedTypeName);
 			int status;
 			if (method.equals(Method.GET)){
-				r = webResource.accept(returnedTypeName).type(returnedTypeName).get(ClientResponse.class); 
-				status = r.getStatus();
-			} else {
+				r = builder.get(ClientResponse.class);
+			} else if (method.equals(Method.POST)){
 				if (input != null){
-					r = webResource.accept(returnedTypeName).type(returnedTypeName).post(ClientResponse.class, input);
+					r = builder.post(ClientResponse.class, input);
 				} else {
-					r = webResource.accept(returnedTypeName).type(returnedTypeName).post(ClientResponse.class);
+					r = builder.post(ClientResponse.class);
 				}
-				status = r.getStatus();
+			} else {
+				r = builder.options(ClientResponse.class);
 			}
+			status = r.getStatus();
 			if (status == Response.Status.OK.getStatusCode()){
 				Object output = r.getEntity(returnedTypeClass);
 				resp = Response.ok().entity(output).build();

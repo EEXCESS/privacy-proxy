@@ -15,7 +15,7 @@ import eu.eexcess.Cst;
 
 public class TestLoggingServices {
 	
-	private ResourceManager resrcManager = new ResourceManager();
+	private Util resrcManager = new Util();
 	private String loggingUrl =  Cst.PRIVACY_PROXY_URL + Cst.PATH_LOG + File.separator;
 	
 	private static final String MODULE_OPENED_CLOSED_INPUT = "log-moduleOpenedClosed.json";
@@ -26,17 +26,25 @@ public class TestLoggingServices {
 	private static final String ITEM_RATED_INPUT = "log-itemRated.json";
 	private static final String ITEM_BOOKMARKED_INPUT = "log-itemBookmarked.json";
 	
+	// Options calls
+	
+	@Test
+	public void logOptions(){
+		Response response = RequestForwarder.forwardOptionsRequest(loggingUrl, MediaType.APPLICATION_JSON, String.class);
+		assertEquals(Status.OK.getStatusCode(), response.getStatus());
+	}
+	
 	// Module opened / closed
 	@Test
 	public void logModuleOpened(){
-		JSONObject input = resrcManager.getContent(MODULE_OPENED_CLOSED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(MODULE_OPENED_CLOSED_INPUT);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_MODULE_OPENED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 	}
 	
 	@Test
 	public void logModuleOpenedOriginMissing(){
-		JSONObject input = resrcManager.getContent(MODULE_OPENED_CLOSED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(MODULE_OPENED_CLOSED_INPUT);
 		input.remove(Cst.TAG_ORIGIN);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_MODULE_OPENED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -44,14 +52,14 @@ public class TestLoggingServices {
 	
 	@Test
 	public void logModuleClosed(){
-		JSONObject input = resrcManager.getContent(MODULE_OPENED_CLOSED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(MODULE_OPENED_CLOSED_INPUT);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_MODULE_CLOSED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 	}
 	
 	@Test
 	public void logModuleClosedOriginMissing(){
-		JSONObject input = resrcManager.getContent(MODULE_OPENED_CLOSED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(MODULE_OPENED_CLOSED_INPUT);
 		input.remove(Cst.TAG_ORIGIN);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_MODULE_CLOSED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -60,14 +68,14 @@ public class TestLoggingServices {
 	// Module statistics
 	@Test
 	public void logModuleStatisticsCollected(){
-		JSONObject input = resrcManager.getContent(MODULE_STATISTICS_INPUT);
+		JSONObject input = resrcManager.getJsonContent(MODULE_STATISTICS_INPUT);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_MODULE_STATISTICS_COLLECTED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 	}
 	
 	@Test
 	public void logModuleStatisticsCollectedOriginMissing(){
-		JSONObject input = resrcManager.getContent(MODULE_STATISTICS_INPUT);
+		JSONObject input = resrcManager.getJsonContent(MODULE_STATISTICS_INPUT);
 		input.remove(Cst.TAG_ORIGIN);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_MODULE_STATISTICS_COLLECTED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -76,14 +84,14 @@ public class TestLoggingServices {
 	// Item opened / closed
 	@Test
 	public void logItemOpened(){
-		JSONObject input = resrcManager.getContent(ITEM_OPENED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_OPENED_INPUT);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_OPENED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 	}
 	
 	@Test
 	public void logItemOpenedOriginMissing(){
-		JSONObject input = resrcManager.getContent(ITEM_OPENED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_OPENED_INPUT);
 		input.remove(Cst.TAG_ORIGIN);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_OPENED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -91,14 +99,14 @@ public class TestLoggingServices {
 	
 	@Test
 	public void logItemClosed(){
-		JSONObject input = resrcManager.getContent(ITEM_CLOSED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_CLOSED_INPUT);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_CLOSED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 	}
 	
 	@Test
 	public void logItemClosedOriginMissing(){
-		JSONObject input = resrcManager.getContent(ITEM_CLOSED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_CLOSED_INPUT);
 		input.remove(Cst.TAG_ORIGIN);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_CLOSED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -108,14 +116,14 @@ public class TestLoggingServices {
 	
 	@Test
 	public void logItemCitedAsHyperlink(){
-		JSONObject input = resrcManager.getContent(ITEM_CITED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_CITED_INPUT);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_CITED_AS_HYPERLINK, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 	}
 	
 	@Test
 	public void logItemCitedAsHyperlinkOriginMissing(){
-		JSONObject input = resrcManager.getContent(ITEM_CITED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_CITED_INPUT);
 		input.remove(Cst.TAG_ORIGIN);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_CITED_AS_HYPERLINK, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -123,14 +131,14 @@ public class TestLoggingServices {
 	
 	@Test
 	public void logItemCitedAsImage(){
-		JSONObject input = resrcManager.getContent(ITEM_CITED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_CITED_INPUT);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_CITED_AS_IMAGE, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 	}
 	
 	@Test
 	public void logItemCitedAsImageOriginMissing(){
-		JSONObject input = resrcManager.getContent(ITEM_CITED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_CITED_INPUT);
 		input.remove(Cst.TAG_ORIGIN);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_CITED_AS_IMAGE, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -138,14 +146,14 @@ public class TestLoggingServices {
 	
 	@Test
 	public void logItemCitedAsText(){
-		JSONObject input = resrcManager.getContent(ITEM_CITED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_CITED_INPUT);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_CITED_AS_TEXT, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 	}
 	
 	@Test
 	public void logItemCitedAsTextOriginMissing(){
-		JSONObject input = resrcManager.getContent(ITEM_CITED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_CITED_INPUT);
 		input.remove(Cst.TAG_ORIGIN);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_CITED_AS_TEXT, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -155,14 +163,14 @@ public class TestLoggingServices {
 	
 	@Test
 	public void logItemRated(){
-		JSONObject input = resrcManager.getContent(ITEM_RATED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_RATED_INPUT);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_RATED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 	}
 	
 	@Test
 	public void logItemRatedOriginMissing(){
-		JSONObject input = resrcManager.getContent(ITEM_RATED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_RATED_INPUT);
 		input.remove(Cst.TAG_ORIGIN);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_RATED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -170,14 +178,14 @@ public class TestLoggingServices {
 	
 	@Test
 	public void logItemBookmarked(){
-		JSONObject input = resrcManager.getContent(ITEM_BOOKMARKED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_BOOKMARKED_INPUT);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_BOOKMARKED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 	}
 	
 	@Test
 	public void logItemBookmarkedOriginMissing(){
-		JSONObject input = resrcManager.getContent(ITEM_BOOKMARKED_INPUT);
+		JSONObject input = resrcManager.getJsonContent(ITEM_BOOKMARKED_INPUT);
 		input.remove(Cst.TAG_ORIGIN);
 		Response response = RequestForwarder.forwardPostRequest(loggingUrl + Cst.INTERACTION_ITEM_BOOKMARKED, MediaType.APPLICATION_JSON, String.class, input.toString());
 		assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());

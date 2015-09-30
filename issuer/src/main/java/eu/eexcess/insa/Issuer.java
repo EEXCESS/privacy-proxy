@@ -39,6 +39,7 @@ import eu.eexcess.insa.peas.Scheduler;
 public class Issuer {
 
 	protected String queryLogLocation = Config.getValue(Config.DATA_DIRECTORY) + Config.getValue(Config.QUERY_LOG);
+	protected ComplianceManager complianceManager = new ComplianceManager();
 
 	/**
 	 * Initialization of the Privacy Proxy. 
@@ -69,7 +70,7 @@ public class Issuer {
 		Response resp = Response.ok().build();
 		JSONObject jsonQuery = new JSONObject(query);
 		Logger logger = Logger.getInstance();
-		if (containsCompliantOrigin(jsonQuery)){
+		if (complianceManager.containsCompliantOrigin(jsonQuery)){
 			JSONObject jsonOrigin = jsonQuery.getJSONObject(Cst.TAG_ORIGIN);
 			jsonQuery.remove(Cst.TAG_ORIGIN);
 			String ip = req.getRemoteAddr();
@@ -88,7 +89,7 @@ public class Issuer {
 				logger.logRegularResults(jsonOrigin, ip, queryId, results);
 			}
 		} else {
-			resp = badRequestResponse(); 
+			resp = complianceManager.notCompliantRequestResponse(); 
 		}
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
@@ -129,7 +130,7 @@ public class Issuer {
 		Response resp = Response.ok().build();
 		JSONObject jsonDetailsQuery = new JSONObject(detailsQuery);
 		Logger logger = Logger.getInstance();
-		if (containsCompliantOrigin(jsonDetailsQuery) && jsonDetailsQuery.has(Cst.TAG_QUERY_ID)){
+		if (complianceManager.containsCompliantOrigin(jsonDetailsQuery) && jsonDetailsQuery.has(Cst.TAG_QUERY_ID)){
 			JSONObject jsonOrigin = jsonDetailsQuery.getJSONObject(Cst.TAG_ORIGIN);
 			jsonDetailsQuery.remove(Cst.TAG_ORIGIN); 
 			String queryId = jsonDetailsQuery.getString(Cst.TAG_QUERY_ID);
@@ -186,7 +187,7 @@ public class Issuer {
 
 		Response resp = Response.ok().build();
 		JSONObject jsonInput = new JSONObject(input);
-		if (containsCompliantOrigin(jsonInput)){
+		if (complianceManager.containsCompliantOrigin(jsonInput)){
 			Logger logger = Logger.getInstance();
 			jsonInput.put(Cst.TAG_IP, req.getRemoteAddr());
 			Boolean logged = logger.log(interactionType, jsonInput); 
@@ -385,25 +386,6 @@ public class Issuer {
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
 		servletResp.setHeader(Cst.ACA_METHODS_KEY, Cst.ACA_POST);
 		return Response.ok().build();
-	}
-
-	/**
-	 * TODO
-	 * @param object
-	 * @return
-	 */
-	private Boolean containsCompliantOrigin(JSONObject object){
-		Boolean complient = false;
-		if (object.has(Cst.TAG_ORIGIN)){
-			JSONObject origin = object.getJSONObject(Cst.TAG_ORIGIN);
-			complient = origin.has(Cst.TAG_USER_ID) && origin.has(Cst.TAG_CLIENT_TYPE) && origin.has(Cst.TAG_CLIENT_VERSION) && origin.has(Cst.TAG_MODULE);		
-		}
-		return complient;
-	}
-	
-	private Response badRequestResponse(){
-		//return Response.status(Status.BAD_REQUEST).build();
-		return Response.status(Status.BAD_REQUEST).entity("An attribute \"" + Cst.TAG_ORIGIN + "\" (composed of \"" + Cst.TAG_USER_ID + "\", \"" + Cst.TAG_CLIENT_TYPE + "\", \"" + Cst.TAG_CLIENT_VERSION + "\" and \"" + Cst.TAG_MODULE + "\") must be provided.").build();
 	}
 	
 }

@@ -30,6 +30,8 @@ public class Config {
 	public static final String SUGGEST_CATEGORY = "services.doser.suggestCategories";
 	public static final String RECOGIZE_ENTITY = "services.doser.recognizeEntity";
 	
+	public static final String TEMPLATE_HTTP_ERROR = "templateHttpError";
+	
 	// Configuration file
 	private static final String PROP_FILE_NAME = "config.properties";
 	
