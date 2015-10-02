@@ -58,7 +58,6 @@ public class CachingTask extends TimerTask {
 			cacheMaximalCliques(cliques, cacheMaximalCliques);
 			cacheMaximalCliques.renameTo(new File(cacheMaximalCliquesLocation));
 		}
-		System.out.println(this.getClass() + " " + this.hashCode());
 	}
 
 	/**

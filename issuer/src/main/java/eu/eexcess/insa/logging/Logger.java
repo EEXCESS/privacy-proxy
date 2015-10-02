@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import eu.eexcess.Config;
 import eu.eexcess.Cst;
 
+// TODO Documentation
 public class Logger {
 
 	private String logDirectoryName = Cst.CATALINA_BASE + Config.getValue(Config.LOG_DIRECTORY);
@@ -36,8 +37,8 @@ public class Logger {
 		}
 		return instance;
 	}
-
-	public Boolean log(String interactionType, JSONObject input){
+	
+	public Boolean log(String interactionType, JSONObject input) {
 		Boolean isValidInteraction = isValidInteraction(interactionType);
 		if (isValidInteraction){
 			JSONObject entry = new JSONObject();
@@ -114,8 +115,7 @@ public class Logger {
 		return queryId;
 	}
 
-	public Boolean logDetailsQuery(JSONObject origin, String ip, String queryId, JSONObject detailsQuery){
-		Boolean logged = false;
+	public void logDetailsQuery(JSONObject origin, String ip, String queryId, JSONObject detailsQuery){
 		JSONObject input = new JSONObject();
 		// IP address 
 		input.put(Cst.TAG_IP, ip);
@@ -127,12 +127,10 @@ public class Logger {
 		content.put(Cst.TAG_DETAILS_QUERY, detailsQuery);
 		content.put(Cst.TAG_QUERY_ID, queryId);
 		input.put(Cst.TAG_CONTENT, content);
-		logged = log(Cst.INTERACTION_DETAILS_QUERY, input);
-		return logged;
+		log(Cst.INTERACTION_DETAILS_QUERY, input);
 	}
 	
-	public Boolean logRegularResults(JSONObject origin, String ip, String queryId, JSONObject results){
-		Boolean logged = false;
+	public void logRegularResults(JSONObject origin, String ip, String queryId, JSONObject results){
 		JSONObject input = new JSONObject();
 		input.put(Cst.TAG_IP, ip);
 		input.put(Cst.TAG_ORIGIN, origin);
@@ -140,22 +138,18 @@ public class Logger {
 		content.put(Cst.TAG_RESULTS, results);
 		content.put(Cst.TAG_QUERY_ID, queryId);
 		input.put(Cst.TAG_CONTENT, content);
-		logged = log(Cst.INTERACTION_RESPONSE, input);
-		return logged;
+		log(Cst.INTERACTION_RESPONSE, input);
 	}
 	
-	public Boolean logMergedResults(JSONObject origin, String ip, String queryId, JSONObject results){
-		Boolean logged = false;
+	public void logMergedResults(JSONObject origin, String ip, String queryId, JSONObject results){
 		JSONObject input = new JSONObject();
 		input.put(Cst.TAG_IP, ip);
 		input.put(Cst.TAG_ORIGIN, origin);
 		input.put(Cst.TAG_CONTENT, results);
-		logged = log(Cst.INTERACTION_RESPONSE, input);
-		return logged;
+		log(Cst.INTERACTION_RESPONSE, input);
 	}
 
-	public Boolean logDetailsResults(JSONObject origin, String ip, String queryId, JSONObject results){
-		Boolean logged = false;
+	public void logDetailsResults(JSONObject origin, String ip, String queryId, JSONObject results){
 		JSONObject input = new JSONObject();
 		input.put(Cst.TAG_IP, ip);
 		input.put(Cst.TAG_ORIGIN, origin);
@@ -163,8 +157,7 @@ public class Logger {
 		content.put(Cst.TAG_RESULTS, results);
 		content.put(Cst.TAG_QUERY_ID, queryId);
 		input.put(Cst.TAG_CONTENT, content);
-		logged = log(Cst.INTERACTION_DETAILS_RESPONSE, input);
-		return logged;
+		log(Cst.INTERACTION_DETAILS_RESPONSE, input);
 	}
 	
 	private void writeEntry(JSONObject entry){

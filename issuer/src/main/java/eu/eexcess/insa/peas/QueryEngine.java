@@ -105,8 +105,7 @@ public class QueryEngine {
 		return resp;
 	}
 
-	private Response processRegularQuery(JSONObject query, QueryFormats type, UriInfo uriInfo){
-//		Date before = new Date();
+	protected Response processRegularQuery(JSONObject query, QueryFormats type, UriInfo uriInfo){
 		Response resp = Response.status(Response.Status.BAD_REQUEST).build();
 		String serviceUrl = Cst.SERVICE_RECOMMEND;
 		if (type.equals(QueryFormats.QF3)){
@@ -115,12 +114,9 @@ public class QueryEngine {
 		resp = RequestForwarder.forwardPostRequest(serviceUrl, MediaType.APPLICATION_JSON, String.class, uriInfo.getQueryParameters(), query.toString());
 		String output = resp.getEntity().toString();
 		if (type.equals(QueryFormats.QF3) && (resp.getStatus() == Response.Status.OK.getStatusCode())){
-			// XXX Not sure why it's needed on the privacy proxy
 			output = correctDetailField(output);
 			resp = Response.ok().entity(output).build();
 		}
-//		Date after = new Date();
-//		System.out.println(after.getTime()-before.getTime());
 		return resp;
 	}
 	
@@ -131,14 +127,16 @@ public class QueryEngine {
 	 * @param query Obfuscated query (i.e., query of format QF2). 
 	 * @return Result containing a list of set of recommendations. The format is RF2. 
 	 */
-	private Response processObfuscatedQuery(JSONObject query, UriInfo uriInfo){
-//		Date before = new Date();
+	protected Response processObfuscatedQuery(JSONObject query, UriInfo uriInfo){
 		Response resp = Response.status(Response.Status.BAD_REQUEST).build();
 		if (query.has(Cst.TAG_CONTEXT_KEYWORDS)){
 			JSONArray queryArray = query.getJSONArray(Cst.TAG_CONTEXT_KEYWORDS);
 			Boolean oneSuccess = false; // Determines if at least one query was processed successfully
 			List<JSONObject> results = new ArrayList<JSONObject>();
 			Integer nbResults = 0;
+			
+			List<QueryEngineThread> threads = new ArrayList<QueryEngineThread>();
+			
 			// Forwarding of all the sub-queries (independently)
 			for (Integer i = 0 ; i < queryArray.length() ; i++){
 				JSONArray queryArrayEntry = queryArray.getJSONArray(i);
@@ -147,14 +145,27 @@ public class QueryEngine {
 					clonedQuery.put(Cst.TAG_QUERY_ID, clonedQuery.get(Cst.TAG_QUERY_ID) + i.toString());
 				}
 				clonedQuery.put(Cst.TAG_CONTEXT_KEYWORDS, queryArrayEntry);
-				Response respClonedQuery = processQuery(clonedQuery, QueryFormats.QF1, uriInfo);
-				Boolean success = (respClonedQuery.getStatus() == Response.Status.OK.getStatusCode());
-				oneSuccess = oneSuccess || success;
-				if (success){
-					JSONObject result = new JSONObject(respClonedQuery.getEntity().toString());
-					result.remove(Cst.TAG_QUERY_ID);
-					nbResults += result.getJSONArray(Cst.TAG_RESULT).length();
-					results.add(result);
+				
+				QueryEngineThread thread = new QueryEngineThread(this, clonedQuery, QueryFormats.QF1, uriInfo);
+				threads.add(thread);
+				thread.start();
+
+			}
+			for (Integer i = 0 ; i < threads.size() ; i++){
+				QueryEngineThread thread = threads.get(i);
+				try {
+					thread.join();
+					Response respClonedQuery = thread.getReponse();
+					Boolean success = (respClonedQuery.getStatus() == Response.Status.OK.getStatusCode());
+					oneSuccess = oneSuccess || success;
+					if (success){
+						JSONObject result = new JSONObject(respClonedQuery.getEntity().toString());
+						result.remove(Cst.TAG_QUERY_ID);
+						nbResults += result.getJSONArray(Cst.TAG_RESULT).length();
+						results.add(result);
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 			// Returns the results
@@ -171,8 +182,6 @@ public class QueryEngine {
 		} else {
 			resp = Response.status(Response.Status.BAD_REQUEST).build();
 		}
-//		Date after = new Date();
-//		System.out.println(after.getTime()-before.getTime());
 		return resp;
 	}
 	

@@ -69,8 +69,10 @@ public class Issuer {
 
 		Response resp = Response.ok().build();
 		JSONObject jsonQuery = new JSONObject(query);
-		Logger logger = Logger.getInstance();
+		
 		if (complianceManager.containsCompliantOrigin(jsonQuery)){
+			Logger logger = Logger.getInstance();
+			
 			JSONObject jsonOrigin = jsonQuery.getJSONObject(Cst.TAG_ORIGIN);
 			jsonQuery.remove(Cst.TAG_ORIGIN);
 			String ip = req.getRemoteAddr();

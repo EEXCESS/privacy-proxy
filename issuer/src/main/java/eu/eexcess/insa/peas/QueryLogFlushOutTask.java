@@ -56,7 +56,6 @@ public class QueryLogFlushOutTask extends TimerTask {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println(this.getClass() + " " + this.hashCode());
 	}
 
 }
