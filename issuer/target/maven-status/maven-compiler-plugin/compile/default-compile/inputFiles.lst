@@ -1,7 +1,8 @@
 /Users/Thomas/git/eexcess-privacy-proxy/issuer/src/main/java/eu/eexcess/Config.java
 /Users/Thomas/git/eexcess-privacy-proxy/issuer/src/main/java/eu/eexcess/Cst.java
-/Users/Thomas/git/eexcess-privacy-proxy/issuer/src/main/java/eu/eexcess/insa/peas/CoOccurrenceGraph.java
 /Users/Thomas/git/eexcess-privacy-proxy/issuer/src/main/java/eu/eexcess/insa/peas/Scheduler.java
+/Users/Thomas/git/eexcess-privacy-proxy/issuer/src/main/java/eu/eexcess/insa/peas/CoOccurrenceGraph.java
+/Users/Thomas/git/eexcess-privacy-proxy/issuer/src/main/java/eu/eexcess/insa/peas/QueryEngineThread.java
 /Users/Thomas/git/eexcess-privacy-proxy/issuer/src/main/java/eu/eexcess/insa/logging/Logger.java
 /Users/Thomas/git/eexcess-privacy-proxy/issuer/src/main/java/eu/eexcess/insa/RequestForwarder.java
 /Users/Thomas/git/eexcess-privacy-proxy/issuer/src/main/java/eu/eexcess/insa/Issuer.java
@@ -13,3 +14,4 @@
 /Users/Thomas/git/eexcess-privacy-proxy/issuer/src/main/java/eu/eexcess/insa/peas/CachingTask.java
 /Users/Thomas/git/eexcess-privacy-proxy/issuer/src/main/java/eu/eexcess/insa/peas/QueryEngine.java
 /Users/Thomas/git/eexcess-privacy-proxy/issuer/src/main/java/eu/eexcess/JsonUtil.java
+/Users/Thomas/git/eexcess-privacy-proxy/issuer/src/main/java/eu/eexcess/insa/ComplianceManager.java

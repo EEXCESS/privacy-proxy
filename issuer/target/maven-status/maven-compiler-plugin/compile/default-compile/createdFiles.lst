@@ -1,6 +1,6 @@
 eu/eexcess/Config.class
-eu/eexcess/insa/peas/CachingTask.class
 eu/eexcess/insa/peas/Clique.class
+eu/eexcess/insa/peas/CachingTask.class
 eu/eexcess/Cst.class
 eu/eexcess/insa/peas/CoOccurrenceGraph.class
 eu/eexcess/insa/QueryFormats.class
