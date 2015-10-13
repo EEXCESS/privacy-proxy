@@ -90,8 +90,7 @@ public class Logger {
 		return isValidInteraction;
 	}
 
-	public String logQuery(JSONObject origin, String ip, JSONObject query){
-		String queryId = "";
+	public void logQuery(JSONObject origin, String ip, JSONObject query, String queryId){
 		JSONObject input = new JSONObject();
 		// IP address 
 		input.put(Cst.TAG_IP, ip);
@@ -100,19 +99,9 @@ public class Logger {
 		JSONObject content = new JSONObject();
 		// Content / query
 		content.put(Cst.TAG_QUERY, query);
-		if (!query.has(Cst.TAG_QUERY_ID)){
-			String queryIdAux = query.toString(); 
-			Date currentDate = new Date();
-			Long timestamp = currentDate.getTime(); 
-			queryId = hash(queryIdAux, timestamp);
-			// Content / queryID
-			content.put(Cst.TAG_QUERY_ID, queryId);
-		} else {
-			content.put(Cst.TAG_QUERY_ID, query.getString(Cst.TAG_QUERY_ID));
-		}
+		content.put(Cst.TAG_QUERY_ID, queryId);
 		input.put(Cst.TAG_CONTENT, content);
 		log(Cst.INTERACTION_QUERY, input);
-		return queryId;
 	}
 
 	public void logDetailsQuery(JSONObject origin, String ip, String queryId, JSONObject detailsQuery){
@@ -197,16 +186,6 @@ public class Logger {
 			contains = contains || (element.equals(Cst.VALID_INTERACTIONS[i]));
 		}
 		return contains;
-	}
-
-	private String hash(Object o1, Object o2){
-		String output;
-		Integer hashCode = o1.hashCode() * o2.hashCode();
-		if (hashCode < 0){
-			hashCode = -hashCode;
-		}
-		output = hashCode.toString();
-		return output;
 	}
 
 	public static Boolean mustBeLogged(JSONObject input){

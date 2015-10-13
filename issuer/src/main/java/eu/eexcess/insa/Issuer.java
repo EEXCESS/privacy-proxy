@@ -76,10 +76,17 @@ public class Issuer {
 			
 			JSONObject jsonOrigin = jsonQuery.getJSONObject(Cst.TAG_ORIGIN);
 			jsonQuery.remove(Cst.TAG_ORIGIN);
+			
 			jsonQuery.remove(Cst.TAG_LOGGING_LEVEL);
 			String ip = req.getRemoteAddr();
-			String queryId = logger.logQuery(jsonOrigin, ip, jsonQuery);
-			jsonQuery.put(Cst.TAG_QUERY_ID, queryId);
+			String queryId;
+			if (jsonQuery.has(Cst.TAG_QUERY_ID)){
+				queryId = jsonQuery.getString(Cst.TAG_QUERY_ID);
+			} else {
+				queryId = QueryEngine.generateQueryId(jsonQuery);
+				jsonQuery.put(Cst.TAG_QUERY_ID, queryId);
+			}
+			logger.logQuery(jsonOrigin, ip, jsonQuery, queryId);
 			jsonQuery.remove(Cst.TAG_LOGGING_LEVEL);
 
 			QueryEngine engine = QueryEngine.getInstance();

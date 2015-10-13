@@ -1,6 +1,7 @@
 package eu.eexcess.insa.peas;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -213,4 +214,28 @@ public class QueryEngine {
 		return jsonString;
 	}
 
+	/**
+	 * TODO
+	 * @param query
+	 * @return
+	 */
+	static public String generateQueryId(JSONObject query){
+		String queryId = "";
+		String queryIdAux = query.toString(); 
+		Date currentDate = new Date();
+		Long timestamp = currentDate.getTime(); 
+		queryId = QueryEngine.hash(queryIdAux, timestamp);
+		return queryId;
+	}
+	
+	static private String hash(Object o1, Object o2){
+		String output;
+		Integer hashCode = o1.hashCode() * o2.hashCode();
+		if (hashCode < 0){
+			hashCode = -hashCode;
+		}
+		output = hashCode.toString();
+		return output;
+	}
+	
 }
