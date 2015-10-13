@@ -12,7 +12,11 @@ import org.json.JSONObject;
 import eu.eexcess.Config;
 import eu.eexcess.Cst;
 
-// TODO Documentation
+/**
+ * This class defines all the methods needed to log user interactions on the Privacy Proxy. 
+ * @author Thomas Cerqueus
+ * @version 1.0
+ */
 public class Logger {
 
 	private String logDirectoryName = Cst.CATALINA_BASE + Config.getValue(Config.LOG_DIRECTORY);
@@ -38,6 +42,12 @@ public class Logger {
 		return instance;
 	}
 	
+	/**
+	 * Logs generic interactions. 
+	 * @param interactionType Type of the interaction. 
+	 * @param input Data to be logged. 
+	 * @return {@code true} if the input was logged; {@code false} otherwise. 
+	 */
 	public Boolean log(String interactionType, JSONObject input) {
 		Boolean isValidInteraction = isValidInteraction(interactionType);
 		if (isValidInteraction){
@@ -90,7 +100,15 @@ public class Logger {
 		return isValidInteraction;
 	}
 
-	public void logQuery(JSONObject origin, String ip, JSONObject query, String queryId){
+	/**
+	 * Logs a recommendation interaction. 
+	 * @param origin Origin of the interaction. 
+	 * @param ip IP address of the user. 
+	 * @param queryId Identifier of the query. 
+	 * @param query JSON object representing the query. 
+	 * @return {@code true} if the input was logged; {@code false} otherwise. 
+	 */
+	public Boolean logQuery(JSONObject origin, String ip, String queryId, JSONObject query){
 		JSONObject input = new JSONObject();
 		// IP address 
 		input.put(Cst.TAG_IP, ip);
@@ -101,10 +119,18 @@ public class Logger {
 		content.put(Cst.TAG_QUERY, query);
 		content.put(Cst.TAG_QUERY_ID, queryId);
 		input.put(Cst.TAG_CONTENT, content);
-		log(Cst.INTERACTION_QUERY, input);
+		return log(Cst.INTERACTION_QUERY, input);
 	}
 
-	public void logDetailsQuery(JSONObject origin, String ip, String queryId, JSONObject detailsQuery){
+	/**
+	 * Logs a getDetails interaction. 
+	 * @param origin Origin of the interaction. 
+	 * @param ip IP address of the user. 
+	 * @param queryId Identifier of the query. 
+	 * @param detailsQuery JSON object representing the details query.
+	 * @return {@code true} if the input was logged; {@code false} otherwise.
+	 */
+	public Boolean logDetailsQuery(JSONObject origin, String ip, String queryId, JSONObject detailsQuery){
 		JSONObject input = new JSONObject();
 		// IP address 
 		input.put(Cst.TAG_IP, ip);
@@ -116,10 +142,18 @@ public class Logger {
 		content.put(Cst.TAG_DETAILS_QUERY, detailsQuery);
 		content.put(Cst.TAG_QUERY_ID, queryId);
 		input.put(Cst.TAG_CONTENT, content);
-		log(Cst.INTERACTION_DETAILS_QUERY, input);
+		return log(Cst.INTERACTION_DETAILS_QUERY, input);
 	}
 	
-	public void logRegularResults(JSONObject origin, String ip, String queryId, JSONObject results){
+	/**
+	 * Logs the results of a regular query interaction. 
+	 * @param origin Origin of the interaction. 
+	 * @param ip IP address of the user. 
+	 * @param queryId Identifier of the query. 
+	 * @param results JSON object representing the results corresponding to a query. 
+	 * @return {@code true} if the input was logged; {@code false} otherwise.
+	 */
+	public Boolean logRegularResults(JSONObject origin, String ip, String queryId, JSONObject results){
 		JSONObject input = new JSONObject();
 		input.put(Cst.TAG_IP, ip);
 		input.put(Cst.TAG_ORIGIN, origin);
@@ -127,18 +161,34 @@ public class Logger {
 		content.put(Cst.TAG_RESULTS, results);
 		content.put(Cst.TAG_QUERY_ID, queryId);
 		input.put(Cst.TAG_CONTENT, content);
-		log(Cst.INTERACTION_RESPONSE, input);
+		return log(Cst.INTERACTION_RESPONSE, input);
 	}
 	
-	public void logMergedResults(JSONObject origin, String ip, String queryId, JSONObject results){
+	/**
+	 * Logs the results of an obfuscated query interaction. 
+	 * @param origin Origin of the interaction. 
+	 * @param ip IP address of the user. 
+	 * @param queryId Identifier of the query. 
+	 * @param results JSON object representing the results corresponding to a query. 
+	 * @return {@code true} if the input was logged; {@code false} otherwise.
+	 */
+	public Boolean logMergedResults(JSONObject origin, String ip, String queryId, JSONObject results){
 		JSONObject input = new JSONObject();
 		input.put(Cst.TAG_IP, ip);
 		input.put(Cst.TAG_ORIGIN, origin);
 		input.put(Cst.TAG_CONTENT, results);
-		log(Cst.INTERACTION_RESPONSE, input);
+		return log(Cst.INTERACTION_RESPONSE, input);
 	}
 
-	public void logDetailsResults(JSONObject origin, String ip, String queryId, JSONObject results){
+	/**
+	 * Logs the results of a details query interaction. 
+	 * @param origin Origin of the interaction. 
+	 * @param ip IP address of the user. 
+	 * @param queryId Identifier of the query. 
+	 * @param results JSON object representing the results corresponding to a query. 
+	 * @return {@code true} if the input was logged; {@code false} otherwise.
+	 */
+	public Boolean logDetailsResults(JSONObject origin, String ip, String queryId, JSONObject results){
 		JSONObject input = new JSONObject();
 		input.put(Cst.TAG_IP, ip);
 		input.put(Cst.TAG_ORIGIN, origin);
@@ -146,7 +196,7 @@ public class Logger {
 		content.put(Cst.TAG_RESULTS, results);
 		content.put(Cst.TAG_QUERY_ID, queryId);
 		input.put(Cst.TAG_CONTENT, content);
-		log(Cst.INTERACTION_DETAILS_RESPONSE, input);
+		return log(Cst.INTERACTION_DETAILS_RESPONSE, input);
 	}
 	
 	private void writeEntry(JSONObject entry){
@@ -188,6 +238,11 @@ public class Logger {
 		return contains;
 	}
 
+	/**
+	 * Determines if an interaction must be logged based on the JSON input. 
+	 * @param input A JSON object. 
+	 * @return {@code true} is the interaction must be logged; {@code false} otherwise. 
+	 */
 	public static Boolean mustBeLogged(JSONObject input){
 		Boolean mustBeLogged = true;
 		if (input.has(Cst.TAG_LOGGING_LEVEL)){

@@ -215,27 +215,21 @@ public class QueryEngine {
 	}
 
 	/**
-	 * TODO
-	 * @param query
-	 * @return
+	 * Generates a query identifier. 
+	 * @param query A JSON object representing a query. 
+	 * @return An identifier (with no formal guarantee of uniqueness). 
 	 */
 	static public String generateQueryId(JSONObject query){
 		String queryId = "";
 		String queryIdAux = query.toString(); 
 		Date currentDate = new Date();
 		Long timestamp = currentDate.getTime(); 
-		queryId = QueryEngine.hash(queryIdAux, timestamp);
-		return queryId;
-	}
-	
-	static private String hash(Object o1, Object o2){
-		String output;
-		Integer hashCode = o1.hashCode() * o2.hashCode();
+		Integer hashCode = queryIdAux.hashCode() * timestamp.hashCode();
 		if (hashCode < 0){
 			hashCode = -hashCode;
 		}
-		output = hashCode.toString();
-		return output;
+		queryId = hashCode.toString();
+		return queryId;
 	}
 	
 }

@@ -15,7 +15,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
@@ -51,9 +50,9 @@ public class Issuer {
 
 	/**
 	 * Service providing recommendations for a query. 
-	 * @param origin Origin of the query. 
 	 * @param req HTTP request. 
-	 * @param servletResp HTTP response. 
+	 * @param servletResp HTTP response.
+	 * @param uriInfo URI information. 
 	 * @param query Query of format QF1 or QF2 (both are supported). 
 	 * @return A set of recommendations. The format is RF1 (respectively RF2) if the format of the query is QF1 (respectively QF2). 
 	 * @see QueryEngine
@@ -74,11 +73,11 @@ public class Issuer {
 			
 			Logger logger = Logger.getInstance();
 			
+			// Origin
 			JSONObject jsonOrigin = jsonQuery.getJSONObject(Cst.TAG_ORIGIN);
 			jsonQuery.remove(Cst.TAG_ORIGIN);
 			
-			jsonQuery.remove(Cst.TAG_LOGGING_LEVEL);
-			String ip = req.getRemoteAddr();
+			// Query ID
 			String queryId;
 			if (jsonQuery.has(Cst.TAG_QUERY_ID)){
 				queryId = jsonQuery.getString(Cst.TAG_QUERY_ID);
@@ -86,22 +85,38 @@ public class Issuer {
 				queryId = QueryEngine.generateQueryId(jsonQuery);
 				jsonQuery.put(Cst.TAG_QUERY_ID, queryId);
 			}
-			logger.logQuery(jsonOrigin, ip, jsonQuery, queryId);
-			jsonQuery.remove(Cst.TAG_LOGGING_LEVEL);
+			
+			// IP address 
+			String ip = req.getRemoteAddr();
+			
+			Boolean mustLog = true;
+			if (jsonQuery.has(Cst.TAG_LOGGING_LEVEL)){
+				mustLog = (jsonQuery.getInt(Cst.TAG_LOGGING_LEVEL) == 0);
+				jsonQuery.remove(Cst.TAG_LOGGING_LEVEL);
+			}			
+			
+			
+			if (mustLog){
+				logger.logQuery(jsonOrigin, ip, queryId, jsonQuery);
+			}
 
 			QueryEngine engine = QueryEngine.getInstance();
 			jsonQuery = engine.alterQuery(jsonQuery);
 			if (engine.isObfuscatedQuery(jsonQuery)){
 				resp = engine.processQuery(jsonQuery, QueryFormats.QF2, uriInfo);
 				JSONObject results = new JSONObject(resp.getEntity().toString());
-				logger.logMergedResults(jsonOrigin, ip, queryId, results);
+				if (mustLog){
+					logger.logMergedResults(jsonOrigin, ip, queryId, results);
+				}
 			} else {
 				resp = engine.processQuery(jsonQuery, QueryFormats.QF1, uriInfo);
 				JSONObject results = new JSONObject(resp.getEntity().toString());
-				logger.logRegularResults(jsonOrigin, ip, queryId, results);
+				if (mustLog){
+					logger.logRegularResults(jsonOrigin, ip, queryId, results);
+				}
 			}
 		} else {
-			resp = complianceManager.notCompliantRequestResponse(); 
+			resp = complianceManager.missingOriginRequestResponse(); 
 		}
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
@@ -128,10 +143,10 @@ public class Issuer {
 
 	/**
 	 * Service providing detailed information of a set of resources. 
-	 * @param origin Origin of the query. 
 	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
-	 * @param detailsQuery
+	 * @param uriInfo URI information.
+	 * @param detailsQuery Query of format QF3. 
 	 * @return A set of detailed results (i.e., document badges). 
 	 */
 	@POST
@@ -142,7 +157,7 @@ public class Issuer {
 		Response resp = Response.ok().build();
 		JSONObject jsonDetailsQuery = new JSONObject(detailsQuery);
 		Logger logger = Logger.getInstance();
-		if (complianceManager.containsCompliantOrigin(jsonDetailsQuery) && jsonDetailsQuery.has(Cst.TAG_QUERY_ID)){
+		if (complianceManager.containsCompliantOrigin(jsonDetailsQuery) && complianceManager.containsQueryId(jsonDetailsQuery)){
 			JSONObject jsonOrigin = jsonDetailsQuery.getJSONObject(Cst.TAG_ORIGIN);
 			jsonDetailsQuery.remove(Cst.TAG_ORIGIN); 
 			jsonDetailsQuery.remove(Cst.TAG_LOGGING_LEVEL); 
@@ -161,8 +176,10 @@ public class Issuer {
 			} else {
 				resp = Response.status(resp.getStatus()).build();
 			}
+		} else if (!complianceManager.containsCompliantOrigin(jsonDetailsQuery)){
+			resp = complianceManager.missingOriginRequestResponse();
 		} else {
-			resp = Response.status(Status.BAD_REQUEST).build();
+			resp = complianceManager.missingQueryIdRequestResponse();
 		}
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
@@ -188,8 +205,7 @@ public class Issuer {
 
 	/** 
 	 * Service logging interactions. 
-	 * @param interactionType
-	 * @param origin Origin of the query. 
+	 * @param interactionType Type of interaction to be logged. 
 	 * @param req HTTP request. 
 	 * @param servletResp HTTP response. 
 	 * @param input Content to log. 
@@ -212,7 +228,7 @@ public class Issuer {
 				resp = Response.serverError().build();
 			}
 		} else {
-			resp = Response.status(Status.BAD_REQUEST).build();
+			resp = complianceManager.missingOriginRequestResponse();
 		}
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
@@ -292,6 +308,7 @@ public class Issuer {
 	 * This service only forwards the query to the federated recommender, 
 	 * and returns the result. 
 	 * @param servletResp HTTP response. 
+	 * @param uriInfo URI information.
 	 * @return The list of partners registered on the federated recommender. 
 	 */
 	@GET
@@ -308,6 +325,7 @@ public class Issuer {
 	 * Service providing the favicon of a given partner. 
 	 * @param servletResp HTTP response. 
 	 * @param partnerId Identifier of a partner. 
+	 * @param uriInfo URI information.
 	 * @return An image (image/png). 
 	 */
 	@GET
@@ -323,7 +341,8 @@ public class Issuer {
 	/**
 	 * Service providing a default image if a media is missing. 
 	 * @param servletResp HTTP response. 
-	 * @param type Type of the missing media. Possible values are : text, audio, 3d, image, video, other, unknown.  
+	 * @param type Type of the missing media. Possible values are : text, audio, 3d, image, video, other, unknown. 
+	 * @param uriInfo URI information.
 	 * @return An image (image/png). 
 	 */
 	@GET
@@ -337,11 +356,11 @@ public class Issuer {
 	}
 
 	/**
-	 * TODO
+	 * Service providing a set of categories given an input. 
 	 * @param servletResp HTTP response.
-	 * @param uriInfo
-	 * @param input
-	 * @return
+	 * @param uriInfo URI information. 
+	 * @param input A term and a language (e.g., {"input":"war", "language":"en"}). 
+	 * @return A set of categories related to the input. 
 	 */
 	@POST
 	@Path(Cst.PATH_SUGGEST_CATEGORIES)
@@ -355,9 +374,9 @@ public class Issuer {
 	}
 
 	/**
-	 * TODO
+	 * Default service providing a set of categories given an input. 
 	 * @param servletResp HTTP response.
-	 * @return
+	 * @return An empty response with status OK. 
 	 */
 	@OPTIONS
 	@Path(Cst.PATH_SUGGEST_CATEGORIES)
@@ -371,11 +390,11 @@ public class Issuer {
 	}
 
 	/**
-	 * TODO
+	 * Service providing entity recognition. 
 	 * @param servletResp HTTP response.
-	 * @param uriInfo
-	 * @param input
-	 * @return
+	 * @param uriInfo URI information. 
+	 * @param input TODO
+	 * @return TODO
 	 */
 	@POST
 	@Path(Cst.PATH_RECOGNIZE_ENTITY)
@@ -389,10 +408,9 @@ public class Issuer {
 	}
 
 	/**
-	 * TODO
+	 * Default service providing entity recognition. 
 	 * @param servletResp HTTP response. 
-	 * @param uriInfo
-	 * @return
+	 * @return An empty response with status OK. 
 	 */
 	@OPTIONS
 	@Path(Cst.PATH_RECOGNIZE_ENTITY)
