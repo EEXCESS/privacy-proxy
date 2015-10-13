@@ -61,6 +61,7 @@ public class Cst {
 	public static final String TAG_CLIENT_TYPE = "clientType"; 
 	public static final String TAG_CLIENT_VERSION = "clientVersion";
 	public static final String TAG_MODULE = "module";
+	public static final String TAG_LOGGING_LEVEL = "loggingLevel";
 	
 	// Dictionary and Co-occurence graph
 	public static final String TAG_TERM = "term";

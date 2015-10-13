@@ -209,4 +209,13 @@ public class Logger {
 		return output;
 	}
 
+	public static Boolean mustBeLogged(JSONObject input){
+		Boolean mustBeLogged = true;
+		if (input.has(Cst.TAG_LOGGING_LEVEL)){
+			mustBeLogged = (input.getInt(Cst.TAG_LOGGING_LEVEL) == 0);
+			input.remove(Cst.TAG_LOGGING_LEVEL);
+		}
+		return mustBeLogged;
+	}
+	
 }

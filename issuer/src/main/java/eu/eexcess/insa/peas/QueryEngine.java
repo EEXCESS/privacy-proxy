@@ -112,10 +112,14 @@ public class QueryEngine {
 			serviceUrl = Cst.SERVICE_GET_DETAILS;
 		} 
 		resp = RequestForwarder.forwardPostRequest(serviceUrl, MediaType.APPLICATION_JSON, String.class, uriInfo.getQueryParameters(), query.toString());
-		String output = resp.getEntity().toString();
-		if (type.equals(QueryFormats.QF3) && (resp.getStatus() == Response.Status.OK.getStatusCode())){
-			output = correctDetailField(output);
-			resp = Response.ok().entity(output).build();
+		if (resp.getStatus() == Response.Status.OK.getStatusCode()){
+			if (type.equals(QueryFormats.QF3)){
+				String output = resp.getEntity().toString();
+				output = correctDetailField(output);
+				resp = Response.ok().entity(output).build();
+			}
+		} else {
+			resp = Response.status(resp.getStatus()).build();
 		}
 		return resp;
 	}

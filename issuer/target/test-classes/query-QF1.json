@@ -4,7 +4,6 @@
 		"clientType": "EEXCESS - Google Chrome Extension", 
 		"clientVersion": "2beta", 
 		"module": "testing"
-	
 	},
 	"numResults":3,
 	"contextKeywords":[{
@@ -13,5 +12,6 @@
 	},{
 		"text":"vienna", 
 		"weight":0.1
-	}]
+	}], 
+	"loggingLevel": 0
 }

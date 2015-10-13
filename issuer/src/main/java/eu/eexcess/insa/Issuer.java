@@ -71,13 +71,16 @@ public class Issuer {
 		JSONObject jsonQuery = new JSONObject(query);
 		
 		if (complianceManager.containsCompliantOrigin(jsonQuery)){
+			
 			Logger logger = Logger.getInstance();
 			
 			JSONObject jsonOrigin = jsonQuery.getJSONObject(Cst.TAG_ORIGIN);
 			jsonQuery.remove(Cst.TAG_ORIGIN);
+			jsonQuery.remove(Cst.TAG_LOGGING_LEVEL);
 			String ip = req.getRemoteAddr();
 			String queryId = logger.logQuery(jsonOrigin, ip, jsonQuery);
 			jsonQuery.put(Cst.TAG_QUERY_ID, queryId);
+			jsonQuery.remove(Cst.TAG_LOGGING_LEVEL);
 
 			QueryEngine engine = QueryEngine.getInstance();
 			jsonQuery = engine.alterQuery(jsonQuery);
@@ -135,6 +138,7 @@ public class Issuer {
 		if (complianceManager.containsCompliantOrigin(jsonDetailsQuery) && jsonDetailsQuery.has(Cst.TAG_QUERY_ID)){
 			JSONObject jsonOrigin = jsonDetailsQuery.getJSONObject(Cst.TAG_ORIGIN);
 			jsonDetailsQuery.remove(Cst.TAG_ORIGIN); 
+			jsonDetailsQuery.remove(Cst.TAG_LOGGING_LEVEL); 
 			String queryId = jsonDetailsQuery.getString(Cst.TAG_QUERY_ID);
 			jsonDetailsQuery.remove(Cst.TAG_QUERY_ID); 
 			String ip = req.getRemoteAddr();
@@ -142,10 +146,14 @@ public class Issuer {
 
 			QueryEngine engine = QueryEngine.getInstance();
 			resp = engine.processQuery(jsonDetailsQuery, QueryFormats.QF3, uriInfo);
-			JSONObject results = new JSONObject(resp.getEntity().toString());
-			results.put(Cst.TAG_QUERY_ID, queryId);
-			resp = Response.ok().entity(results.toString()).build();
-			logger.logDetailsResults(jsonOrigin, ip, queryId, results);
+			if (resp.getStatus() == Response.Status.OK.getStatusCode()){
+				JSONObject results = new JSONObject(resp.getEntity().toString());
+				results.put(Cst.TAG_QUERY_ID, queryId);
+				resp = Response.ok().entity(results.toString()).build();
+				logger.logDetailsResults(jsonOrigin, ip, queryId, results);
+			} else {
+				resp = Response.status(resp.getStatus()).build();
+			}
 		} else {
 			resp = Response.status(Status.BAD_REQUEST).build();
 		}
