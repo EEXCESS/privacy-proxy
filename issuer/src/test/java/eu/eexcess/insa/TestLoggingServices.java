@@ -377,7 +377,7 @@ public class TestLoggingServices {
 	
 	@Test
 	public void logOptions(){
-		Response response = RequestForwarder.forwardOptionsRequest(loggingUrl, MediaType.APPLICATION_JSON, String.class);
+		Response response = RequestForwarder.forwardOptionsRequest(loggingUrl  + Cst.INTERACTION_ITEM_BOOKMARKED, MediaType.APPLICATION_JSON, String.class);
 		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 	}
 		

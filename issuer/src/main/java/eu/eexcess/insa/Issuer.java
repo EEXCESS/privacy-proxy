@@ -214,6 +214,7 @@ public class Issuer {
 	@POST
 	@Path(Cst.PATH_LOG + "/{" + Cst.PARAM_INTERACTION_TYPE + "}")
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response log(@PathParam(Cst.PARAM_INTERACTION_TYPE) String interactionType,
 			@Context HttpServletRequest req, @Context HttpServletResponse servletResp,
 			String input) {
@@ -242,8 +243,9 @@ public class Issuer {
 	 * @return An empty response with status OK. 
 	 */
 	@OPTIONS
-	@Path(Cst.PATH_LOG)
+	@Path(Cst.PATH_LOG + "/{" + Cst.PARAM_INTERACTION_TYPE + "}")
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response log(@Context HttpServletResponse servletResp) {
 		servletResp.setHeader(Cst.ACA_ORIGIN_KEY, Cst.ACA_ORIGIN_VALUE);
 		servletResp.setHeader(Cst.ACA_HEADERS_KEY, Cst.ACA_HEADERS_VALUE);
