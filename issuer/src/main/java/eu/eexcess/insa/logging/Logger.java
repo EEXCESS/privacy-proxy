@@ -84,11 +84,14 @@ public class Logger {
 			// Query ID
 			String queryId = "";
 			if (interactionType.equals(Cst.INTERACTION_QUERY)){
-
-			} else {
-				if (input.has(Cst.TAG_QUERY_ID)){
-					queryId = input.getString(Cst.TAG_QUERY_ID);
+				if (input.has(Cst.TAG_QUERY)){
+					JSONObject query = input.getJSONObject(Cst.TAG_QUERY);
+					if (query.has(Cst.TAG_QUERY_ID)){
+						queryId = query.getString(Cst.TAG_QUERY_ID);
+					}
 				}
+			} else if (input.has(Cst.TAG_QUERY_ID)){
+				queryId = input.getString(Cst.TAG_QUERY_ID);
 			}
 			if (!queryId.equals("")){
 				JSONObject content = entry.getJSONObject(Cst.TAG_CONTENT);
