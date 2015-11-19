@@ -111,7 +111,7 @@ public class Issuer {
 			} else {
 				resp = engine.processQuery(jsonQuery, QueryFormats.QF1, uriInfo);
 				JSONObject results = new JSONObject();
-				if (resp.getStatus() == Response.Status.ACCEPTED.getStatusCode()){
+				if (resp.getStatus() == Response.Status.OK.getStatusCode()){
 					results = new JSONObject(resp.getEntity().toString());
 				} 
 				if (mustLog){

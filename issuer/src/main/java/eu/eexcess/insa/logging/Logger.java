@@ -164,6 +164,7 @@ public class Logger {
 		content.put(Cst.TAG_RESULTS, results);
 		content.put(Cst.TAG_QUERY_ID, queryId);
 		input.put(Cst.TAG_CONTENT, content);
+		System.out.println("regular: " + input);
 		return log(Cst.INTERACTION_RESPONSE, input);
 	}
 	
